@@ -1,16 +1,29 @@
 use bevy::prelude::*;
 
+use hectic_dungeon::ui::UIPlugin;
+
 fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
-        .run();
+    let window_descriptor = WindowDescriptor {
+        present_mode: bevy::window::PresentMode::Fifo,
+        title: "hectic_dungeon".into(),
+        ..default()
+    };
+
+    let mut app = App::new();
+
+    app.insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
+        .insert_resource(window_descriptor);
+
+    // 3rd party plugins
+    app.add_plugins(DefaultPlugins);
+
+    // internal plugins
+    app.add_plugin(UIPlugin);
+
+    // systems
+    app.add_startup_system(setup);
+
+    app.run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SpriteBundle {
-        texture: asset_server.load("icon.png"),
-        ..Default::default()
-    });
-}
+fn setup(mut commands: Commands) {}
