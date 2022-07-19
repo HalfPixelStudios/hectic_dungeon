@@ -22,12 +22,17 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
-            .add_system(spawn_player)
-            .add_system(player_controller);
+            .add_event::<SpawnPlayerEvent>()
+            .add_system(player_controller)
+            .add_startup_system(setup);
     }
 }
 
-fn spawn_player(mut cmd: Commands) {
+fn setup(mut cmd: Commands) {
+    spawn_player(&mut cmd)
+}
+
+fn spawn_player(cmd: &mut Commands) {
     let input_map = InputMap::new([
         (KeyCode::Left, PlayerAction::Left),
         (KeyCode::A, PlayerAction::Left),
@@ -51,19 +56,24 @@ fn spawn_player(mut cmd: Commands) {
 }
 
 fn player_controller(mut cmd: Commands, query: Query<&ActionState<PlayerAction>, With<Player>>) {
-    let action_state = query.single();
-    let mut dir = IVec2::ZERO;
+    if let Ok(action_state) = query.get_single() {
+        let mut dir = IVec2::ZERO;
 
-    if action_state.just_pressed(PlayerAction::Left) {
-        dir += IVec2::new(-1, 0);
-    }
-    if action_state.just_pressed(PlayerAction::Right) {
-        dir += IVec2::new(1, 0);
-    }
-    if action_state.just_pressed(PlayerAction::Up) {
-        dir += IVec2::new(0, -1);
-    }
-    if action_state.just_pressed(PlayerAction::Left) {
-        dir += IVec2::new(0, 1);
+        if action_state.just_pressed(PlayerAction::Left) {
+            dir += IVec2::new(-1, 0);
+        }
+        if action_state.just_pressed(PlayerAction::Right) {
+            dir += IVec2::new(1, 0);
+        }
+        if action_state.just_pressed(PlayerAction::Up) {
+            dir += IVec2::new(0, -1);
+        }
+        if action_state.just_pressed(PlayerAction::Down) {
+            dir += IVec2::new(0, 1);
+        }
+
+        if dir != IVec2::ZERO {
+            info!("{}", dir);
+        }
     }
 }

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use hectic_dungeon::ui::UIPlugin;
+use hectic_dungeon::{player::PlayerPlugin, ui::UIPlugin};
 
 fn main() {
     let window_descriptor = WindowDescriptor {
@@ -18,7 +18,7 @@ fn main() {
     app.add_plugins(DefaultPlugins);
 
     // internal plugins
-    app.add_plugin(UIPlugin);
+    app.add_plugin(UIPlugin).add_plugin(PlayerPlugin);
 
     // systems
     app.add_startup_system(setup);
