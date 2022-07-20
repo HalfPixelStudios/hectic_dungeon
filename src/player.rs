@@ -1,13 +1,11 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
 
-pub struct SpawnPlayerEvent;
+use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition};
+use leafwing_input_manager::prelude::*;
 
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component)]
-pub struct GridPosition(pub IVec2);
 
 #[derive(Actionlike, Clone)]
 pub enum PlayerAction {
@@ -17,45 +15,63 @@ pub enum PlayerAction {
     Down,
 }
 
-pub struct PlayerPlugin;
 
-impl Plugin for PlayerPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
-            .add_event::<SpawnPlayerEvent>()
-            .add_system(player_controller)
-            .add_startup_system(setup);
+pub struct SpawnPlayerEvent {
+    pub spawn_pos: Vec2,
+}
+
+fn spawn_player(
+    mut cmd: Commands,
+    mut events: EventReader<SpawnPlayerEvent>,
+    asset_sheet: Res<SpriteSheets>,
+    prefab_data: Res<PrefabData>,
+    beings: Res<Assets<BeingPrefab>>
+) {
+    for SpawnPlayerEvent { spawn_pos } in events.iter() {
+        let input_map = InputMap::new([
+            (KeyCode::Left, PlayerAction::Left),
+            (KeyCode::A, PlayerAction::Left),
+            (KeyCode::Right, PlayerAction::Right),
+            (KeyCode::D, PlayerAction::Right),
+            (KeyCode::Up, PlayerAction::Up),
+            (KeyCode::W, PlayerAction::Up),
+            (KeyCode::Down, PlayerAction::Down),
+            (KeyCode::S, PlayerAction::Down),
+        ]);
+
+
+        let player = beings.get(prefab_data.get("archer").unwrap()).unwrap();
+        cmd.spawn()
+            .insert_bundle(SpriteSheetBundle {
+                sprite: TextureAtlasSprite {
+                    index:0,
+                    ..default()
+                },
+                texture_atlas: asset_sheet.get("archer").unwrap().clone(),
+                transform: Transform {
+                    translation: spawn_pos.extend(0.),
+                    ..default()
+                },
+                ..default()
+            })
+            .insert(Animation::new(&player.anim))
+            .insert(Player)
+            .insert(GridPosition(IVec2::ZERO))
+            .insert_bundle(InputManagerBundle::<PlayerAction> {
+                action_state: ActionState::default(),
+                input_map,
+            });
+
+            
+
     }
 }
 
-fn setup(mut cmd: Commands) {
-    spawn_player(&mut cmd)
-}
 
-fn spawn_player(cmd: &mut Commands) {
-    let input_map = InputMap::new([
-        (KeyCode::Left, PlayerAction::Left),
-        (KeyCode::A, PlayerAction::Left),
-        (KeyCode::Right, PlayerAction::Right),
-        (KeyCode::D, PlayerAction::Right),
-        (KeyCode::Up, PlayerAction::Up),
-        (KeyCode::W, PlayerAction::Up),
-        (KeyCode::Down, PlayerAction::Down),
-        (KeyCode::S, PlayerAction::Down),
-    ]);
 
-    let e = cmd.spawn().id();
-
-    cmd.entity(e)
-        .insert(Player)
-        .insert(GridPosition(IVec2::ZERO))
-        .insert_bundle(InputManagerBundle::<PlayerAction> {
-            action_state: ActionState::default(),
-            input_map,
-        });
-}
 
 fn player_controller(mut cmd: Commands, query: Query<&ActionState<PlayerAction>, With<Player>>) {
+    
     if let Ok(action_state) = query.get_single() {
         let mut dir = IVec2::ZERO;
 
@@ -77,3 +93,14 @@ fn player_controller(mut cmd: Commands, query: Query<&ActionState<PlayerAction>,
         }
     }
 }
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+            .add_event::<SpawnPlayerEvent>()
+            .add_system(player_controller)
+            .add_system(spawn_player);
+    }
+}
+
