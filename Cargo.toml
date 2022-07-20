@@ -14,8 +14,12 @@ bevy_ui = ["bevy/bevy_ui", "bevy/bevy_text", "bevy/bevy_render"]
 
 [dependencies]
 bevy = { version = "0.7.0", default-features = false, features = [ "render", "animation", "bevy_winit", "bevy_gilrs", "png", "hdr", "filesystem_watcher", "x11", "trace" ] }
+ron = "0.7"
 
+iyes_loopless = "0.6.1"
+anyhow = "1.0.58"
 autodefault = { version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 rand = { version = "0.8.5" }
+enum-map = {version = "2.4.0", features = ["serde"]}
 

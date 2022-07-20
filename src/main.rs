@@ -1,16 +1,36 @@
+use bevy::asset::AssetLoader;
 use bevy::prelude::*;
+use bevy::animation::*;
+use hectic_dungeon::animation::AnimatePlugin;
+use hectic_dungeon::assets::*;
+use hectic_dungeon::camera::CameraPlugin;
+use hectic_dungeon::player::PlayerPlugin;
+use hectic_dungeon::player::SpawnPlayerEvent;
+pub enum AppState{
+    Menu,
+    InGame,
+}
 
 fn main() {
-    App::new()
+    App::new() 
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
+        .add_plugin(AssetLoadPlugin)
+        .add_plugin(PlayerPlugin)
+        .add_plugin(AnimatePlugin)
+        .add_plugin(CameraPlugin)
+        .add_system(debug)
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SpriteBundle {
-        texture: asset_server.load("icon.png"),
-        ..Default::default()
-    });
+fn debug(
+    keys: Res<Input<KeyCode>>,
+    mut spawn_player: EventWriter<SpawnPlayerEvent>,
+) {
+    if keys.just_pressed(KeyCode::T) {
+        info!("send event");
+        spawn_player.send(SpawnPlayerEvent{spawn_pos: Vec2::ZERO});
+
+    }
+    if keys.just_pressed(KeyCode::Q) {
+    }
 }
