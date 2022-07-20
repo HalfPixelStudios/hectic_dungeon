@@ -4,20 +4,27 @@ use bevy::animation::*;
 use hectic_dungeon::animation::AnimatePlugin;
 use hectic_dungeon::assets::*;
 use hectic_dungeon::camera::CameraPlugin;
-use hectic_dungeon::player::PlayerPlugin;
 use hectic_dungeon::player::SpawnPlayerEvent;
 pub enum AppState{
     Menu,
     InGame,
 }
 
+use hectic_dungeon::{player::PlayerPlugin, ui::UIPlugin};
+
 fn main() {
     App::new() 
+        .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
+        .insert_resource(WindowDescriptor{
+            present_mode: bevy::window::PresentMode::Fifo,
+            title: "Hectic Dungeon".into(),
+            ..default()})
         .add_plugins(DefaultPlugins)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(AnimatePlugin)
         .add_plugin(CameraPlugin)
+        .add_plugin(UIPlugin)
         .add_system(debug)
         .run();
 }

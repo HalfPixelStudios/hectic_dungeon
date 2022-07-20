@@ -31,7 +31,6 @@ pub struct Animation {
 }
 impl Animation {
     pub fn new(prefab:&AnimationPrefab) -> Self {
-        info!(prefab.speed);
         Self {
             frames:prefab.frames.clone(),
             index: prefab.frames[AniState::Idle].start,
@@ -56,7 +55,6 @@ pub fn animate(time: Res<Time>, mut animations: Query<(&mut Animation, &mut Text
             sprite.index = ani.index as usize;
             ani.index += 1;
 
-            info!("{}", ani.index);
         }
         
     }
