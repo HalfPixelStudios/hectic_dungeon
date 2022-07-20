@@ -4,6 +4,7 @@ use bevy::animation::*;
 use hectic_dungeon::animation::AnimatePlugin;
 use hectic_dungeon::assets::*;
 use hectic_dungeon::camera::CameraPlugin;
+use hectic_dungeon::movement::MovementPlugin;
 use hectic_dungeon::player::SpawnPlayerEvent;
 pub enum AppState{
     Menu,
@@ -25,6 +26,7 @@ fn main() {
         .add_plugin(AnimatePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
+        .add_plugin(MovementPlugin)
         .add_system(debug)
         .run();
 }

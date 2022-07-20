@@ -20,7 +20,7 @@ pub struct SpawnPlayerEvent {
     pub spawn_pos: Vec2,
 }
 
-fn spawn_player(
+fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnPlayerEvent>,
     asset_sheet: Res<SpriteSheets>,
@@ -69,10 +69,10 @@ fn spawn_player(
 
 
 
-
-fn player_controller(mut cmd: Commands, query: Query<&ActionState<PlayerAction>, With<Player>>) {
+//TODO check collision with tiled map
+fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &ActionState<PlayerAction>), With<Player>>) {
     
-    if let Ok(action_state) = query.get_single() {
+    if let Ok((mut grid_position, action_state)) = query.get_single_mut() {
         let mut dir = IVec2::ZERO;
 
         if action_state.just_pressed(PlayerAction::Left) {
@@ -91,6 +91,8 @@ fn player_controller(mut cmd: Commands, query: Query<&ActionState<PlayerAction>,
         if dir != IVec2::ZERO {
             info!("{}", dir);
         }
+        grid_position.0+=dir;
+
     }
 }
 pub struct PlayerPlugin;
@@ -99,8 +101,8 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
             .add_event::<SpawnPlayerEvent>()
-            .add_system(player_controller)
-            .add_system(spawn_player);
+            .add_system(controller)
+            .add_system(spawn);
     }
 }
 

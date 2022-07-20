@@ -7,3 +7,4 @@ pub mod map;
 pub mod player;
 pub mod ui;
 pub mod grid;
+pub mod movement;
