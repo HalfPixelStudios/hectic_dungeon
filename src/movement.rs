@@ -1,30 +1,35 @@
 use bevy::prelude::*;
 
-use crate::grid::{GridPosition, to_world_coords};
+use crate::{grid::{GridPosition, to_world_coords, snap_to_grid}, animation::AniState};
 
-const THRESHOLD:f32 = 2.;
+const THRESHOLD:f32 = 4.;
 
     
-// }
-//2 ideas
-//calculate distance from current position to grid position. if dist is greater
-//than a threshold, keep moving towards the target. 
-//Second idea, keep a track of last position, 
-// Also have constant speed with timer?
-fn movement(mut query:Query<(&GridPosition, &mut Transform)>){
-    for (grid_pos, mut transform) in query.iter_mut(){
-        let pos = to_world_coords(grid_pos);
-        if transform.translation.truncate().distance(pos)>THRESHOLD{
+// store grid pos, or next move?
+#[derive(Component)]
+pub struct Movement{
+    // time to get to next grid cell
+    pub timer: Timer,
+    // the move dir, 0 if nothing
+    pub next_move: IVec2,
+    
+}
+fn movement(mut query:Query<(&mut GridPosition, &mut Movement, &mut Transform)>){
+    for (mut grid_pos, mut mv, mut transform) in query.iter_mut(){
+        if mv.next_move == IVec2::ZERO{
+            return 
+        }
+        let next_pos = to_world_coords(&(grid_pos.0+mv.next_move));
+        let cur_pos = transform.translation.truncate();
+        if cur_pos.distance(next_pos)>THRESHOLD{
+            transform.translation += mv.next_move.as_vec2().extend(0.)*1.8;
         }
         else{
-            transform.translation.x = pos.x;
-            transform.translation.y = pos.y;
+            transform.translation = next_pos.extend(transform.translation.z);
+            grid_pos.0 +=mv.next_move;
+            mv.next_move = IVec2::ZERO;
         }
-
-
     }
-
-
 }
 
 

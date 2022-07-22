@@ -1,15 +1,17 @@
 use bevy::prelude::*;
 
-const CELLWIDTH:i32 = 32;
-const CELLHEIGHT:i32 = 32;
+const CELLWIDTH:i32 = 16;
+const CELLHEIGHT:i32 = 16;
 
 #[derive(Component,DerefMut,Deref)]
 pub struct GridPosition(pub IVec2);
 
-pub fn to_world_coords(p: &GridPosition)-> Vec2{
+pub fn to_world_coords(p: &IVec2)-> Vec2{
     Vec2::new((p.x*CELLWIDTH) as f32,(p.y*CELLWIDTH) as f32)
 }
-pub fn snap_to_grid(pos: Vec2) -> IVec2 {
-    let mut snapped = ((pos / CELLWIDTH as f32).ceil() * CELLWIDTH as f32).round();
-    IVec2::new(snapped.x as i32, snapped.y as i32)
+pub fn snap_to_grid(p: Vec2) -> IVec2 {
+    info!("{:?}",p);
+    Vec2::new((p.x/CELLWIDTH as f32),(p.y*CELLWIDTH as f32)).as_ivec2()
+
+
 }
