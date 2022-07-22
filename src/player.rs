@@ -2,13 +2,13 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 
-use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition, movement::Movement};
+use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::{GridPosition, to_world_coords}, movement::Movement};
 use leafwing_input_manager::prelude::*;
 
 #[derive(Component)]
 pub struct Player;
 
-
+//TODO add direction vectors to PlayerAction definition
 #[derive(Actionlike, Clone)]
 pub enum PlayerAction {
     Left,
@@ -16,7 +16,7 @@ pub enum PlayerAction {
     Up,
     Down,
 }
-
+pub struct PlayerMovedEvent;
 
 pub struct SpawnPlayerEvent {
     pub spawn_pos: Vec2,
@@ -58,14 +58,14 @@ fn spawn(
             })
             .insert(Animation::new(&player.anim))
             .insert(Player)
-            .insert(GridPosition(IVec2::ZERO))
+            .insert(GridPosition::new(spawn_pos))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,
             })
             .insert(Movement{
-                timer: Timer::from_seconds(0.9, true),
-                next_move: IVec2::ZERO
+                next_move: IVec2::ZERO,
+                frame: 0.
             });
 
             
@@ -76,7 +76,8 @@ fn spawn(
 
 
 //TODO check collision with tiled map
-fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &mut Movement, &ActionState<PlayerAction>), With<Player>>) {
+fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &mut Movement, &ActionState<PlayerAction>), With<Player>>, mut player_moved: EventWriter<PlayerMovedEvent>) {
+    
     
     if let Ok((mut grid_position, mut movement, action_state)) = query.get_single_mut() {
         let mut dir = IVec2::ZERO;
@@ -94,11 +95,13 @@ fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &mut Movem
             dir += IVec2::new(0, -1);
         }
 
-        if dir != IVec2::ZERO {
-            info!("{}", dir);
-        }
         if movement.next_move==IVec2::ZERO{
-            movement.next_move=dir;
+            if dir != IVec2::ZERO {
+                player_moved.send(PlayerMovedEvent);
+                movement.next_move=dir;
+
+            }
+
         }
 
     }
@@ -109,6 +112,7 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
             .add_event::<SpawnPlayerEvent>()
+            .add_event::<PlayerMovedEvent>()
             .add_system(controller)
             .add_system(spawn);
     }
