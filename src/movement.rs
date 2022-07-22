@@ -17,6 +17,15 @@ pub struct Movement{
     pub frame: f32
     
 }
+impl Movement{
+    pub fn new() -> Self {
+        return Movement{
+            next_move: IVec2::ZERO,
+            frame:0.
+        }
+    }
+}
+
 //time based lerp; make mv.frame/t = 1 where t = time to move between squares
 fn movement(mut query:Query<(&mut GridPosition, &mut Movement, &mut Transform)>){
     for (mut grid_pos, mut mv, mut transform) in query.iter_mut(){

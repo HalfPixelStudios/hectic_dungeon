@@ -63,10 +63,7 @@ fn spawn(
                 action_state: ActionState::default(),
                 input_map,
             })
-            .insert(Movement{
-                next_move: IVec2::ZERO,
-                frame: 0.
-            });
+            .insert(Movement::new());
 
             
 

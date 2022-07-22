@@ -36,10 +36,7 @@ fn spawn(
             })
             .insert(Animation::new(&enemy.anim))
             .insert(GridPosition::new(spawn_pos))
-            .insert(Movement{
-                next_move: IVec2::ZERO,
-                frame: 0.
-            })
+            .insert(Movement::new())
             .insert(Enemy);
 
             
