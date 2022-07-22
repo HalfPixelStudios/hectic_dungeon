@@ -8,7 +8,7 @@ use leafwing_input_manager::prelude::*;
 #[derive(Component)]
 pub struct Player;
 
-
+//TODO add direction vectors to PlayerAction definition
 #[derive(Actionlike, Clone)]
 pub enum PlayerAction {
     Left,
@@ -64,8 +64,8 @@ fn spawn(
                 input_map,
             })
             .insert(Movement{
-                delay: Timer::from_seconds(1.0, false),
-                next_move: IVec2::ZERO
+                next_move: IVec2::ZERO,
+                frame: 0.
             });
 
             
@@ -77,6 +77,7 @@ fn spawn(
 
 //TODO check collision with tiled map
 fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &mut Movement, &ActionState<PlayerAction>), With<Player>>, mut player_moved: EventWriter<PlayerMovedEvent>) {
+    
     
     if let Ok((mut grid_position, mut movement, action_state)) = query.get_single_mut() {
         let mut dir = IVec2::ZERO;

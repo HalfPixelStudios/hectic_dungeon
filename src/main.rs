@@ -6,18 +6,18 @@ use hectic_dungeon::assets::*;
 use hectic_dungeon::camera::CameraPlugin;
 use hectic_dungeon::enemy::EnemyPlugin;
 use hectic_dungeon::enemy::SpawnEnemyEvent;
+use hectic_dungeon::game::GameState;
 use hectic_dungeon::movement::MovementPlugin;
 use hectic_dungeon::player::PlayerMovedEvent;
 use hectic_dungeon::player::SpawnPlayerEvent;
-pub enum AppState{
-    Menu,
-    InGame,
-}
+
 
 use hectic_dungeon::{player::PlayerPlugin, ui::UIPlugin};
+use iyes_loopless::prelude::AppLooplessStateExt;
 
 fn main() {
     App::new() 
+        .add_loopless_state(GameState::EnemyPhase)
         .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
         .insert_resource(WindowDescriptor{
             present_mode: bevy::window::PresentMode::Fifo,

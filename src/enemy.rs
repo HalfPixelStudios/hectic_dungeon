@@ -1,6 +1,7 @@
 use bevy::prelude::*;
+use iyes_loopless::prelude::ConditionSet;
 
-use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition, movement::Movement, player::PlayerMovedEvent};
+use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition, movement::Movement, player::PlayerMovedEvent, game::GameState};
 
 
 #[derive(Component)]
@@ -36,8 +37,8 @@ fn spawn(
             .insert(Animation::new(&enemy.anim))
             .insert(GridPosition::new(spawn_pos))
             .insert(Movement{
-                delay: Timer::from_seconds(1., false),
-                next_move: IVec2::ZERO
+                next_move: IVec2::ZERO,
+                frame: 0.
             })
             .insert(Enemy);
 
@@ -45,14 +46,16 @@ fn spawn(
 
     }
 }
-fn ai(mut query: Query<(&mut GridPosition, &mut Movement),With<Enemy>>,
+fn ai(mut query: Query<(&Transform, &mut GridPosition, &mut Movement),With<Enemy>>,
       mut events:EventReader<PlayerMovedEvent>){
-    for PlayerMovedEvent in events.iter(){
-        for (mut grid_pos, mut mv) in query.iter_mut(){
-            info!("move");
-            mv.next_move = IVec2::X;
 
-        }
+    for (transform, mut grid_pos, mut mv) in query.iter_mut(){
+        info!("move{}",transform.translation);
+        
+        
+        mv.next_move = -IVec2::X;
+
+
     }
 
     
@@ -65,7 +68,12 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnEnemyEvent>()
             .add_system(spawn)
-            .add_system(ai);
+            .add_system_set(
+                ConditionSet::new()
+                .run_on_event::<PlayerMovedEvent>() 
+                .with_system(ai)
+                .into()
+                );
     }
     
 }
