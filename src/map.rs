@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use autodefault::autodefault;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::layers::ZLayers;
 
 
 pub struct MapPlugin;

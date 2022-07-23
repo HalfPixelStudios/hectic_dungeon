@@ -14,12 +14,7 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup)
             .insert_resource(Cursor(Vec2::ZERO))
-            .add_system(cursor_system)
-            .add_system_set(
-                SystemSet::new()
-                    .with_system(camera_movement)
-                    .with_system(camera_zoom),
-            );
+            .add_system(cursor_system);
         // .add_system(camera_controller);
     }
 }
@@ -34,6 +29,30 @@ fn setup(mut cmd: Commands) {
     })
     .insert(PanCam::default())
     .insert(MainCamera);
+}
+fn camera_controller(
+    entity_query: Query<&mut GlobalTransform, (With<CameraFollow>, Without<MainCamera>)>,
+    mut camera_query: Query<
+        (&mut Camera, &mut GlobalTransform),
+        (With<MainCamera>, Without<CameraFollow>),
+    >,
+    mut cursor: ResMut<Cursor>,
+) {
+    let (mut camera, mut cam_transform) = camera_query.single_mut();
+    let mut pos: Vec2 = Vec2::ZERO;
+    let mut query_len = 0.;
+    for (transform) in entity_query.iter() {
+        info!("{}",pos);
+        pos.x += transform.translation.x;
+        pos.y += transform.translation.y;
+        query_len += 1.;
+    }
+    if(query_len==0.){
+        return
+    }
+    pos /= query_len;
+    cam_transform.translation.x = lerp(cam_transform.translation.x, pos.x, 0.1);
+    cam_transform.translation.y = lerp(cam_transform.translation.y, pos.y, 0.1);
 }
 fn camera_zoom(
     mut query: Query<(&PanCam, &mut OrthographicProjection)>,

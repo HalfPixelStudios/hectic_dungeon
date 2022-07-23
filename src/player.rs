@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 
-use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::{GridPosition, to_world_coords}, movement::Movement};
+use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::{GridPosition, to_world_coords}, movement::Movement, camera::CameraFollow};
 use leafwing_input_manager::prelude::*;
 
 #[derive(Component)]
@@ -63,9 +63,8 @@ fn spawn(
                 action_state: ActionState::default(),
                 input_map,
             })
+            .insert(CameraFollow)
             .insert(Movement::new());
-
-            
 
     }
 }

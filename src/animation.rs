@@ -1,7 +1,7 @@
 
 use std::ops::Range;
 use enum_map::*;
-use bevy::{prelude::*, sprite};
+use bevy::prelude::*;
 use serde::*;
 
 use crate::movement::Movement;

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use iyes_loopless::prelude::ConditionSet;
 
-use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition, movement::Movement, player::PlayerMovedEvent, game::GameState};
+use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition, movement::Movement, player::PlayerMovedEvent};
 
 
 #[derive(Component)]
