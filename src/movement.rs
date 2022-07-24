@@ -9,6 +9,9 @@ pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
     x * (1. - by) + y * by
 }
 
+
+
+
 // store grid pos, or next move?
 #[derive(Component)]
 pub struct Movement{

@@ -30,3 +30,4 @@ fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
         ldtk_handle: asset_server.load("map/plains.ldtk"),
     });
 }
+//TODO add gridposition to every GridCoord from map

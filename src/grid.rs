@@ -5,6 +5,13 @@ const CELLHEIGHT:i32 = 16;
 const MAPWIDTH:i32 = 100;
 const MAPHEIGHT:i32 = 100;
 
+#[derive(Copy,Clone)]
+pub enum CellType{
+    Empty = 0,
+    Player=1,
+    Enemy=2,
+    Wall=3
+}
 
 #[derive(DerefMut,Deref)]
 pub struct Grid([[i32;MAPWIDTH as usize];MAPHEIGHT as usize]);
@@ -13,9 +20,22 @@ impl Grid{
         self.0[v.y as usize][v.x as usize]==0
         
     }
-    pub fn inbounds(&self,v:IVec2) -> bool{
+    pub fn inbounds(&self, v:IVec2) -> bool{
         0<=v.x&&v.x<MAPWIDTH&&0<=v.y&&v.y<MAPHEIGHT
     }
+    pub fn find(&self, t: CellType)->Option<IVec2>{
+        for y in 0..MAPHEIGHT as usize{
+            for x in 0..MAPWIDTH as usize{
+                if self[y][x]==t as i32{
+                    return Some(IVec2::new(x as i32,y as i32))
+                }
+            }
+        }
+        return None
+    }
+        
+
+
 }
 
 #[derive(Component,DerefMut,Deref)]
@@ -47,8 +67,10 @@ pub fn generate_grid(mut grid: ResMut<Grid>,mut query:Query<&GridPosition>){
         }
     }
     for (grid_pos) in query.iter_mut(){
-        info!("{}",grid_pos.0);
-        grid[grid_pos.y as usize][grid_pos.x as usize] = 1;
+        if grid.inbounds(grid_pos.0){
+
+            grid[grid_pos.y as usize][grid_pos.x as usize] = 1;
+        }
     }
 }
 
@@ -56,6 +78,7 @@ pub fn generate_grid(mut grid: ResMut<Grid>,mut query:Query<&GridPosition>){
 pub struct GridPlugin;
 impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
+        //TODO generate_grid doesnt need to be run every fram?
         app.add_system(generate_grid)
             .insert_resource(Grid([[0;MAPWIDTH as usize];MAPHEIGHT as usize]));
     }

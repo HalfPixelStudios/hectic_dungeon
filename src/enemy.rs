@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use iyes_loopless::prelude::ConditionSet;
 
-use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::GridPosition, movement::Movement, player::PlayerMovedEvent};
+use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::{GridPosition, Grid, CellType}, movement::Movement, player::PlayerMovedEvent};
 
 
 #[derive(Component)]
@@ -9,6 +9,7 @@ pub struct Enemy;
 pub struct SpawnEnemyEvent{
     pub spawn_pos: Vec2
 }
+pub struct EnemyUpdateEvent;
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnEnemyEvent>,
@@ -44,16 +45,34 @@ fn spawn(
     }
 }
 fn ai(mut query: Query<(&Transform, &mut GridPosition, &mut Movement),With<Enemy>>,
-      mut events:EventReader<PlayerMovedEvent>){
+      mut events:EventReader<PlayerMovedEvent>,
+      grid: Res<Grid>){
+    let player_pos = grid.find(CellType::Player);
 
     for (transform, mut grid_pos, mut mv) in query.iter_mut(){
-        info!("move{}",transform.translation);
+        if let Some(p) = player_pos{
+            let diff = p-grid_pos.0;
+            if diff.x.abs()>diff.y.abs(){
+                mv.next_move = diff.x.signum()*IVec2::X;
+            }
+            else{
+                mv.next_move = diff.y.signum()*IVec2::Y;
+            }
+
+            
+
+        }
+        else{
+            mv.next_move = IVec2::ZERO;
+        }
         
-        
-        mv.next_move = -IVec2::X;
 
 
     }
+
+
+
+
 
     
 }
@@ -64,10 +83,12 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnEnemyEvent>()
+            .add_event::<EnemyUpdateEvent>()
             .add_system(spawn)
+            
             .add_system_set(
                 ConditionSet::new()
-                .run_on_event::<PlayerMovedEvent>() 
+                .run_on_event::<EnemyUpdateEvent>() 
                 .with_system(ai)
                 .into()
                 );
