@@ -9,6 +9,9 @@ pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
     x * (1. - by) + y * by
 }
 
+
+
+
 // store grid pos, or next move?
 #[derive(Component)]
 pub struct Movement{
@@ -17,6 +20,15 @@ pub struct Movement{
     pub frame: f32
     
 }
+impl Movement{
+    pub fn new() -> Self {
+        return Movement{
+            next_move: IVec2::ZERO,
+            frame:0.
+        }
+    }
+}
+
 //time based lerp; make mv.frame/t = 1 where t = time to move between squares
 fn movement(mut query:Query<(&mut GridPosition, &mut Movement, &mut Transform)>){
     for (mut grid_pos, mut mv, mut transform) in query.iter_mut(){

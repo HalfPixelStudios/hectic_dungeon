@@ -9,3 +9,4 @@ pub mod ui;
 pub mod grid;
 pub mod movement;
 pub mod game;
+pub mod layers;

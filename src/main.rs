@@ -6,7 +6,9 @@ use hectic_dungeon::assets::*;
 use hectic_dungeon::camera::CameraPlugin;
 use hectic_dungeon::enemy::EnemyPlugin;
 use hectic_dungeon::enemy::SpawnEnemyEvent;
+use hectic_dungeon::game::GamePlugin;
 use hectic_dungeon::game::GameState;
+use hectic_dungeon::grid::GridPlugin;
 use hectic_dungeon::movement::MovementPlugin;
 use hectic_dungeon::player::PlayerMovedEvent;
 use hectic_dungeon::player::SpawnPlayerEvent;
@@ -24,6 +26,7 @@ fn main() {
             title: "Hectic Dungeon".into(),
             ..default()})
         .add_plugins(DefaultPlugins)
+        .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(AnimatePlugin)
@@ -31,6 +34,7 @@ fn main() {
         .add_plugin(UIPlugin)
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
+        .add_plugin(GridPlugin)
         .add_system(debug)
         .run();
 }
