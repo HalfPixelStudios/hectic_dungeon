@@ -44,6 +44,8 @@ fn spawn(
 
     }
 }
+//TODO player cant move if go neg or enemy on top
+//Maybe both are knocked back when two beings try to move into the same cell
 fn ai(mut query: Query<(&Transform, &mut GridPosition, &mut Movement),With<Enemy>>,
       mut events:EventReader<PlayerMovedEvent>,
       grid: Res<Grid>){
