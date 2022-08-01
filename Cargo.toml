@@ -15,16 +15,16 @@ bevy_ui = ["bevy/bevy_ui", "bevy/bevy_text", "bevy/bevy_render"]
 [dependencies]
 bevy = { version = "0.7.0", default-features = false, features = [ "render", "animation", "bevy_winit", "bevy_gilrs", "png", "hdr", "filesystem_watcher", "x11", "trace" ] }
 bevy_prototype_debug_lines = { version = "0.7.0" }
-ron = "0.7"
+bevy_ecs_ldtk = { version = "0.3.0", features = [ "atlas" ] }
 leafwing-input-manager = { version = "0.4.1" }
-
 iyes_loopless = "0.6.1"
+
+ron = "0.7"
 anyhow = "1.0.58"
 autodefault = { version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 rand = { version = "0.8.5" }
-enum-map = {version = "2.4.0", features = ["serde"]}
-bevy_ecs_ldtk = { version = "0.3.0", features = [ "atlas" ] }
+enum-map = { version = "2.4.0", features = ["serde"] }
 
 [profile.dev]
 opt-level = 1
