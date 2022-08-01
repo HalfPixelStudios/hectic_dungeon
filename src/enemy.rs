@@ -39,7 +39,7 @@ fn spawn(
                 ..default()
             })
             // .insert(Animation::new(&enemy.anim))
-            .insert(GridPosition::new(spawn_pos))
+            .insert(GridPosition::new(spawn_pos, CellType::Enemy))
             .insert(Movement::new())
             .insert(Enemy);
     }
@@ -55,7 +55,7 @@ fn ai(
 
     for (transform, mut grid_pos, mut mv) in query.iter_mut() {
         if let Some(p) = player_pos {
-            let diff = p - grid_pos.0;
+            let diff = p - grid_pos.pos();
             if diff.x.abs() > diff.y.abs() {
                 mv.next_move = diff.x.signum() * IVec2::X;
             } else {

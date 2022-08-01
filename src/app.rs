@@ -18,7 +18,7 @@ use crate::map::MapPlugin;
 pub fn app() {
     let window_descriptor = WindowDescriptor {
         present_mode: bevy::window::PresentMode::Fifo,
-        title: "Hectic Dungeon".into(),
+        title: "bevy_test".into(),
         ..default()
     };
 

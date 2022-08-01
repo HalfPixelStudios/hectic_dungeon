@@ -7,7 +7,7 @@ use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
     camera::CameraFollow,
-    grid::{to_world_coords, GridPosition},
+    grid::{to_world_coords, CellType, GridPosition},
     movement::Movement,
 };
 
@@ -76,7 +76,7 @@ fn spawn(
                 ..default()
             })
             .insert(Player)
-            .insert(GridPosition::new(spawn_pos))
+            .insert(GridPosition::new(spawn_pos, CellType::Player))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,
