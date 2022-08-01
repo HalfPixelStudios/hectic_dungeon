@@ -1,4 +1,5 @@
-use bevy::{animation::*, asset::AssetLoader, prelude::*};
+use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
+use bevy_mod_gizmos::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
 use super::{
@@ -14,15 +15,24 @@ use super::{
 };
 
 pub fn app() {
-    App::new()
-        .add_loopless_state(GameState::EnemyPhase)
-        .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
-        .insert_resource(WindowDescriptor {
-            present_mode: bevy::window::PresentMode::Fifo,
-            title: "Hectic Dungeon".into(),
-            ..default()
-        })
+    let window_descriptor = WindowDescriptor {
+        present_mode: bevy::window::PresentMode::Fifo,
+        title: "Hectic Dungeon".into(),
+        ..default()
+    };
+
+    let mut app = App::new();
+
+    app.insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
+        .insert_resource(window_descriptor);
+    // .insert_resource(LogSettings {
+    //     level: bevy::log::Level::DEBUG,
+    //     ..default()
+    // });
+
+    app.add_loopless_state(GameState::EnemyPhase)
         .add_plugins(DefaultPlugins)
+        .add_plugin(GizmosPlugin)
         .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
@@ -32,8 +42,9 @@ pub fn app() {
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(GridPlugin)
-        .add_system(debug)
-        .run();
+        .add_system(debug);
+
+    app.run();
 }
 
 fn debug(

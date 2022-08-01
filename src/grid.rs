@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_mod_gizmos::*;
 
 const CELLWIDTH: i32 = 16;
 const CELLHEIGHT: i32 = 16;
@@ -15,6 +16,7 @@ pub enum CellType {
 
 #[derive(DerefMut, Deref)]
 pub struct Grid([[i32; MAPWIDTH as usize]; MAPHEIGHT as usize]);
+
 impl Grid {
     pub fn is_open(&self, v: IVec2) -> bool {
         self.0[v.y as usize][v.x as usize] == 0
@@ -47,6 +49,7 @@ impl GridPosition {
 pub fn to_world_coords(p: &IVec2) -> Vec2 {
     Vec2::new((p.x * CELLWIDTH) as f32, (p.y * CELLWIDTH) as f32)
 }
+
 pub fn snap_to_grid(p: &Vec2) -> IVec2 {
     info!("{:?}", p);
     Vec2::new(p.x / CELLWIDTH as f32, p.y / CELLWIDTH as f32).as_ivec2()
@@ -66,10 +69,21 @@ pub fn generate_grid(mut grid: ResMut<Grid>, mut query: Query<&GridPosition>) {
 }
 
 pub struct GridPlugin;
+
 impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
         //TODO generate_grid doesnt need to be run every fram?
-        app.add_system(generate_grid)
+        app.add_system(gizmo)
+            .add_system(generate_grid)
             .insert_resource(Grid([[0; MAPWIDTH as usize]; MAPHEIGHT as usize]));
     }
+}
+
+fn gizmo() {
+    let gizmo = Gizmo::sphere(Vec3::ZERO, 100., Color::RED);
+    draw_gizmo(gizmo);
+    draw_line(
+        vec![Vec3::new(0., 0., 0.), Vec3::new(500., 0., 0.)],
+        Color::WHITE,
+    );
 }
