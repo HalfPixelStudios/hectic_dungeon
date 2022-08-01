@@ -5,12 +5,15 @@
 //! Create your custom asset types as follows:
 //!
 
-use bevy::prelude::*;
-use bevy::asset::{AssetLoader, LoadContext, LoadedAsset};
-use bevy::utils::BoxedFuture;
-use bevy::reflect::TypeUuid;
-use serde::Deserialize;
 use std::marker::PhantomData;
+
+use bevy::{
+    asset::{AssetLoader, LoadContext, LoadedAsset},
+    prelude::*,
+    reflect::TypeUuid,
+    utils::BoxedFuture,
+};
+use serde::Deserialize;
 
 struct RonLoader<T> {
     extensions: Vec<&'static str>,
@@ -25,7 +28,11 @@ where
         &self.extensions
     }
 
-    fn load<'a>(&'a self, bytes: &'a [u8], load_context: &'a mut LoadContext) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
+    fn load<'a>(
+        &'a self,
+        bytes: &'a [u8],
+        load_context: &'a mut LoadContext,
+    ) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
         Box::pin(async move {
             let loaded = ron::de::from_bytes::<T>(bytes)?;
             load_context.set_default_asset(LoadedAsset::new(loaded));
@@ -51,8 +58,7 @@ where
             extensions: self.extensions.clone(),
             _t: PhantomData,
         };
-        app.add_asset::<T>()
-            .add_asset_loader(loader);
+        app.add_asset::<T>().add_asset_loader(loader);
     }
 }
 
@@ -71,4 +77,3 @@ impl<T> RonAssetPlugin<T> {
         }
     }
 }
-

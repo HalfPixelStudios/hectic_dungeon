@@ -1,5 +1,4 @@
-use bevy::input::mouse::*;
-use bevy::prelude::*;
+use bevy::{input::mouse::*, prelude::*};
 #[derive(Debug, Component)]
 struct MainCamera;
 
@@ -42,13 +41,13 @@ fn camera_controller(
     let mut pos: Vec2 = Vec2::ZERO;
     let mut query_len = 0.;
     for (transform) in entity_query.iter() {
-        info!("{}",pos);
+        info!("{}", pos);
         pos.x += transform.translation.x;
         pos.y += transform.translation.y;
         query_len += 1.;
     }
-    if(query_len==0.){
-        return
+    if (query_len == 0.) {
+        return;
     }
     pos /= query_len;
     cam_transform.translation.x = lerp(cam_transform.translation.x, pos.x, 0.1);

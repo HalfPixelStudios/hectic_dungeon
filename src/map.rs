@@ -1,8 +1,6 @@
-use bevy::prelude::*;
 use autodefault::autodefault;
+use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-
-
 
 pub struct MapPlugin;
 pub const MAPWIDTH: f32 = 256.;
@@ -20,11 +18,7 @@ impl Plugin for MapPlugin {
 fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
     cmd.spawn_bundle(LdtkWorldBundle {
         transform: Transform {
-            translation: Vec3::new(
-                -MAPWIDTH / 2.,
-                -MAPHEIGHT / 2.,
-                -1.
-            ),
+            translation: Vec3::new(-MAPWIDTH / 2., -MAPHEIGHT / 2., -1.),
             ..default()
         },
         ldtk_handle: asset_server.load("map/plains.ldtk"),

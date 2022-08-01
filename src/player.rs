@@ -1,9 +1,15 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-
-use crate::{assets::{SpriteSheets, PrefabData, BeingPrefab}, animation::Animation, grid::{GridPosition, to_world_coords}, movement::Movement, camera::CameraFollow};
 use leafwing_input_manager::prelude::*;
+
+use crate::{
+    animation::Animation,
+    assets::{BeingPrefab, PrefabData, SpriteSheets},
+    camera::CameraFollow,
+    grid::{to_world_coords, GridPosition},
+    movement::Movement,
+};
 
 #[derive(Component)]
 pub struct Player;
@@ -27,7 +33,7 @@ fn spawn(
     mut events: EventReader<SpawnPlayerEvent>,
     asset_sheet: Res<SpriteSheets>,
     prefab_data: Res<PrefabData>,
-    beings: Res<Assets<BeingPrefab>>
+    beings: Res<Assets<BeingPrefab>>,
 ) {
     for SpawnPlayerEvent { spawn_pos } in events.iter() {
         let input_map = InputMap::new([
@@ -41,12 +47,11 @@ fn spawn(
             (KeyCode::S, PlayerAction::Down),
         ]);
 
-
         let player = beings.get(prefab_data.get("archer").unwrap()).unwrap();
         cmd.spawn()
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index:0,
+                    index: 0,
                     ..default()
                 },
                 texture_atlas: asset_sheet.get("archer").unwrap().clone(),
@@ -65,16 +70,15 @@ fn spawn(
             })
             .insert(CameraFollow)
             .insert(Movement::new());
-
     }
 }
 
-
-
 //TODO check collision with tiled map
-fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &mut Movement, &ActionState<PlayerAction>), With<Player>>, mut player_moved: EventWriter<PlayerMovedEvent>) {
-    
-    
+fn controller(
+    mut cmd: Commands,
+    mut query: Query<(&mut GridPosition, &mut Movement, &ActionState<PlayerAction>), With<Player>>,
+    mut player_moved: EventWriter<PlayerMovedEvent>,
+) {
     if let Ok((mut grid_position, mut movement, action_state)) = query.get_single_mut() {
         let mut dir = IVec2::ZERO;
 
@@ -91,15 +95,12 @@ fn controller(mut cmd: Commands, mut query: Query<(&mut GridPosition, &mut Movem
             dir += IVec2::new(0, -1);
         }
 
-        if movement.next_move==IVec2::ZERO{
+        if movement.next_move == IVec2::ZERO {
             if dir != IVec2::ZERO {
                 player_moved.send(PlayerMovedEvent);
-                movement.next_move=dir;
-
+                movement.next_move = dir;
             }
-
         }
-
     }
 }
 pub struct PlayerPlugin;
@@ -113,4 +114,3 @@ impl Plugin for PlayerPlugin {
             .add_system(spawn);
     }
 }
-

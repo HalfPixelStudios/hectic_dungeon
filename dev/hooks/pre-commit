@@ -3,5 +3,5 @@
 BOLD='\033[1;36m'
 NC='\033[0m'
 printf "${BOLD}[PRE-COMMIT]${NC} formatting code...\n"
-cargo fmt --all
+cargo +nightly fmt --all
 git add -u

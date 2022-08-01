@@ -1,19 +1,15 @@
-use bevy::prelude::*;
-
-
-
-use super::animation::*;
-use bevy::reflect::TypeUuid;
-use crate::prefab::*;
-use serde::*;
 use std::collections::HashMap;
 
+use bevy::{prelude::*, reflect::TypeUuid};
+use serde::*;
 
+use super::animation::*;
+use crate::prefab::*;
 
 #[derive(Deref)]
 pub struct SpriteSheets(pub HashMap<String, Handle<TextureAtlas>>);
 
-#[derive(Debug,Deref)]
+#[derive(Debug, Deref)]
 pub struct PrefabData(pub HashMap<String, HandleUntyped>);
 
 #[derive(Deserialize, TypeUuid, Debug)]
@@ -31,7 +27,6 @@ pub fn load_assets(
     let mut data: HashMap<String, HandleUntyped> = HashMap::new();
     let mut sheets = HashMap::new();
 
-
     let archer_handle = texture_atlases.add(TextureAtlas::from_grid_with_padding(
         assets.load("archer.png"),
         Vec2::new(32.0, 32.0),
@@ -41,10 +36,10 @@ pub fn load_assets(
     ));
     sheets.insert("archer".into(), archer_handle);
 
-    data.insert("archer".to_string(), assets.load_untyped("beings/archer.being"));
-
-
-
+    data.insert(
+        "archer".to_string(),
+        assets.load_untyped("beings/archer.being"),
+    );
 
     cmd.insert_resource(SpriteSheets(sheets));
 
@@ -58,4 +53,3 @@ impl Plugin for AssetLoadPlugin {
             .add_startup_system(load_assets);
     }
 }
-
