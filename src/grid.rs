@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
 
-const CELL_WIDTH: i32 = 16;
-const CELL_HEIGHT: i32 = 16;
-const MAP_WIDTH: i32 = 100;
-const MAP_HEIGHT: i32 = 100;
+const CELL_WIDTH: i32 = 8;
+const CELL_HEIGHT: i32 = 8;
+const MAP_WIDTH: i32 = 16;
+const MAP_HEIGHT: i32 = 16;
 
 #[derive(Copy, Clone)]
 pub enum CellType {
@@ -80,7 +80,7 @@ impl Plugin for GridPlugin {
 }
 
 fn gizmo(mut lines: ResMut<DebugLines>) {
-    for y in 0..MAP_HEIGHT {
+    for y in 0..=MAP_HEIGHT {
         lines.line(
             Vec3::new(0., (y * CELL_HEIGHT) as f32, 0.),
             Vec3::new(
@@ -91,7 +91,7 @@ fn gizmo(mut lines: ResMut<DebugLines>) {
             0.,
         );
     }
-    for x in 0..MAP_WIDTH {
+    for x in 0..=MAP_WIDTH {
         lines.line(
             Vec3::new((x * CELL_WIDTH) as f32, 0., 0.),
             Vec3::new(
