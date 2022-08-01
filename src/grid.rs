@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
 
+// TODO unify these constants with the map constants
 const CELL_WIDTH: i32 = 8;
 const CELL_HEIGHT: i32 = 8;
 const MAP_WIDTH: i32 = 16;
@@ -18,12 +19,17 @@ pub enum CellType {
 pub struct Grid([[i32; MAP_WIDTH as usize]; MAP_HEIGHT as usize]);
 
 impl Grid {
-    pub fn is_open(&self, v: IVec2) -> bool {
-        self.0[v.y as usize][v.x as usize] == 0
+    /// Checks if given cell value is empty
+    pub fn is_empty(&self, v: IVec2) -> bool {
+        self.0[v.y as usize][v.x as usize] == CellType::Empty as i32
     }
+
+    /// Checks if position is in bounds
     pub fn inbounds(&self, v: IVec2) -> bool {
         0 <= v.x && v.x < MAP_WIDTH && 0 <= v.y && v.y < MAP_HEIGHT
     }
+
+    /// Returns the first found cell of a given cell type
     pub fn find(&self, t: CellType) -> Option<IVec2> {
         for y in 0..MAP_HEIGHT as usize {
             for x in 0..MAP_WIDTH as usize {
@@ -34,6 +40,18 @@ impl Grid {
         }
         return None;
     }
+
+    /// Move the current contents of a cell to a new cell
+    ///
+    /// Leaves the old cell empty. Furthermore, moving a cell that is currently empty has no
+    /// effect.
+    pub fn move_cell(&mut self, cur_pos: IVec2, dest_pos: IVec2) {
+        let cur_value = self[cur_pos.y as usize][cur_pos.x as usize];
+        if cur_value == 0 {
+            return;
+        }
+        self[dest_pos.y as usize][dest_pos.x as usize] = cur_value;
+    }
 }
 
 #[derive(Component, DerefMut, Deref)]
@@ -41,7 +59,6 @@ pub struct GridPosition(pub IVec2);
 
 impl GridPosition {
     pub fn new(v: &Vec2) -> GridPosition {
-        info!("snap{}", snap_to_grid(v));
         GridPosition(snap_to_grid(v))
     }
 }
@@ -51,7 +68,6 @@ pub fn to_world_coords(p: &IVec2) -> Vec2 {
 }
 
 pub fn snap_to_grid(p: &Vec2) -> IVec2 {
-    info!("{:?}", p);
     Vec2::new(p.x / CELL_WIDTH as f32, p.y / CELL_WIDTH as f32).as_ivec2()
 }
 
@@ -74,7 +90,7 @@ impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
         //TODO generate_grid doesnt need to be run every fram?
         app.add_system(gizmo)
-            .add_system(generate_grid)
+            .add_startup_system(generate_grid)
             .insert_resource(Grid([[0; MAP_WIDTH as usize]; MAP_HEIGHT as usize]));
     }
 }

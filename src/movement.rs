@@ -17,8 +17,10 @@ pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
 pub struct Movement {
     // the move dir, 0 if nothing
     pub next_move: IVec2,
+    // TODO: not very nice that animation logic is bunched together with movement
     pub frame: f32,
 }
+
 impl Movement {
     pub fn new() -> Self {
         return Movement {

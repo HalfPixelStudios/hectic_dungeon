@@ -21,7 +21,6 @@ fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
     cmd.spawn_bundle(LdtkWorldBundle {
         transform: Transform {
             translation: Vec3::new(-TILEWIDTH / 2., -TILEWIDTH / 2., -1.),
-            ..default()
         },
         ldtk_handle: asset_server.load("maps/testing.ldtk"),
     });

@@ -13,5 +13,8 @@ devsetup:
 fmt:
     cargo +nightly fmt --all
 
+chk:
+    cargo check
+
 lint:
     cargo clippy
