@@ -11,5 +11,5 @@ $ rustup install nighyly
 
 Next install some git hooks:
 ```
-$ ./tools/devsetup.sh
+$ just devsetup
 ```
