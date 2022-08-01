@@ -1,4 +1,5 @@
 use bevy::{input::mouse::*, prelude::*};
+
 #[derive(Debug, Component)]
 struct MainCamera;
 
@@ -26,7 +27,7 @@ fn setup(mut cmd: Commands) {
         },
         ..OrthographicCameraBundle::new_2d()
     })
-    .insert(PanCam::default())
+    // .insert(PanCam::default())
     .insert(MainCamera);
 }
 fn camera_controller(
