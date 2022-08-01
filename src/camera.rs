@@ -1,5 +1,4 @@
 use bevy::{input::mouse::*, prelude::*};
-use bevy_mod_gizmos::{interactions::GizmoInteractionCamera, *};
 
 #[derive(Debug, Component)]
 struct MainCamera;
@@ -29,8 +28,7 @@ fn setup(mut cmd: Commands) {
         ..OrthographicCameraBundle::new_2d()
     })
     // .insert(PanCam::default())
-    .insert(MainCamera)
-    .insert_bundle(GizmoInteractionCamera::default());
+    .insert(MainCamera);
 }
 fn camera_controller(
     entity_query: Query<&mut GlobalTransform, (With<CameraFollow>, Without<MainCamera>)>,

@@ -1,5 +1,5 @@
 use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
-use bevy_mod_gizmos::*;
+use bevy_prototype_debug_lines::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
 use super::{
@@ -32,7 +32,7 @@ pub fn app() {
 
     app.add_loopless_state(GameState::EnemyPhase)
         .add_plugins(DefaultPlugins)
-        .add_plugin(GizmosPlugin)
+        .add_plugin(DebugLinesPlugin::default())
         .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)

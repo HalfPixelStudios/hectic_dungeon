@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_mod_gizmos::*;
+use bevy_prototype_debug_lines::*;
 
 const CELL_WIDTH: i32 = 16;
 const CELL_HEIGHT: i32 = 16;
@@ -79,31 +79,27 @@ impl Plugin for GridPlugin {
     }
 }
 
-fn gizmo() {
+fn gizmo(mut lines: ResMut<DebugLines>) {
     for y in 0..MAP_HEIGHT {
-        draw_line(
-            vec![
-                Vec3::new(0., (y * CELL_HEIGHT) as f32, 0.),
-                Vec3::new(
-                    (MAP_WIDTH * CELL_WIDTH) as f32,
-                    (y * CELL_HEIGHT) as f32,
-                    0.,
-                ),
-            ],
-            Color::WHITE,
+        lines.line(
+            Vec3::new(0., (y * CELL_HEIGHT) as f32, 0.),
+            Vec3::new(
+                (MAP_WIDTH * CELL_WIDTH) as f32,
+                (y * CELL_HEIGHT) as f32,
+                0.,
+            ),
+            0.,
         );
     }
     for x in 0..MAP_WIDTH {
-        draw_line(
-            vec![
-                Vec3::new((x * CELL_WIDTH) as f32, 0., 0.),
-                Vec3::new(
-                    (x * CELL_WIDTH) as f32,
-                    (MAP_HEIGHT * CELL_HEIGHT) as f32,
-                    0.,
-                ),
-            ],
-            Color::WHITE,
+        lines.line(
+            Vec3::new((x * CELL_WIDTH) as f32, 0., 0.),
+            Vec3::new(
+                (x * CELL_WIDTH) as f32,
+                (MAP_HEIGHT * CELL_HEIGHT) as f32,
+                0.,
+            ),
+            0.,
         );
     }
 }
