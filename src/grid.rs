@@ -80,23 +80,23 @@ impl Plugin for GridPlugin {
 }
 
 fn gizmo(mut lines: ResMut<DebugLines>) {
-    for y in 0..=MAP_HEIGHT {
+    for y in 0..MAP_HEIGHT {
         lines.line(
             Vec3::new(0., (y * CELL_HEIGHT) as f32, 0.),
             Vec3::new(
-                (MAP_WIDTH * CELL_WIDTH) as f32,
+                ((MAP_WIDTH - 1) * CELL_WIDTH) as f32,
                 (y * CELL_HEIGHT) as f32,
                 0.,
             ),
             0.,
         );
     }
-    for x in 0..=MAP_WIDTH {
+    for x in 0..MAP_WIDTH {
         lines.line(
             Vec3::new((x * CELL_WIDTH) as f32, 0., 0.),
             Vec3::new(
                 (x * CELL_WIDTH) as f32,
-                (MAP_HEIGHT * CELL_HEIGHT) as f32,
+                ((MAP_HEIGHT - 1) * CELL_HEIGHT) as f32,
                 0.,
             ),
             0.,
