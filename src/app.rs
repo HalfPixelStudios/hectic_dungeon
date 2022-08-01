@@ -37,7 +37,7 @@ pub fn app() {
         .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
-        .add_plugin(AnimatePlugin)
+        // .add_plugin(AnimatePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
         .add_plugin(MovementPlugin)

@@ -59,8 +59,8 @@ fn spawn(
             (KeyCode::S, PlayerAction::Down),
         ]);
 
-        let handle = prefab_data.get("archer").unwrap();
-        let player = beings.get(handle).unwrap();
+        // let handle = prefab_data.get("player").unwrap();
+        // let player = beings.get(handle).unwrap();
 
         cmd.spawn()
             .insert_bundle(SpriteSheetBundle {
@@ -68,14 +68,13 @@ fn spawn(
                     index: 0,
                     ..default()
                 },
-                texture_atlas: asset_sheet.get("archer").unwrap().clone(),
+                texture_atlas: asset_sheet.get("player").unwrap().clone(),
                 transform: Transform {
                     translation: spawn_pos.extend(0.),
                     ..default()
                 },
                 ..default()
             })
-            .insert(Animation::new(&player.anim))
             .insert(Player)
             .insert(GridPosition::new(spawn_pos))
             .insert_bundle(InputManagerBundle::<PlayerAction> {

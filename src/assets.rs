@@ -27,19 +27,26 @@ pub fn load_assets(
     let mut data: HashMap<String, HandleUntyped> = HashMap::new();
     let mut sheets = HashMap::new();
 
-    let archer_handle = texture_atlases.add(TextureAtlas::from_grid_with_padding(
-        assets.load("archer.png"),
-        Vec2::new(32.0, 32.0),
-        10,
-        3,
-        Vec2::splat(0.0),
+    let archer_handle = texture_atlases.add(TextureAtlas::from_grid(
+        assets.load("tilesheet/player.png"),
+        Vec2::new(8.0, 8.0),
+        1,
+        1,
     ));
-    sheets.insert("archer".into(), archer_handle);
+    sheets.insert("player".into(), archer_handle);
 
-    data.insert(
-        "archer".to_string(),
-        assets.load_untyped("beings/archer.being"),
-    );
+    let orc_handle = texture_atlases.add(TextureAtlas::from_grid(
+        assets.load("tilesheet/orc.png"),
+        Vec2::new(8.0, 8.0),
+        1,
+        1,
+    ));
+    sheets.insert("orc".into(), orc_handle);
+
+    // data.insert(
+    //     "archer".to_string(),
+    //     assets.load_untyped("beings/archer.being"),
+    // );
 
     cmd.insert_resource(SpriteSheets(sheets));
 

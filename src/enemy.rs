@@ -23,7 +23,7 @@ fn spawn(
     beings: Res<Assets<BeingPrefab>>,
 ) {
     for SpawnEnemyEvent { spawn_pos } in events.iter() {
-        let enemy = beings.get(prefab_data.get("archer").unwrap()).unwrap();
+        // let enemy = beings.get(prefab_data.get("archer").unwrap()).unwrap();
         cmd.spawn()
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
@@ -31,14 +31,14 @@ fn spawn(
                     color: Color::ORANGE,
                     ..default()
                 },
-                texture_atlas: asset_sheet.get("archer").unwrap().clone(),
+                texture_atlas: asset_sheet.get("orc").unwrap().clone(),
                 transform: Transform {
                     translation: spawn_pos.extend(0.),
                     ..default()
                 },
                 ..default()
             })
-            .insert(Animation::new(&enemy.anim))
+            // .insert(Animation::new(&enemy.anim))
             .insert(GridPosition::new(spawn_pos))
             .insert(Movement::new())
             .insert(Enemy);
