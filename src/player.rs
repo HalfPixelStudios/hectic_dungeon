@@ -28,6 +28,18 @@ pub struct SpawnPlayerEvent {
     pub spawn_pos: Vec2,
 }
 
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+            .add_event::<SpawnPlayerEvent>()
+            .add_event::<PlayerMovedEvent>()
+            .add_system(controller)
+            .add_system(spawn);
+    }
+}
+
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnPlayerEvent>,
@@ -47,7 +59,9 @@ fn spawn(
             (KeyCode::S, PlayerAction::Down),
         ]);
 
-        let player = beings.get(prefab_data.get("archer").unwrap()).unwrap();
+        let handle = prefab_data.get("archer").unwrap();
+        let player = beings.get(handle).unwrap();
+
         cmd.spawn()
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
@@ -101,16 +115,5 @@ fn controller(
                 movement.next_move = dir;
             }
         }
-    }
-}
-pub struct PlayerPlugin;
-
-impl Plugin for PlayerPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
-            .add_event::<SpawnPlayerEvent>()
-            .add_event::<PlayerMovedEvent>()
-            .add_system(controller)
-            .add_system(spawn);
     }
 }

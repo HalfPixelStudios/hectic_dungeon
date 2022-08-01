@@ -58,7 +58,7 @@ impl Animation {
 fn iv2_sum(v: IVec2) -> i32 {
     v.x + v.y
 }
-pub fn state(mut query: Query<(&Movement, &mut Animation)>) {
+fn state(mut query: Query<(&Movement, &mut Animation)>) {
     for (mv, mut anim) in query.iter_mut() {
         if iv2_sum(mv.next_move) != 0 {
             anim.set_state(AniState::Walk);
@@ -72,7 +72,7 @@ pub fn state(mut query: Query<(&Movement, &mut Animation)>) {
         }
     }
 }
-pub fn animate(time: Res<Time>, mut animations: Query<(&mut Animation, &mut TextureAtlasSprite)>) {
+fn animate(time: Res<Time>, mut animations: Query<(&mut Animation, &mut TextureAtlasSprite)>) {
     for (mut ani, mut sprite) in animations.iter_mut() {
         let ani_range = ani.frames[ani.state].clone();
 

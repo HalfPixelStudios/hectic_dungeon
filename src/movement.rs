@@ -42,7 +42,6 @@ fn movement(mut query: Query<(&mut GridPosition, &mut Movement, &mut Transform)>
             mv.frame += 1.;
         } else {
             mv.frame = 0.;
-            info!("finished");
             transform.translation = next_pos.extend(transform.translation.z);
             grid_pos.0 += mv.next_move;
             mv.next_move = IVec2::ZERO;

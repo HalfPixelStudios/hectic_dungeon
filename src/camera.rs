@@ -14,8 +14,8 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup)
             .insert_resource(Cursor(Vec2::ZERO))
-            .add_system(cursor_system);
-        // .add_system(camera_controller);
+            .add_system(cursor_system)
+            .add_system(camera_controller);
     }
 }
 
@@ -27,7 +27,7 @@ fn setup(mut cmd: Commands) {
         },
         ..OrthographicCameraBundle::new_2d()
     })
-    // .insert(PanCam::default())
+    .insert(PanCam::default())
     .insert(MainCamera);
 }
 fn camera_controller(
@@ -42,7 +42,6 @@ fn camera_controller(
     let mut pos: Vec2 = Vec2::ZERO;
     let mut query_len = 0.;
     for (transform) in entity_query.iter() {
-        info!("{}", pos);
         pos.x += transform.translation.x;
         pos.y += transform.translation.y;
         query_len += 1.;

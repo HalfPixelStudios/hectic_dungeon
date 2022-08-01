@@ -41,24 +41,30 @@ pub fn app() {
         .add_plugin(UIPlugin)
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
-        .add_plugin(GridPlugin)
-        .add_system(debug);
+        .add_plugin(GridPlugin);
+
+    app.add_startup_system(setup).add_system(debug);
 
     app.run();
 }
 
+fn setup(
+    mut spawn_player: EventWriter<SpawnPlayerEvent>,
+    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
+) {
+    spawn_player.send(SpawnPlayerEvent {
+        spawn_pos: Vec2::ZERO,
+    });
+    spawn_enemy.send(SpawnEnemyEvent {
+        spawn_pos: Vec2::new(96., 96.),
+    });
+}
+
 fn debug(
     keys: Res<Input<KeyCode>>,
-    mut spawn_player: EventWriter<SpawnPlayerEvent>,
     mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
     mut player_move: EventWriter<PlayerMovedEvent>,
 ) {
-    if keys.just_pressed(KeyCode::T) {
-        info!("send event");
-        spawn_player.send(SpawnPlayerEvent {
-            spawn_pos: Vec2::ZERO,
-        });
-    }
     if keys.just_pressed(KeyCode::Q) {
         spawn_enemy.send(SpawnEnemyEvent {
             spawn_pos: Vec2::new(96., 96.),
