@@ -36,7 +36,7 @@ fn movement(mut query: Query<(&mut GridPosition, &mut Movement, &mut Transform)>
         if mv.next_move == IVec2::ZERO {
             return;
         }
-        let next_pos = to_world_coords(&(grid_pos.0 + mv.next_move));
+        let next_pos = to_world_coords(&(grid_pos.pos() + mv.next_move));
         let cur_pos = transform.translation.truncate();
         if cur_pos.distance(next_pos) > THRESHOLD {
             transform.translation.x = lerp(transform.translation.x, next_pos.x, mv.frame / 60.);
@@ -45,7 +45,7 @@ fn movement(mut query: Query<(&mut GridPosition, &mut Movement, &mut Transform)>
         } else {
             mv.frame = 0.;
             transform.translation = next_pos.extend(transform.translation.z);
-            grid_pos.0 += mv.next_move;
+            grid_pos.move_relative(&mv.next_move);
             mv.next_move = IVec2::ZERO;
         }
     }
