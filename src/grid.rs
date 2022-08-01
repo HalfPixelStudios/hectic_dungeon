@@ -3,7 +3,7 @@ use std::{fmt::Debug, ops::Deref};
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
 
-use crate::player::PlayerMovedEvent;
+use crate::{map::CollisionMap, player::PlayerMovedEvent};
 
 // TODO: make grid not have a constant size, we need to be able to switch out the map later
 
@@ -128,13 +128,24 @@ pub fn snap_to_grid(p: &Vec2) -> IVec2 {
 }
 
 /// Grabs all grid positions and updates the grid
-fn update_grid(mut grid: ResMut<Grid>, mut query: Query<&GridPosition>) {
+fn update_grid(
+    mut grid: ResMut<Grid>,
+    collision_map: Res<CollisionMap>,
+    query: Query<&GridPosition>,
+) {
     for y in 0..MAP_HEIGHT as usize {
         for x in 0..MAP_WIDTH as usize {
             grid[y][x] = 0;
         }
     }
-    for (grid_pos) in query.iter_mut() {
+    // TOOD: not very efficient to reload collisions every time, consider making a 'background'
+    // grid that gets loaded
+    for col in collision_map.iter() {
+        if grid.inbounds(col) {
+            grid[col.y as usize][col.x as usize] = CellType::Wall as i32;
+        }
+    }
+    for grid_pos in query.iter() {
         if grid.inbounds(grid_pos) {
             grid[grid_pos.y as usize][grid_pos.x as usize] = grid_pos.value as i32;
         }
