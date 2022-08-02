@@ -1,3 +1,5 @@
+mod attack_indicator;
+
 use bevy::prelude::*;
 
 pub struct UIPlugin;
