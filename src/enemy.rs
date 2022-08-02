@@ -12,7 +12,7 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheets},
     grid::{CellType, Grid, GridPosition},
     movement::Movement,
-    player::PlayerMovedEvent,
+    player::{Player, PlayerMovedEvent},
 };
 
 #[derive(Component)]
@@ -53,29 +53,38 @@ fn spawn(
 //TODO player cant move if go neg or enemy on top
 //Maybe both are knocked back when two beings try to move into the same cell
 fn ai(
-    mut query: Query<(&Transform, &mut GridPosition, &mut Movement), With<Enemy>>,
+    mut player_query: Query<(&GridPosition), (With<Player>, Without<Enemy>)>,
+    mut enemy_query: Query<
+        (&Transform, &mut GridPosition, &mut Movement),
+        (With<Enemy>, Without<Player>),
+    >,
     mut events: EventReader<PlayerMovedEvent>,
     grid: Res<Grid>,
 ) {
     for _ in events.iter() {
-        let player_pos = grid.find(CellType::Player);
+        info!("player moved");
+        let player_grid_pos = player_query.single().pos();
 
-        for (transform, mut grid_pos, mut mv) in query.iter_mut() {
-            if let Some(player_pos) = player_pos {
-                if let Some(path) = a_star(&grid_pos, &player_pos, &grid) {
-                    let next_pos = path.get(0).unwrap();
-                    debug!("next move {:?}", *next_pos - grid_pos.pos());
-                    mv.next_move = *next_pos - grid_pos.pos();
-                }
+        for (transform, mut grid_pos, mut mv) in enemy_query.iter_mut() {
+            let cur_pos = grid_pos.pos();
+            if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
+                let next_pos = path.get(0).unwrap_or(&cur_pos);
+                info!("next move {:?}", *next_pos - cur_pos);
+                mv.next_move = *next_pos - cur_pos;
             } else {
-                mv.next_move = IVec2::ZERO;
+                info!("failed to calculate path");
             }
         }
     }
 }
 
 pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2>> {
-    info!("starting a star search {:?} {:?}", start, dest);
+    // trivial case
+    if start == dest {
+        return Some(Vec::new());
+    }
+
+    // info!("starting a star search {:?} {:?}", start, dest);
     let mut search: PriorityQueue<IVec2, Reverse<i32>> = PriorityQueue::new();
     search.push_decrease(*start, Reverse(0));
 
@@ -101,7 +110,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2
                 pos = prev_pos;
             }
             path.reverse();
-            info!("path {:?}", path);
+            // info!("path {:?}", path);
             return Some(path);
         }
 

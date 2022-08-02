@@ -59,9 +59,6 @@ fn setup(
     spawn_player.send(SpawnPlayerEvent {
         spawn_pos: Vec2::new(8., 8.),
     });
-    spawn_enemy.send(SpawnEnemyEvent {
-        spawn_pos: Vec2::new(64., 64.),
-    });
 }
 
 fn debug(

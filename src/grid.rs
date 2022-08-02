@@ -169,7 +169,7 @@ impl Plugin for GridPlugin {
 
 fn debug(grid: Res<Grid>, mut events: EventReader<PlayerMovedEvent>) {
     for _ in events.iter() {
-        info!("{:?}", grid);
+        // info!("{:?}", grid);
     }
 }
 

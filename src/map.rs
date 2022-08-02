@@ -1,8 +1,8 @@
 use autodefault::autodefault;
-use bevy::prelude::*;
+use bevy::{ecs::query, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::grid::snap_to_grid;
+use crate::{enemy::SpawnEnemyEvent, grid::snap_to_grid};
 
 pub const MAPWIDTH: f32 = 16.;
 pub const MAPHEIGHT: f32 = 16.;
@@ -20,7 +20,8 @@ impl Plugin for MapPlugin {
             .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_startup_system(setup)
-            .add_system(register_collision_int_cell);
+            .add_system(register_collision_int_cell)
+            .add_system(register_spawn_points);
     }
 }
 
@@ -41,4 +42,36 @@ fn register_collision_int_cell(
     for (transform, int_cell) in query.iter() {
         collision_map.push(snap_to_grid(&transform.translation.truncate()));
     }
+}
+
+fn register_spawn_points(
+    query: Query<&EntityInstance, Added<EntityInstance>>,
+    mut writer: EventWriter<SpawnEnemyEvent>,
+) {
+    for entity_instance in query.iter() {
+        // TODO handle not found
+        if let Some(field) = entity_instance
+            .field_instances
+            .iter()
+            .find(|field| field.identifier == "id")
+        {
+            if let FieldValue::String(Some(v)) = &field.value {
+                info!(
+                    "field instance {:?} {:?}",
+                    v,
+                    entity_instance.grid.as_vec2() * TILEWIDTH
+                );
+                writer.send(SpawnEnemyEvent {
+                    spawn_pos: ldtk_to_bevy(&entity_instance.grid).as_vec2() * TILEWIDTH,
+                });
+            }
+        }
+    }
+}
+
+/// Converts ldtk coordinates to bevy coordinates
+///
+/// Ldtk uses down position, right positive whereas bevy uses up positive, right positive
+fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
+    IVec2::new(v.x, (MAPHEIGHT as i32) - v.y - 1)
 }

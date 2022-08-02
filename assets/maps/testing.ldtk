@@ -10,7 +10,7 @@
 	},
 	"jsonVersion": "1.1.3",
 	"appBuildId": 460557,
-	"nextUid": 5,
+	"nextUid": 10,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -34,6 +34,33 @@
 	"tutorialDesc": null,
 	"flags": [],
 	"defs": { "layers": [
+		{
+			"__type": "Entities",
+			"identifier": "Entities",
+			"type": "Entities",
+			"uid": 8,
+			"gridSize": 8,
+			"guideGridWid": 0,
+			"guideGridHei": 0,
+			"displayOpacity": 1,
+			"inactiveOpacity": 0.6,
+			"hideInList": false,
+			"hideFieldsWhenInactive": true,
+			"pxOffsetX": 0,
+			"pxOffsetY": 0,
+			"parallaxFactorX": 0,
+			"parallaxFactorY": 0,
+			"parallaxScaling": true,
+			"requiredTags": [],
+			"excludedTags": [],
+			"intGridValues": [],
+			"autoTilesetDefUid": null,
+			"autoRuleGroups": [],
+			"autoSourceLayerDefUid": null,
+			"tilesetDefUid": null,
+			"tilePivotX": 0,
+			"tilePivotY": 0
+		},
 		{
 			"__type": "IntGrid",
 			"identifier": "Collision",
@@ -88,7 +115,97 @@
 			"tilePivotX": 0,
 			"tilePivotY": 0
 		}
-	], "entities": [], "tilesets": [
+	], "entities": [
+		{
+			"identifier": "EnemySpawn",
+			"uid": 5,
+			"tags": [],
+			"width": 8,
+			"height": 8,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#94D9B3",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": [
+				{
+					"identifier": "id",
+					"__type": "String",
+					"uid": 6,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "ValueOnly",
+					"editorDisplayPos": "Above",
+					"editorAlwaysShow": false,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["\"\""]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
+		},
+		{
+			"identifier": "PlayerSpawn",
+			"uid": 9,
+			"tags": [],
+			"width": 8,
+			"height": 8,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#1A11F4",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
+		}
+	], "tilesets": [
 		{
 			"__cWid": 8,
 			"__cHei": 8,
@@ -108,7 +225,7 @@
 			"savedSelections": [],
 			"cachedPixelData": {
 				"opaqueTiles": "1100000000000000000000000000000000000000000000000000000000000000",
-				"averageColors": "f666f22300000000000000000000000000000000000000000000000000000000689d654300000000000000000000000066a3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+				"averageColors": "f889f2350000000000000000000000003fee0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 			}
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
@@ -134,6 +251,114 @@
 			"externalRelPath": null,
 			"fieldInstances": [],
 			"layerInstances": [
+				{
+					"__identifier": "Entities",
+					"__type": "Entities",
+					"__cWid": 16,
+					"__cHei": 16,
+					"__gridSize": 8,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": null,
+					"__tilesetRelPath": null,
+					"iid": "05bbd2e0-02f0-11ed-bc98-7b0127b8cfd7",
+					"levelId": 0,
+					"layerDefUid": 8,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [],
+					"autoLayerTiles": [],
+					"seed": 4800659,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
+					"entityInstances": [
+						{
+							"__identifier": "EnemySpawn",
+							"__grid": [9,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "0d94a4b0-02f0-11ed-bc98-b7be6a80a607",
+							"width": 8,
+							"height": 8,
+							"defUid": 5,
+							"px": [72,32],
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["orc"]
+							}] }]
+						},
+						{
+							"__identifier": "EnemySpawn",
+							"__grid": [11,7],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "11bffee0-02f0-11ed-bc98-9d3a855f02ba",
+							"width": 8,
+							"height": 8,
+							"defUid": 5,
+							"px": [88,56],
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["orc"]
+							}] }]
+						},
+						{
+							"__identifier": "EnemySpawn",
+							"__grid": [6,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "1683a170-02f0-11ed-bc98-3344c1a794bf",
+							"width": 8,
+							"height": 8,
+							"defUid": 5,
+							"px": [48,88],
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["orc"]
+							}] }]
+						},
+						{
+							"__identifier": "EnemySpawn",
+							"__grid": [4,8],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "28c3df30-02f0-11ed-bc98-b39dc2710507",
+							"width": 8,
+							"height": 8,
+							"defUid": 5,
+							"px": [32,64],
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["orc"]
+							}] }]
+						},
+						{
+							"__identifier": "PlayerSpawn",
+							"__grid": [1,14],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#1A11F4",
+							"iid": "43a91860-02f0-11ed-bc98-e3af7b25bd7e",
+							"width": 8,
+							"height": 8,
+							"defUid": 9,
+							"px": [8,112],
+							"fieldInstances": []
+						}
+					]
+				},
 				{
 					"__identifier": "Collision",
 					"__type": "IntGrid",
