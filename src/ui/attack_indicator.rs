@@ -65,7 +65,8 @@ impl Plugin for AttackIndicatorPlugin {
         app.add_event::<SpawnAttackIndicatorEvent>()
             .add_system(spawn)
             .add_system(render)
-            .add_system(debug);
+            .add_system(debug)
+            .add_system(control);
     }
 }
 
@@ -96,7 +97,9 @@ fn spawn(
         let offsets = attack_indictor.to_offsets();
 
         let parent = cmd.spawn().id();
-        cmd.entity(parent).insert(attack_indictor);
+        cmd.entity(parent)
+            .insert(attack_indictor)
+            .insert_bundle(TransformBundle::default());
 
         for offset in offsets.iter().map(|v| *v * 8) {
             let child = cmd.spawn().id();
@@ -113,14 +116,37 @@ fn spawn(
                 },
                 ..default()
             });
-            // cmd.entity(parent).push_children(&[child]);
+            cmd.entity(parent).push_children(&[child]);
         }
-        // cmd.entity(player).push_children(&[parent]);
+        cmd.entity(player).push_children(&[parent]);
     }
 }
 
 fn debug(keys: Res<Input<KeyCode>>, mut writer: EventWriter<SpawnAttackIndicatorEvent>) {
     if keys.just_pressed(KeyCode::E) {
         writer.send(SpawnAttackIndicatorEvent);
+    }
+}
+
+fn control(keys: Res<Input<KeyCode>>, mut query: Query<(&mut AttackIndicator, &mut Transform)>) {
+    use std::f32::consts::PI;
+
+    for (mut attack_indicator, mut transform) in query.iter_mut() {
+        if keys.just_pressed(KeyCode::Up) {
+            attack_indicator.dir = Dir::North;
+            transform.rotation = Quat::from_rotation_z(0.);
+        }
+        if keys.just_pressed(KeyCode::Left) {
+            attack_indicator.dir = Dir::West;
+            transform.rotation = Quat::from_rotation_z(PI / 2.);
+        }
+        if keys.just_pressed(KeyCode::Down) {
+            attack_indicator.dir = Dir::South;
+            transform.rotation = Quat::from_rotation_z(PI);
+        }
+        if keys.just_pressed(KeyCode::Right) {
+            attack_indicator.dir = Dir::East;
+            transform.rotation = Quat::from_rotation_z(3. * PI / 2.);
+        }
     }
 }
