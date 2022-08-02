@@ -70,7 +70,7 @@ fn spawn(
                 },
                 texture_atlas: asset_sheet.get("player").unwrap().clone(),
                 transform: Transform {
-                    translation: spawn_pos.extend(0.),
+                    translation: spawn_pos.extend(1.),
                     ..default()
                 },
                 ..default()

@@ -32,13 +32,17 @@ pub struct Grid([[i32; MAP_WIDTH as usize]; MAP_HEIGHT as usize]);
 
 impl Grid {
     /// Checks if given cell value is empty
-    pub fn is_empty(&self, v: IVec2) -> bool {
+    pub fn is_empty(&self, v: &IVec2) -> bool {
         self.0[v.y as usize][v.x as usize] == CellType::Empty as i32
     }
 
     /// Checks if position is in bounds
     pub fn inbounds(&self, v: &IVec2) -> bool {
         0 <= v.x && v.x < MAP_WIDTH && 0 <= v.y && v.y < MAP_HEIGHT
+    }
+
+    pub fn at(&self, v: &IVec2) -> i32 {
+        self[v.y as usize][v.x as usize]
     }
 
     /// Returns the first found cell of a given cell type
