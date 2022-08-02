@@ -66,12 +66,7 @@ fn debug(
     mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
     mut player_move: EventWriter<PlayerMovedEvent>,
 ) {
-    if keys.just_pressed(KeyCode::Q) {
-        spawn_enemy.send(SpawnEnemyEvent {
-            spawn_pos: Vec2::new(96., 96.),
-        });
-    }
-    if keys.just_pressed(KeyCode::Y) {
-        player_move.send(PlayerMovedEvent);
-    }
+    // if keys.just_pressed(KeyCode::Y) {
+    //     player_move.send(PlayerMovedEvent);
+    // }
 }

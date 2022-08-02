@@ -129,16 +129,21 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2
 }
 
 fn tiles_around(pos: &IVec2, grid: &Res<Grid>) -> Vec<IVec2> {
-    [
+    use rand::{seq::SliceRandom, thread_rng};
+
+    let mut dirs = [
         IVec2::new(1, 0),
         IVec2::new(-1, 0),
         IVec2::new(0, 1),
         IVec2::new(0, -1),
-    ]
-    .into_iter()
-    .map(|d| *pos + d)
-    .filter(|pos| grid.inbounds(pos) && grid.at(pos) != CellType::Wall as i32)
-    .collect()
+    ];
+
+    dirs.shuffle(&mut thread_rng());
+
+    dirs.into_iter()
+        .map(|d| *pos + d)
+        .filter(|pos| grid.inbounds(pos) && grid.at(pos) != CellType::Wall as i32)
+        .collect()
 }
 
 fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {

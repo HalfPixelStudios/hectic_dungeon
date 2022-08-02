@@ -49,13 +49,13 @@ fn spawn(
 ) {
     for SpawnPlayerEvent { spawn_pos } in events.iter() {
         let input_map = InputMap::new([
-            (KeyCode::Left, PlayerAction::Left),
+            // (KeyCode::Left, PlayerAction::Left),
             (KeyCode::A, PlayerAction::Left),
-            (KeyCode::Right, PlayerAction::Right),
+            // (KeyCode::Right, PlayerAction::Right),
             (KeyCode::D, PlayerAction::Right),
-            (KeyCode::Up, PlayerAction::Up),
+            // (KeyCode::Up, PlayerAction::Up),
             (KeyCode::W, PlayerAction::Up),
-            (KeyCode::Down, PlayerAction::Down),
+            // (KeyCode::Down, PlayerAction::Down),
             (KeyCode::S, PlayerAction::Down),
         ]);
 

@@ -27,6 +27,14 @@ pub fn load_assets(
     let mut data: HashMap<String, HandleUntyped> = HashMap::new();
     let mut sheets = HashMap::new();
 
+    let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
+        assets.load("tilesheet/tilesheet.png"),
+        Vec2::new(8.0, 8.0),
+        8,
+        8,
+    ));
+    sheets.insert("tilesheet".into(), tilesheet_handle);
+
     let archer_handle = texture_atlases.add(TextureAtlas::from_grid(
         assets.load("tilesheet/player.png"),
         Vec2::new(8.0, 8.0),
