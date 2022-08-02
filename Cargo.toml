@@ -25,6 +25,7 @@ autodefault = { version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 rand = { version = "0.8.5" }
 enum-map = { version = "2.4.0", features = ["serde"] }
+priority-queue = { version = "1.2.3" }
 
 [profile.dev]
 opt-level = 1

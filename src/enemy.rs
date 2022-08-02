@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 use bevy::prelude::*;
 use iyes_loopless::prelude::ConditionSet;
+use priority_queue::PriorityQueue;
 
 use crate::{
     animation::Animation,
@@ -65,6 +68,43 @@ fn ai(
             mv.next_move = IVec2::ZERO;
         }
     }
+}
+
+fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) {
+    let mut search: PriorityQueue<IVec2, i32> = PriorityQueue::new();
+    search.push_decrease(*start, 0);
+
+    while search.len() > 0 {
+        let (cur_pos, cur_cost) = search.pop().unwrap();
+
+        // done
+        if cur_pos == *dest {
+            return;
+        }
+
+        // insert potential search cells
+        for next_pos in tiles_around(&cur_pos, grid).iter() {
+            search.push_decrease(*next_pos, heuristic(next_pos, dest));
+        }
+    }
+}
+
+fn tiles_around(pos: &IVec2, grid: &Res<Grid>) -> Vec<IVec2> {
+    [
+        IVec2::new(1, 0),
+        IVec2::new(-1, 0),
+        IVec2::new(0, 1),
+        IVec2::new(0, -1),
+    ]
+    .into_iter()
+    .map(|d| *pos + d)
+    .filter(|pos| grid.inbounds(pos))
+    .collect()
+}
+
+fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
+    // manhatten distance
+    (cur.x - dest.x).abs() + (cur.y - dest.y).abs()
 }
 
 pub struct EnemyPlugin;
