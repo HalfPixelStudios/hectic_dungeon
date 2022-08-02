@@ -1,5 +1,5 @@
 use autodefault::autodefault;
-use bevy::prelude::*;
+use bevy::{ecs::query, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 
 use crate::grid::snap_to_grid;
@@ -20,7 +20,8 @@ impl Plugin for MapPlugin {
             .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_startup_system(setup)
-            .add_system(register_collision_int_cell);
+            .add_system(register_collision_int_cell)
+            .add_system(register_spawn_points);
     }
 }
 
@@ -40,5 +41,20 @@ fn register_collision_int_cell(
 ) {
     for (transform, int_cell) in query.iter() {
         collision_map.push(snap_to_grid(&transform.translation.truncate()));
+    }
+}
+
+fn register_spawn_points(query: Query<(&EntityInstance), Added<EntityInstance>>) {
+    for entity_instance in query.iter() {
+        // TODO handle not found
+        if let Some(field) = entity_instance
+            .field_instances
+            .iter()
+            .find(|field| field.identifier == "id")
+        {
+            if let FieldValue::String(Some(v)) = &field.value {
+                info!("field instance {:?} {:?}", v, entity_instance.grid);
+            }
+        }
     }
 }
