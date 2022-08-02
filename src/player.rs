@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy_bobs::component::health::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::{
@@ -76,6 +77,7 @@ fn spawn(
                 ..default()
             })
             .insert(Player)
+            .insert(Health::new(10))
             .insert(GridPosition::new(spawn_pos, CellType::Player))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),

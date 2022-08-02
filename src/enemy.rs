@@ -4,6 +4,7 @@ use std::{
 };
 
 use bevy::prelude::*;
+use bevy_bobs::component::health::Health;
 use iyes_loopless::prelude::ConditionSet;
 use priority_queue::PriorityQueue;
 
@@ -47,7 +48,8 @@ fn spawn(
             // .insert(Animation::new(&enemy.anim))
             .insert(GridPosition::new(spawn_pos, CellType::Enemy))
             .insert(Movement::new())
-            .insert(Enemy);
+            .insert(Enemy)
+            .insert(Health::new(3));
     }
 }
 //TODO player cant move if go neg or enemy on top
