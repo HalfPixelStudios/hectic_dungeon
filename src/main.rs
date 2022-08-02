@@ -9,6 +9,7 @@ mod game;
 mod grid;
 mod layers;
 mod map;
+mod material;
 mod movement;
 mod player;
 mod prefab;
