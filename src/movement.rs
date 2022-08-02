@@ -6,7 +6,7 @@ use crate::{
     grid::{snap_to_grid, to_world_coords, GridPosition},
 };
 
-const THRESHOLD: f32 = 0.01;
+const THRESHOLD: f32 = 0.001;
 
 pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
     x * (1. - by) + y * by
@@ -34,7 +34,7 @@ impl Movement {
 fn movement(mut query: Query<(&mut GridPosition, &mut Movement, &mut Transform)>) {
     for (mut grid_pos, mut mv, mut transform) in query.iter_mut() {
         if mv.next_move == IVec2::ZERO {
-            return;
+            continue;
         }
         let next_pos = to_world_coords(&(grid_pos.pos() + mv.next_move));
         let cur_pos = transform.translation.truncate();
