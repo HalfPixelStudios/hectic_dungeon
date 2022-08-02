@@ -58,14 +58,18 @@ fn ai(
     grid: Res<Grid>,
 ) {
     for _ in events.iter() {
+        info!("player moved");
         let player_pos = grid.find(CellType::Player);
 
         for (transform, mut grid_pos, mut mv) in query.iter_mut() {
+            let cur_pos = grid_pos.pos();
             if let Some(player_pos) = player_pos {
                 if let Some(path) = a_star(&grid_pos, &player_pos, &grid) {
-                    let next_pos = path.get(0).unwrap();
-                    debug!("next move {:?}", *next_pos - grid_pos.pos());
-                    mv.next_move = *next_pos - grid_pos.pos();
+                    let next_pos = path.get(0).unwrap_or(&cur_pos);
+                    info!("next move {:?}", *next_pos - cur_pos);
+                    mv.next_move = *next_pos - cur_pos;
+                } else {
+                    info!("failed to calculate path");
                 }
             } else {
                 mv.next_move = IVec2::ZERO;
@@ -75,7 +79,7 @@ fn ai(
 }
 
 pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2>> {
-    info!("starting a star search {:?} {:?}", start, dest);
+    // info!("starting a star search {:?} {:?}", start, dest);
     let mut search: PriorityQueue<IVec2, Reverse<i32>> = PriorityQueue::new();
     search.push_decrease(*start, Reverse(0));
 
@@ -101,7 +105,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2
                 pos = prev_pos;
             }
             path.reverse();
-            info!("path {:?}", path);
+            // info!("path {:?}", path);
             return Some(path);
         }
 
