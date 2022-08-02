@@ -18,7 +18,9 @@ use crate::map::MapPlugin;
 pub fn app() {
     let window_descriptor = WindowDescriptor {
         present_mode: bevy::window::PresentMode::Fifo,
-        title: "bevy_test".into(),
+        title: "hectic_dungeon".into(),
+        width: 800.,
+        height: 600.,
         ..default()
     };
 
@@ -55,10 +57,10 @@ fn setup(
     mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
 ) {
     spawn_player.send(SpawnPlayerEvent {
-        spawn_pos: Vec2::ZERO,
+        spawn_pos: Vec2::new(8., 8.),
     });
     spawn_enemy.send(SpawnEnemyEvent {
-        spawn_pos: Vec2::new(96., 96.),
+        spawn_pos: Vec2::new(64., 64.),
     });
 }
 
