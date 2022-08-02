@@ -160,8 +160,8 @@ pub struct GridPlugin;
 
 impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(gizmo)
-            .add_system(update_grid)
+        app.add_system(update_grid)
+            // .add_system(gizmo)
             .add_system(debug)
             .insert_resource(Grid([[0; MAP_WIDTH as usize]; MAP_HEIGHT as usize]));
     }
