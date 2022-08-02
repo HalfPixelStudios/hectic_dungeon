@@ -1,7 +1,9 @@
 use std::{fmt::Debug, ops::Deref};
 
+use anyhow::{anyhow, Result};
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::*;
+use thiserror::Error;
 
 use crate::{map::CollisionMap, player::PlayerMovedEvent};
 
@@ -13,7 +15,7 @@ const CELL_HEIGHT: i32 = 8;
 const MAP_WIDTH: i32 = 16;
 const MAP_HEIGHT: i32 = 16;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum CellType {
     Empty = 0,
     Player = 1,
@@ -21,6 +23,70 @@ pub enum CellType {
     Wall = 3,
 }
 
+pub struct Grid {
+    width: i32,
+    height: i32,
+    grid: Vec<Vec<CellType>>,
+}
+
+#[derive(Error, Debug)]
+pub enum GridError {
+    #[error("tried to access position outside of grid {0}")]
+    OutOfBounds(IVec2),
+}
+
+impl Grid {
+    pub fn new(width: i32, height: i32) -> Self {
+        let grid_vec = Vec::new();
+        grid_vec.reserve((width * height) as usize);
+
+        Grid {
+            width,
+            height,
+            grid: grid_vec,
+        }
+    }
+
+    fn bounds_check(&self, pos: &IVec2) -> bool {
+        0 <= pos.x && pos.x < self.width && 0 <= pos.y && pos.y < self.height
+    }
+
+    fn pos_to_index(&self, pos: &IVec2) -> Result<usize> {
+        if self.bounds_check(pos) {
+            Ok((pos.y * self.width + pos.x) as usize)
+        } else {
+            Err(anyhow!(GridError::OutOfBounds(pos.to_owned())))
+        }
+    }
+
+    fn get_cell(&self, pos: &IVec2) -> Result<&Vec<CellType>> {
+        let ind = self.pos_to_index(pos)?;
+        // shouldn't panic (since already bounds checked)?
+        Ok(self.grid.get(ind).unwrap())
+    }
+
+    fn get_cell_mut(&mut self, pos: &IVec2) -> Result<&mut Vec<CellType>> {
+        let ind = self.pos_to_index(pos)?;
+        Ok(self.grid.get_mut(ind).unwrap())
+    }
+
+    pub fn insert_at(&mut self, pos: &IVec2, val: CellType) -> Result<()> {
+        self.get_cell_mut(pos)?.push(val);
+        Ok(())
+    }
+
+    pub fn contains_at(&self, pos: &IVec2, val: CellType) -> Result<bool> {
+        Ok(self.get_cell(pos)?.contains(&val))
+    }
+
+    pub fn clear(&mut self) {
+        for cell in self.grid.iter_mut() {
+            cell.clear();
+        }
+    }
+}
+
+/*
 /// Collection of grid positions that can be queried and manipulated
 ///
 /// The grid is a read-only structure. It is not a source of truth. GridPositions are the actual
@@ -31,6 +97,7 @@ pub enum CellType {
 pub struct Grid([[i32; MAP_WIDTH as usize]; MAP_HEIGHT as usize]);
 
 impl Grid {
+
     /// Checks if given cell value is empty
     pub fn is_empty(&self, v: &IVec2) -> bool {
         self.0[v.y as usize][v.x as usize] == CellType::Empty as i32
@@ -44,32 +111,6 @@ impl Grid {
     pub fn at(&self, v: &IVec2) -> i32 {
         self[v.y as usize][v.x as usize]
     }
-
-    /// Returns the first found cell of a given cell type
-    pub fn find(&self, t: CellType) -> Option<IVec2> {
-        for y in 0..MAP_HEIGHT as usize {
-            for x in 0..MAP_WIDTH as usize {
-                if self[y][x] == t as i32 {
-                    return Some(IVec2::new(x as i32, y as i32));
-                }
-            }
-        }
-        return None;
-    }
-
-    /* probably not needed
-    /// Move the current contents of a cell to a new cell
-    ///
-    /// Leaves the old cell empty. Furthermore, moving a cell that is currently empty has no
-    /// effect.
-    pub fn move_cell(&mut self, cur_pos: IVec2, dest_pos: IVec2) {
-        let cur_value = self[cur_pos.y as usize][cur_pos.x as usize];
-        if cur_value == 0 {
-            return;
-        }
-        self[dest_pos.y as usize][dest_pos.x as usize] = cur_value;
-    }
-    */
 }
 
 impl Debug for Grid {
@@ -84,6 +125,7 @@ impl Debug for Grid {
         write!(f, "{}", out)
     }
 }
+*/
 
 #[derive(Component)]
 pub struct GridPosition {

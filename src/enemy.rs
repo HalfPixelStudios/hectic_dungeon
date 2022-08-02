@@ -62,14 +62,12 @@ fn ai(
     grid: Res<Grid>,
 ) {
     for _ in events.iter() {
-        info!("player moved");
         let player_grid_pos = player_query.single().pos();
 
         for (transform, mut grid_pos, mut mv) in enemy_query.iter_mut() {
             let cur_pos = grid_pos.pos();
             if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
                 let next_pos = path.get(0).unwrap_or(&cur_pos);
-                info!("next move {:?}", *next_pos - cur_pos);
                 mv.next_move = *next_pos - cur_pos;
             } else {
                 info!("failed to calculate path");

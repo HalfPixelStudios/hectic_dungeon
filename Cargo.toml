@@ -21,6 +21,7 @@ iyes_loopless = "0.6.1"
 
 ron = "0.7"
 anyhow = "1.0.58"
+thiserror = "1"
 autodefault = { version = "2.0.0" }
 serde = { version = "1", features = ["derive"] }
 rand = { version = "0.8.5" }
