@@ -18,6 +18,7 @@ pub enum AniState {
     Walk,
     Attack,
 }
+
 #[derive(Deserialize, Debug, Clone)]
 pub struct AnimationPrefab {
     pub frames: EnumMap<AniState, Range<usize>>,
@@ -33,6 +34,7 @@ pub struct Animation {
     pub played_once: bool,
     pub facing: Facing,
 }
+
 impl Animation {
     pub fn new(prefab: &AnimationPrefab) -> Self {
         Self {
@@ -44,6 +46,7 @@ impl Animation {
             facing: Facing::Left,
         }
     }
+
     pub fn set_state(&mut self, s: AniState) {
         if self.state == s {
             return;
@@ -54,10 +57,12 @@ impl Animation {
         self.timer.reset();
     }
 }
+
 //returns the value of non zero element
 fn iv2_sum(v: IVec2) -> i32 {
     v.x + v.y
 }
+
 fn state(mut query: Query<(&Movement, &mut Animation)>) {
     for (mv, mut anim) in query.iter_mut() {
         if iv2_sum(mv.next_move) != 0 {
@@ -72,6 +77,7 @@ fn state(mut query: Query<(&Movement, &mut Animation)>) {
         }
     }
 }
+
 fn animate(time: Res<Time>, mut animations: Query<(&mut Animation, &mut TextureAtlasSprite)>) {
     for (mut ani, mut sprite) in animations.iter_mut() {
         let ani_range = ani.frames[ani.state].clone();

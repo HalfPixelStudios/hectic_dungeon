@@ -26,7 +26,7 @@ pub fn app() {
 
     let mut app = App::new();
 
-    app.insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
+    app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(window_descriptor);
     // .insert_resource(LogSettings {
     //     level: bevy::log::Level::DEBUG,
