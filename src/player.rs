@@ -7,7 +7,7 @@ use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
     camera::CameraFollow,
-    grid::{CellType, Grid, GridEntity},
+    grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
 };
 
@@ -25,7 +25,7 @@ pub enum PlayerAction {
 pub struct PlayerMovedEvent;
 
 pub struct SpawnPlayerEvent {
-    pub spawn_pos: Vec2,
+    pub spawn_pos: IVec2,
 }
 
 pub struct PlayerPlugin;
@@ -70,13 +70,13 @@ fn spawn(
                 },
                 texture_atlas: asset_sheet.get("player").unwrap().clone(),
                 transform: Transform {
-                    translation: spawn_pos.extend(1.),
+                    translation: to_world_coords(spawn_pos).extend(1.),
                     ..default()
                 },
                 ..default()
             })
             .insert(Player)
-            .insert(GridEntity::new(spawn_pos.as_ivec2(), CellType::Player))
+            .insert(GridEntity::new(*spawn_pos, CellType::Player))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,
@@ -116,6 +116,7 @@ fn controller(
                 && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
             {
                 player_moved.send(PlayerMovedEvent);
+                info!("player move {}", dir);
                 movement.next_move = dir;
             }
         }

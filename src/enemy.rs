@@ -10,7 +10,7 @@ use priority_queue::PriorityQueue;
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
-    grid::{CellType, Grid, GridEntity},
+    grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
 };
@@ -18,7 +18,7 @@ use crate::{
 #[derive(Component)]
 pub struct Enemy;
 pub struct SpawnEnemyEvent {
-    pub spawn_pos: Vec2,
+    pub spawn_pos: IVec2,
 }
 pub struct EnemyUpdateEvent;
 fn spawn(
@@ -39,13 +39,13 @@ fn spawn(
                 },
                 texture_atlas: asset_sheet.get("orc").unwrap().clone(),
                 transform: Transform {
-                    translation: spawn_pos.extend(1.),
+                    translation: to_world_coords(spawn_pos).extend(1.),
                     ..default()
                 },
                 ..default()
             })
             // .insert(Animation::new(&enemy.anim))
-            .insert(GridEntity::new(spawn_pos.as_ivec2(), CellType::Enemy))
+            .insert(GridEntity::new(*spawn_pos, CellType::Enemy))
             .insert(Movement::new())
             .insert(Enemy);
     }
