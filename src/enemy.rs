@@ -14,6 +14,7 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
+    ui::attack_indicator::AttackTileEvent,
 };
 
 #[derive(Component)]
@@ -31,7 +32,9 @@ fn spawn(
 ) {
     for SpawnEnemyEvent { spawn_pos } in events.iter() {
         // let enemy = beings.get(prefab_data.get("archer").unwrap()).unwrap();
-        cmd.spawn()
+        let id = cmd.spawn().id();
+
+        cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
                     index: 0,
@@ -46,7 +49,7 @@ fn spawn(
                 ..default()
             })
             // .insert(Animation::new(&enemy.anim))
-            .insert(GridEntity::new(*spawn_pos, CellType::Enemy))
+            .insert(GridEntity::new(*spawn_pos, CellType::Enemy(id)))
             .insert(Movement::new())
             .insert(Enemy)
             .insert(Health::new(3));
@@ -151,6 +154,16 @@ fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
     (cur.x - dest.x).abs() + (cur.y - dest.y).abs()
 }
 
+fn take_damage(
+    mut cmd: Commands,
+    mut events: EventReader<AttackTileEvent>,
+    mut query: Query<(Entity, &mut Health), With<Enemy>>,
+) {
+    for AttackTileEvent { entity } in events.iter() {
+        cmd.entity(*entity).despawn();
+    }
+}
+
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
@@ -158,6 +171,7 @@ impl Plugin for EnemyPlugin {
         app.add_event::<SpawnEnemyEvent>()
             .add_event::<EnemyUpdateEvent>()
             .add_system(spawn)
+            .add_system(take_damage)
             .add_system_set(
                 ConditionSet::new()
                     .run_on_event::<EnemyUpdateEvent>()
