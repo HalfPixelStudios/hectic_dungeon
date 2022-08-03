@@ -3,6 +3,7 @@
 mod animation;
 mod app;
 mod assets;
+mod attack;
 mod camera;
 mod enemy;
 mod game;
@@ -13,6 +14,7 @@ mod movement;
 mod player;
 mod prefab;
 mod ui;
+mod utils;
 
 fn main() {
     app::app();

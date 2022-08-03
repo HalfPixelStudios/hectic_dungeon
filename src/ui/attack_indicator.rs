@@ -2,31 +2,27 @@ use bevy::prelude::*;
 
 use crate::{
     assets::{PrefabData, SpriteSheets},
+    attack::{rotate_offsets, AttackPattern},
     grid::GridEntity,
     player::Player,
+    utils::Dir,
 };
 
 // TODO unify this
 const CELLWIDTH: f32 = 8.;
 
-// TODO make a proper 2d direction utility
-pub enum Dir {
-    North,
-    East,
-    South,
-    West,
-}
-
-pub enum AttackPattern {
-    StraightOne,
-    StraightTwo,
-    Hammer,
-}
-
 #[derive(Component)]
 pub struct AttackIndicator {
     pub dir: Dir,
     pub pattern: AttackPattern,
+}
+
+impl AttackIndicator {
+    pub fn get_pattern(&self) -> Vec<IVec2> {
+        let offsets = self.pattern.to_offsets();
+        let dir = self.dir;
+        rotate_offsets(offsets, dir)
+    }
 }
 
 pub struct SpawnAttackIndicatorEvent {
@@ -38,36 +34,6 @@ pub struct DespawnAttackIndicatorEvent {
     ///
     /// If false, will spawn attack particles
     cancelled: bool,
-}
-
-impl AttackIndicator {
-    // default north
-    pub fn to_offsets(&self) -> Vec<IVec2> {
-        let north = match &self.pattern {
-            AttackPattern::StraightOne => vec![IVec2::new(0, 1)],
-            AttackPattern::StraightTwo => vec![IVec2::new(0, 1), IVec2::new(0, 2)],
-            AttackPattern::Hammer => vec![
-                IVec2::new(-1, 1),
-                IVec2::new(0, 1),
-                IVec2::new(1, 1),
-                IVec2::new(-1, 2),
-                IVec2::new(0, 2),
-                IVec2::new(1, 2),
-            ],
-        };
-
-        // rotate offsets based on direction
-        Self::rotate_offsets(north, &self.dir)
-    }
-
-    fn rotate_offsets(vecs: Vec<IVec2>, dir: &Dir) -> Vec<IVec2> {
-        match dir {
-            Dir::North => vecs,
-            Dir::East => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
-            Dir::South => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
-            Dir::West => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
-        }
-    }
 }
 
 pub struct AttackIndicatorPlugin;
@@ -87,7 +53,7 @@ impl Plugin for AttackIndicatorPlugin {
 fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
     for (attack_indicator, grid_position) in query.iter() {
         let pos: Vec<IVec2> = attack_indicator
-            .to_offsets()
+            .get_pattern()
             .iter()
             .map(|v| *v + grid_position.pos)
             .collect();
@@ -105,7 +71,7 @@ fn spawn(
             dir: Dir::North,
             pattern: AttackPattern::Hammer,
         };
-        let offsets = attack_indictor.to_offsets();
+        let offsets = attack_indictor.pattern.to_offsets();
 
         let parent = cmd.spawn().id();
         cmd.entity(parent)
@@ -144,7 +110,7 @@ fn despawn(
         for (e, attack_indicator) in query.iter() {
             // Spawn attack animations
             if !cancelled {
-                let grid_positions = attack_indicator.to_offsets();
+                // let grid_positions = attack_indicator.to_offsets();
             }
 
             cmd.entity(e).despawn_recursive();
