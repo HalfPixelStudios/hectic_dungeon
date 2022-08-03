@@ -29,8 +29,8 @@ impl AttackPattern {
 pub fn rotate_offsets(vecs: Vec<IVec2>, dir: Dir) -> Vec<IVec2> {
     match dir {
         Dir::North => vecs,
-        Dir::East => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
+        Dir::West => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
         Dir::South => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
-        Dir::West => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
+        Dir::East => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
     }
 }

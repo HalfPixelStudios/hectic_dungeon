@@ -8,8 +8,6 @@ use crate::{
     utils::Dir,
 };
 
-// TODO decouple attack / pattern logic from the visual logic
-
 // TODO unify this
 const CELLWIDTH: f32 = 8.;
 
@@ -17,7 +15,11 @@ const CELLWIDTH: f32 = 8.;
 pub struct AttackIndicator {
     pub dir: Dir,
     pub pattern: AttackPattern,
+    pub hidden: bool,
 }
+
+#[derive(Component)]
+struct AttackIndicatorRoot;
 
 impl AttackIndicator {
     pub fn get_pattern(&self) -> Vec<IVec2> {
@@ -27,25 +29,12 @@ impl AttackIndicator {
     }
 }
 
-pub struct SpawnAttackIndicatorEvent {
-    pub spawn_grid_pos: IVec2,
-}
-
-pub struct DespawnAttackIndicatorEvent {
-    /// If the attack was cancelled or not
-    ///
-    /// If false, will spawn attack particles
-    cancelled: bool,
-}
-
 pub struct AttackIndicatorPlugin;
 
 impl Plugin for AttackIndicatorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<SpawnAttackIndicatorEvent>()
-            .add_event::<DespawnAttackIndicatorEvent>()
-            .add_system(spawn)
-            .add_system(despawn)
+        app.add_system(spawn)
+            // .add_system(despawn)
             .add_system(render);
     }
 }
@@ -63,24 +52,44 @@ fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
 fn spawn(
     mut cmd: Commands,
     asset_sheet: Res<SpriteSheets>,
-    prefab_data: Res<PrefabData>,
-    mut events: EventReader<SpawnAttackIndicatorEvent>,
+    query: Query<
+        (Entity, &AttackIndicator, Option<&Children>),
+        Or<(Added<AttackIndicator>, Changed<AttackIndicator>)>,
+    >,
+    child_query: Query<&AttackIndicatorRoot>,
 ) {
-    for SpawnAttackIndicatorEvent { spawn_grid_pos } in events.iter() {
-        let attack_indictor = AttackIndicator {
-            dir: Dir::North,
-            pattern: AttackPattern::Hammer,
-        };
-        let offsets = attack_indictor.pattern.to_offsets();
+    for (entity, attack_indictor, children) in query.iter() {
+        info!("added or changed");
 
-        let parent = cmd.spawn().id();
-        cmd.entity(parent)
-            .insert(attack_indictor)
+        if let Some(children) = children {
+            for child in children.iter() {
+                info!("child");
+                if let Ok(_) = child_query.get_component::<AttackIndicatorRoot>(*child) {
+                    cmd.entity(*child).despawn_recursive();
+                }
+            }
+        }
+
+        if attack_indictor.hidden {
+            continue;
+        }
+
+        // spawn root
+        let root = cmd.spawn().id();
+        cmd.entity(root)
             .insert_bundle(TransformBundle::from_transform(
-                Transform::from_translation(spawn_grid_pos.as_vec2().extend(2.) * CELLWIDTH),
-            ));
+                Transform::from_translation(Vec2::ZERO.extend(2.)),
+            ))
+            .insert(AttackIndicatorRoot);
 
-        for offset in offsets.iter().map(|v| v.as_vec2().extend(0.) * CELLWIDTH) {
+        cmd.entity(entity).push_children(&[root]);
+
+        // spawn children
+        for offset in attack_indictor
+            .get_pattern()
+            .iter()
+            .map(|v| v.as_vec2().extend(0.) * CELLWIDTH)
+        {
             let child = cmd.spawn().id();
 
             cmd.entity(child).insert_bundle(SpriteSheetBundle {
@@ -95,12 +104,13 @@ fn spawn(
                 },
                 ..default()
             });
-            cmd.entity(parent).push_children(&[child]);
+            cmd.entity(root).push_children(&[child]);
         }
     }
 }
 
-// TODO this function is disgusting
+// TODO remove detection
+/*
 fn despawn(
     mut cmd: Commands,
     mut events: EventReader<DespawnAttackIndicatorEvent>,
@@ -116,3 +126,4 @@ fn despawn(
         }
     }
 }
+*/

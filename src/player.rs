@@ -7,10 +7,12 @@ use leafwing_input_manager::prelude::*;
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
+    attack::AttackPattern,
     camera::CameraFollow,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
-    ui::attack_indicator::{AttackIndicator, SpawnAttackIndicatorEvent},
+    ui::attack_indicator::AttackIndicator,
+    utils::Dir,
 };
 
 #[derive(Component)]
@@ -96,6 +98,12 @@ fn spawn(
                 input_map,
             })
             .insert(CameraFollow)
+            .insert(AttackIndicator {
+                dir: Dir::North,
+                pattern: AttackPattern::Hammer,
+                hidden: true,
+            })
+            .insert(Children::default())
             .insert(Movement::new());
     }
 }
@@ -140,11 +148,9 @@ fn move_controller(
 fn attack_controller(
     mut cmd: Commands,
     keys: Res<Input<KeyCode>>,
-    query: Query<&GridEntity, With<Player>>,
-    mut writer: EventWriter<SpawnAttackIndicatorEvent>,
+    mut query: Query<(Entity, &mut AttackIndicator), With<Player>>,
 ) {
-    if let Ok(grid_entity) = query.get_single() {
-        /*
+    if let Ok((entity, mut attack_indicator)) = query.get_single_mut() {
         if keys.just_pressed(KeyCode::Up) {
             attack_indicator.dir = Dir::North;
         }
@@ -157,11 +163,8 @@ fn attack_controller(
         if keys.just_pressed(KeyCode::Right) {
             attack_indicator.dir = Dir::East;
         }
-        */
         if keys.just_pressed(KeyCode::Space) {
-            writer.send(SpawnAttackIndicatorEvent {
-                spawn_grid_pos: grid_entity.pos,
-            });
+            attack_indicator.hidden = !attack_indicator.hidden;
         }
     }
 }
