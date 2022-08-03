@@ -57,7 +57,7 @@ fn setup(
     mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
 ) {
     spawn_player.send(SpawnPlayerEvent {
-        spawn_pos: Vec2::new(8., 8.),
+        spawn_pos: IVec2::new(8, 8),
     });
 }
 

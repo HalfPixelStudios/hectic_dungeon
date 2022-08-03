@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     assets::{PrefabData, SpriteSheets},
-    grid::GridPosition,
+    grid::GridEntity,
     player::Player,
 };
 
@@ -84,12 +84,12 @@ impl Plugin for AttackIndicatorPlugin {
     }
 }
 
-fn render(query: Query<(&AttackIndicator, &GridPosition)>) {
+fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
     for (attack_indicator, grid_position) in query.iter() {
         let pos: Vec<IVec2> = attack_indicator
             .to_offsets()
             .iter()
-            .map(|v| *v + grid_position.pos())
+            .map(|v| *v + grid_position.pos)
             .collect();
     }
 }
@@ -155,12 +155,12 @@ fn despawn(
 fn debug(
     keys: Res<Input<KeyCode>>,
     mut writer: EventWriter<SpawnAttackIndicatorEvent>,
-    query: Query<&GridPosition, With<Player>>,
+    query: Query<&GridEntity, With<Player>>,
 ) {
     for grid_position in query.iter() {
         if keys.just_pressed(KeyCode::E) {
             writer.send(SpawnAttackIndicatorEvent {
-                spawn_grid_pos: grid_position.pos(),
+                spawn_grid_pos: grid_position.pos,
             });
         }
     }

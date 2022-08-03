@@ -7,7 +7,7 @@ use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
     camera::CameraFollow,
-    grid::{to_world_coords, CellType, Grid, GridPosition},
+    grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
 };
 
@@ -25,7 +25,7 @@ pub enum PlayerAction {
 pub struct PlayerMovedEvent;
 
 pub struct SpawnPlayerEvent {
-    pub spawn_pos: Vec2,
+    pub spawn_pos: IVec2,
 }
 
 pub struct PlayerPlugin;
@@ -70,13 +70,13 @@ fn spawn(
                 },
                 texture_atlas: asset_sheet.get("player").unwrap().clone(),
                 transform: Transform {
-                    translation: spawn_pos.extend(1.),
+                    translation: to_world_coords(spawn_pos).extend(1.),
                     ..default()
                 },
                 ..default()
             })
             .insert(Player)
-            .insert(GridPosition::new(spawn_pos, CellType::Player))
+            .insert(GridEntity::new(*spawn_pos, CellType::Player))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,
@@ -89,9 +89,9 @@ fn spawn(
 //TODO check collision with tiled map
 fn controller(
     mut cmd: Commands,
-    mut query: Query<(&mut GridPosition, &mut Movement, &ActionState<PlayerAction>), With<Player>>,
+    mut query: Query<(&mut GridEntity, &mut Movement, &ActionState<PlayerAction>), With<Player>>,
     mut player_moved: EventWriter<PlayerMovedEvent>,
-    grid: Res<Grid>,
+    grid: Res<Grid<CellType>>,
 ) {
     if let Ok((mut grid_position, mut movement, action_state)) = query.get_single_mut() {
         let mut dir = IVec2::ZERO;
@@ -110,9 +110,13 @@ fn controller(
         }
 
         if movement.next_move == IVec2::ZERO {
-            let next_pos = grid_position.pos() + dir;
-            if dir != IVec2::ZERO && grid.inbounds(&next_pos) && grid.is_empty(&next_pos) {
+            let next_pos = grid_position.pos + dir;
+            if dir != IVec2::ZERO
+                && grid.bounds_check(&next_pos)
+                && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
+            {
                 player_moved.send(PlayerMovedEvent);
+                info!("player move {}", dir);
                 movement.next_move = dir;
             }
         }
