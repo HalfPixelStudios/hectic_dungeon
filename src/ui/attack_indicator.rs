@@ -28,7 +28,7 @@ impl AttackIndicator {
 }
 
 pub struct SpawnAttackIndicatorEvent {
-    spawn_grid_pos: IVec2,
+    pub spawn_grid_pos: IVec2,
 }
 
 pub struct DespawnAttackIndicatorEvent {
@@ -46,9 +46,7 @@ impl Plugin for AttackIndicatorPlugin {
             .add_event::<DespawnAttackIndicatorEvent>()
             .add_system(spawn)
             .add_system(despawn)
-            .add_system(render)
-            .add_system(debug)
-            .add_system(control);
+            .add_system(render);
     }
 }
 
@@ -106,8 +104,7 @@ fn spawn(
 fn despawn(
     mut cmd: Commands,
     mut events: EventReader<DespawnAttackIndicatorEvent>,
-    query: Query<(Entity, &AttackIndicator), Without<Player>>,
-    player_query: Query<&GridEntity, With<Player>>,
+    query: Query<(Entity, &AttackIndicator)>,
 ) {
     for DespawnAttackIndicatorEvent { cancelled } in events.iter() {
         // TODO despawn all indicators for now
@@ -116,53 +113,6 @@ fn despawn(
             if !cancelled {}
 
             cmd.entity(e).despawn_recursive();
-        }
-    }
-}
-
-fn debug(
-    keys: Res<Input<KeyCode>>,
-    mut writer: EventWriter<SpawnAttackIndicatorEvent>,
-    query: Query<&GridEntity, With<Player>>,
-) {
-    for grid_position in query.iter() {
-        if keys.just_pressed(KeyCode::E) {
-            writer.send(SpawnAttackIndicatorEvent {
-                spawn_grid_pos: grid_position.pos,
-            });
-        }
-    }
-}
-
-fn control(
-    keys: Res<Input<KeyCode>>,
-    mut query: Query<(&mut AttackIndicator, &mut Transform)>,
-    mut writer: EventWriter<DespawnAttackIndicatorEvent>,
-) {
-    use std::f32::consts::PI;
-
-    for (mut attack_indicator, mut transform) in query.iter_mut() {
-        // TODO changing rotation is a quick and dirty implementation. maybe better to rearrange
-        // existing children
-
-        if keys.just_pressed(KeyCode::Up) {
-            attack_indicator.dir = Dir::North;
-            transform.rotation = Quat::from_rotation_z(0.);
-        }
-        if keys.just_pressed(KeyCode::Left) {
-            attack_indicator.dir = Dir::West;
-            transform.rotation = Quat::from_rotation_z(PI / 2.);
-        }
-        if keys.just_pressed(KeyCode::Down) {
-            attack_indicator.dir = Dir::South;
-            transform.rotation = Quat::from_rotation_z(PI);
-        }
-        if keys.just_pressed(KeyCode::Right) {
-            attack_indicator.dir = Dir::East;
-            transform.rotation = Quat::from_rotation_z(3. * PI / 2.);
-        }
-        if keys.just_pressed(KeyCode::Space) {
-            writer.send(DespawnAttackIndicatorEvent { cancelled: false });
         }
     }
 }

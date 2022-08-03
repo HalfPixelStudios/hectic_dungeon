@@ -10,10 +10,17 @@ use crate::{
     camera::CameraFollow,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
+    ui::attack_indicator::{AttackIndicator, SpawnAttackIndicatorEvent},
 };
 
 #[derive(Component)]
 pub struct Player;
+
+#[derive(Component)]
+pub enum PlayerState {
+    Move,
+    Attack,
+}
 
 //TODO add direction vectors to PlayerAction definition
 #[derive(Actionlike, Clone)]
@@ -22,6 +29,7 @@ pub enum PlayerAction {
     Right,
     Up,
     Down,
+    Attack,
 }
 pub struct PlayerMovedEvent;
 
@@ -36,7 +44,8 @@ impl Plugin for PlayerPlugin {
         app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
-            .add_system(controller)
+            .add_system(move_controller)
+            .add_system(attack_controller)
             .add_system(spawn);
     }
 }
@@ -58,6 +67,7 @@ fn spawn(
             (KeyCode::W, PlayerAction::Up),
             // (KeyCode::Down, PlayerAction::Down),
             (KeyCode::S, PlayerAction::Down),
+            (KeyCode::Space, PlayerAction::Attack),
         ]);
 
         // let handle = prefab_data.get("player").unwrap();
@@ -91,7 +101,7 @@ fn spawn(
 }
 
 //TODO check collision with tiled map
-fn controller(
+fn move_controller(
     mut cmd: Commands,
     mut query: Query<(&mut GridEntity, &mut Movement, &ActionState<PlayerAction>), With<Player>>,
     mut player_moved: EventWriter<PlayerMovedEvent>,
@@ -123,6 +133,35 @@ fn controller(
                 info!("player move {}", dir);
                 movement.next_move = dir;
             }
+        }
+    }
+}
+
+fn attack_controller(
+    mut cmd: Commands,
+    keys: Res<Input<KeyCode>>,
+    query: Query<&GridEntity, With<Player>>,
+    mut writer: EventWriter<SpawnAttackIndicatorEvent>,
+) {
+    if let Ok(grid_entity) = query.get_single() {
+        /*
+        if keys.just_pressed(KeyCode::Up) {
+            attack_indicator.dir = Dir::North;
+        }
+        if keys.just_pressed(KeyCode::Left) {
+            attack_indicator.dir = Dir::West;
+        }
+        if keys.just_pressed(KeyCode::Down) {
+            attack_indicator.dir = Dir::South;
+        }
+        if keys.just_pressed(KeyCode::Right) {
+            attack_indicator.dir = Dir::East;
+        }
+        */
+        if keys.just_pressed(KeyCode::Space) {
+            writer.send(SpawnAttackIndicatorEvent {
+                spawn_grid_pos: grid_entity.pos,
+            });
         }
     }
 }
