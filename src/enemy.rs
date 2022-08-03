@@ -14,7 +14,6 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
-    ui::attack_indicator::AttackTileEvent,
 };
 
 #[derive(Component)]
@@ -154,6 +153,7 @@ fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
     (cur.x - dest.x).abs() + (cur.y - dest.y).abs()
 }
 
+/*
 fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<AttackTileEvent>,
@@ -163,6 +163,7 @@ fn take_damage(
         cmd.entity(*entity).despawn();
     }
 }
+*/
 
 pub struct EnemyPlugin;
 
@@ -171,7 +172,7 @@ impl Plugin for EnemyPlugin {
         app.add_event::<SpawnEnemyEvent>()
             .add_event::<EnemyUpdateEvent>()
             .add_system(spawn)
-            .add_system(take_damage)
+            // .add_system(take_damage)
             .add_system_set(
                 ConditionSet::new()
                     .run_on_event::<EnemyUpdateEvent>()

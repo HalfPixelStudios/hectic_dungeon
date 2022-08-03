@@ -2,77 +2,30 @@ use bevy::prelude::*;
 
 use crate::{
     assets::{PrefabData, SpriteSheets},
-    grid::{CellType, Grid, GridEntity},
+    attack::{rotate_offsets, AttackPattern},
+    grid::GridEntity,
     player::Player,
+    utils::Dir,
 };
-
-// TODO decouple attack / pattern logic from the visual logic
 
 // TODO unify this
 const CELLWIDTH: f32 = 8.;
-
-// TODO make a proper 2d direction utility
-pub enum Dir {
-    North,
-    East,
-    South,
-    West,
-}
-
-pub enum AttackPattern {
-    StraightOne,
-    StraightTwo,
-    Hammer,
-}
 
 #[derive(Component)]
 pub struct AttackIndicator {
     pub dir: Dir,
     pub pattern: AttackPattern,
+    pub hidden: bool,
 }
 
-pub struct SpawnAttackIndicatorEvent {
-    spawn_grid_pos: IVec2,
-}
-
-pub struct DespawnAttackIndicatorEvent {
-    /// If the attack was cancelled or not
-    ///
-    /// If false, will spawn attack particles
-    cancelled: bool,
-}
-
-pub struct AttackTileEvent {
-    pub entity: Entity,
-}
+#[derive(Component)]
+struct AttackIndicatorRoot;
 
 impl AttackIndicator {
-    // default north
-    pub fn to_offsets(&self) -> Vec<IVec2> {
-        let north = match &self.pattern {
-            AttackPattern::StraightOne => vec![IVec2::new(0, 1)],
-            AttackPattern::StraightTwo => vec![IVec2::new(0, 1), IVec2::new(0, 2)],
-            AttackPattern::Hammer => vec![
-                IVec2::new(-1, 1),
-                IVec2::new(0, 1),
-                IVec2::new(1, 1),
-                IVec2::new(-1, 2),
-                IVec2::new(0, 2),
-                IVec2::new(1, 2),
-            ],
-        };
-
-        // rotate offsets based on direction
-        Self::rotate_offsets(north, &self.dir)
-    }
-
-    fn rotate_offsets(vecs: Vec<IVec2>, dir: &Dir) -> Vec<IVec2> {
-        match dir {
-            Dir::North => vecs,
-            Dir::West => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
-            Dir::South => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
-            Dir::East => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
-        }
+    pub fn get_pattern(&self) -> Vec<IVec2> {
+        let offsets = self.pattern.to_offsets();
+        let dir = self.dir;
+        rotate_offsets(offsets, dir)
     }
 }
 
@@ -80,21 +33,16 @@ pub struct AttackIndicatorPlugin;
 
 impl Plugin for AttackIndicatorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<SpawnAttackIndicatorEvent>()
-            .add_event::<DespawnAttackIndicatorEvent>()
-            .add_event::<AttackTileEvent>()
-            .add_system(spawn)
-            .add_system(despawn)
-            .add_system(render)
-            .add_system(debug)
-            .add_system(control);
+        app.add_system(spawn)
+            // .add_system(despawn)
+            .add_system(render);
     }
 }
 
 fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
     for (attack_indicator, grid_position) in query.iter() {
         let pos: Vec<IVec2> = attack_indicator
-            .to_offsets()
+            .get_pattern()
             .iter()
             .map(|v| *v + grid_position.pos)
             .collect();
@@ -104,24 +52,41 @@ fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
 fn spawn(
     mut cmd: Commands,
     asset_sheet: Res<SpriteSheets>,
-    prefab_data: Res<PrefabData>,
-    mut events: EventReader<SpawnAttackIndicatorEvent>,
+    query: Query<
+        (Entity, &AttackIndicator, Option<&Children>),
+        Or<(Added<AttackIndicator>, Changed<AttackIndicator>)>,
+    >,
+    child_query: Query<&AttackIndicatorRoot>,
 ) {
-    for SpawnAttackIndicatorEvent { spawn_grid_pos } in events.iter() {
-        let attack_indictor = AttackIndicator {
-            dir: Dir::North,
-            pattern: AttackPattern::Hammer,
-        };
-        let offsets = attack_indictor.to_offsets();
+    for (entity, attack_indictor, children) in query.iter() {
+        if let Some(children) = children {
+            for child in children.iter() {
+                if let Ok(_) = child_query.get_component::<AttackIndicatorRoot>(*child) {
+                    cmd.entity(*child).despawn_recursive();
+                }
+            }
+        }
 
-        let parent = cmd.spawn().id();
-        cmd.entity(parent)
-            .insert(attack_indictor)
+        if attack_indictor.hidden {
+            continue;
+        }
+
+        // spawn root
+        let root = cmd.spawn().id();
+        cmd.entity(root)
             .insert_bundle(TransformBundle::from_transform(
-                Transform::from_translation(spawn_grid_pos.as_vec2().extend(2.) * CELLWIDTH),
-            ));
+                Transform::from_translation(Vec2::ZERO.extend(2.)),
+            ))
+            .insert(AttackIndicatorRoot);
 
-        for offset in offsets.iter().map(|v| v.as_vec2().extend(0.) * CELLWIDTH) {
+        cmd.entity(entity).push_children(&[root]);
+
+        // spawn children
+        for offset in attack_indictor
+            .get_pattern()
+            .iter()
+            .map(|v| v.as_vec2().extend(0.) * CELLWIDTH)
+        {
             let child = cmd.spawn().id();
 
             cmd.entity(child).insert_bundle(SpriteSheetBundle {
@@ -136,92 +101,26 @@ fn spawn(
                 },
                 ..default()
             });
-            cmd.entity(parent).push_children(&[child]);
+            cmd.entity(root).push_children(&[child]);
         }
     }
 }
 
-// TODO this function is disgusting
+// TODO remove detection
+/*
 fn despawn(
     mut cmd: Commands,
     mut events: EventReader<DespawnAttackIndicatorEvent>,
-    mut writer: EventWriter<AttackTileEvent>,
-    query: Query<(Entity, &AttackIndicator), Without<Player>>,
-    player_query: Query<&GridEntity, With<Player>>,
-    grid: Res<Grid<CellType>>,
+    query: Query<(Entity, &AttackIndicator)>,
 ) {
     for DespawnAttackIndicatorEvent { cancelled } in events.iter() {
         // TODO despawn all indicators for now
         for (e, attack_indicator) in query.iter() {
             // Spawn attack animations
-            if !cancelled {
-                let player_pos = player_query.single().pos;
-                for offset in attack_indicator
-                    .to_offsets()
-                    .iter()
-                    .map(|v| *v + player_pos)
-                {
-                    if let Ok(grid_cell) = grid.get_cell(&offset) {
-                        for cell_entity in grid_cell.iter() {
-                            match cell_entity {
-                                CellType::Enemy(entity) => {
-                                    writer.send(AttackTileEvent { entity: *entity });
-                                },
-                                _ => {},
-                            }
-                        }
-                    }
-                }
-            }
+            if !cancelled {}
 
             cmd.entity(e).despawn_recursive();
         }
     }
 }
-
-fn debug(
-    keys: Res<Input<KeyCode>>,
-    mut writer: EventWriter<SpawnAttackIndicatorEvent>,
-    query: Query<&GridEntity, With<Player>>,
-) {
-    for grid_position in query.iter() {
-        if keys.just_pressed(KeyCode::E) {
-            writer.send(SpawnAttackIndicatorEvent {
-                spawn_grid_pos: grid_position.pos,
-            });
-        }
-    }
-}
-
-fn control(
-    keys: Res<Input<KeyCode>>,
-    mut query: Query<(&mut AttackIndicator, &mut Transform)>,
-    mut writer: EventWriter<DespawnAttackIndicatorEvent>,
-) {
-    use std::f32::consts::PI;
-
-    for (mut attack_indicator, mut transform) in query.iter_mut() {
-        // TODO changing rotation is a quick and dirty implementation. maybe better to rearrange
-        // existing children
-
-        if keys.just_pressed(KeyCode::Up) {
-            attack_indicator.dir = Dir::North;
-            transform.rotation = Quat::from_rotation_z(0.);
-        }
-        if keys.just_pressed(KeyCode::Left) {
-            attack_indicator.dir = Dir::West;
-            transform.rotation = Quat::from_rotation_z(PI / 2.);
-        }
-        if keys.just_pressed(KeyCode::Down) {
-            attack_indicator.dir = Dir::South;
-            transform.rotation = Quat::from_rotation_z(PI);
-        }
-        if keys.just_pressed(KeyCode::Right) {
-            attack_indicator.dir = Dir::East;
-            transform.rotation = Quat::from_rotation_z(3. * PI / 2.);
-        }
-        if keys.just_pressed(KeyCode::Space) {
-            writer.send(DespawnAttackIndicatorEvent { cancelled: false });
-        }
-    }
-}
+*/

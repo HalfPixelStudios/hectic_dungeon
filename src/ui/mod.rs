@@ -1,4 +1,3 @@
-// TODO this does not need (should not need) to be pub
 pub mod attack_indicator;
 
 use bevy::prelude::*;
