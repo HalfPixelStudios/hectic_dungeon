@@ -62,7 +62,7 @@ fn register_spawn_points(
                     entity_instance.grid.as_vec2() * TILEWIDTH
                 );
                 writer.send(SpawnEnemyEvent {
-                    spawn_pos: ldtk_to_bevy(&entity_instance.grid).as_vec2() * TILEWIDTH,
+                    spawn_pos: ldtk_to_bevy(&entity_instance.grid),
                 });
             }
         }
