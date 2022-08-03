@@ -59,11 +59,8 @@ fn spawn(
     child_query: Query<&AttackIndicatorRoot>,
 ) {
     for (entity, attack_indictor, children) in query.iter() {
-        info!("added or changed");
-
         if let Some(children) = children {
             for child in children.iter() {
-                info!("child");
                 if let Ok(_) = child_query.get_component::<AttackIndicatorRoot>(*child) {
                     cmd.entity(*child).despawn_recursive();
                 }
