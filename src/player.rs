@@ -62,7 +62,9 @@ fn spawn(
         // let handle = prefab_data.get("player").unwrap();
         // let player = beings.get(handle).unwrap();
 
-        cmd.spawn()
+        let id = cmd.spawn().id();
+
+        cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
                     index: 0,
@@ -76,7 +78,7 @@ fn spawn(
                 ..default()
             })
             .insert(Player)
-            .insert(GridEntity::new(*spawn_pos, CellType::Player))
+            .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,

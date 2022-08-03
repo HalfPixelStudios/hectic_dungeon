@@ -16,9 +16,9 @@ const MAP_HEIGHT: i32 = 16;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum CellType {
-    Player = 1,
-    Enemy = 2,
-    Wall = 3,
+    Player(Entity),
+    Enemy(Entity),
+    Wall,
 }
 
 #[derive(Error, Debug)]

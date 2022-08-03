@@ -6,6 +6,8 @@ use crate::{
     player::Player,
 };
 
+// TODO decouple attack / pattern logic from the visual logic
+
 // TODO unify this
 const CELLWIDTH: f32 = 8.;
 
@@ -38,6 +40,10 @@ pub struct DespawnAttackIndicatorEvent {
     ///
     /// If false, will spawn attack particles
     cancelled: bool,
+}
+
+pub struct AttackTileEvent {
+    pub entity: Entity,
 }
 
 impl AttackIndicator {
@@ -76,6 +82,7 @@ impl Plugin for AttackIndicatorPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnAttackIndicatorEvent>()
             .add_event::<DespawnAttackIndicatorEvent>()
+            .add_event::<AttackTileEvent>()
             .add_system(spawn)
             .add_system(despawn)
             .add_system(render)
@@ -137,6 +144,7 @@ fn spawn(
 fn despawn(
     mut cmd: Commands,
     mut events: EventReader<DespawnAttackIndicatorEvent>,
+    mut writer: EventWriter<AttackTileEvent>,
     query: Query<(Entity, &AttackIndicator)>,
 ) {
     for DespawnAttackIndicatorEvent { cancelled } in events.iter() {
@@ -145,6 +153,7 @@ fn despawn(
             // Spawn attack animations
             if !cancelled {
                 let grid_positions = attack_indicator.to_offsets();
+                // writer.send(AttackTileEvent { entity: });
             }
 
             cmd.entity(e).despawn_recursive();
