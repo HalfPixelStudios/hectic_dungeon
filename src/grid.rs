@@ -62,13 +62,13 @@ impl<T: PartialEq> Grid<T> {
         }
     }
 
-    fn get_cell(&self, pos: &IVec2) -> Result<&Vec<T>> {
+    pub fn get_cell(&self, pos: &IVec2) -> Result<&Vec<T>> {
         let ind = self.pos_to_index(pos)?;
         // shouldn't panic (since already bounds checked)?
         Ok(self.grid.get(ind).unwrap())
     }
 
-    fn get_cell_mut(&mut self, pos: &IVec2) -> Result<&mut Vec<T>> {
+    pub fn get_cell_mut(&mut self, pos: &IVec2) -> Result<&mut Vec<T>> {
         let ind = self.pos_to_index(pos)?;
         Ok(self.grid.get_mut(ind).unwrap())
     }

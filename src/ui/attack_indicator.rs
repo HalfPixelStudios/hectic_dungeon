@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     assets::{PrefabData, SpriteSheets},
-    grid::GridEntity,
+    grid::{CellType, Grid, GridEntity},
     player::Player,
 };
 
@@ -69,9 +69,9 @@ impl AttackIndicator {
     fn rotate_offsets(vecs: Vec<IVec2>, dir: &Dir) -> Vec<IVec2> {
         match dir {
             Dir::North => vecs,
-            Dir::East => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
+            Dir::West => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
             Dir::South => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
-            Dir::West => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
+            Dir::East => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
         }
     }
 }
@@ -141,19 +141,37 @@ fn spawn(
     }
 }
 
+// TODO this function is disgusting
 fn despawn(
     mut cmd: Commands,
     mut events: EventReader<DespawnAttackIndicatorEvent>,
     mut writer: EventWriter<AttackTileEvent>,
-    query: Query<(Entity, &AttackIndicator)>,
+    query: Query<(Entity, &AttackIndicator), Without<Player>>,
+    player_query: Query<&GridEntity, With<Player>>,
+    grid: Res<Grid<CellType>>,
 ) {
     for DespawnAttackIndicatorEvent { cancelled } in events.iter() {
         // TODO despawn all indicators for now
         for (e, attack_indicator) in query.iter() {
             // Spawn attack animations
             if !cancelled {
-                let grid_positions = attack_indicator.to_offsets();
-                // writer.send(AttackTileEvent { entity: });
+                let player_pos = player_query.single().pos;
+                for offset in attack_indicator
+                    .to_offsets()
+                    .iter()
+                    .map(|v| *v + player_pos)
+                {
+                    if let Ok(grid_cell) = grid.get_cell(&offset) {
+                        for cell_entity in grid_cell.iter() {
+                            match cell_entity {
+                                CellType::Enemy(entity) => {
+                                    writer.send(AttackTileEvent { entity: *entity });
+                                },
+                                _ => {},
+                            }
+                        }
+                    }
+                }
             }
 
             cmd.entity(e).despawn_recursive();

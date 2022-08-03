@@ -154,13 +154,15 @@ fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
     (cur.x - dest.x).abs() + (cur.y - dest.y).abs()
 }
 
-// fn take_damage(mut events: EventReader<AttackTileEvent>, mut query: Query<(Entity, &mut Health), With<Enemy>>) {
-
-//     for AttackTileEvent { entity } in events.iter() {
-
-//     }
-
-// }
+fn take_damage(
+    mut cmd: Commands,
+    mut events: EventReader<AttackTileEvent>,
+    mut query: Query<(Entity, &mut Health), With<Enemy>>,
+) {
+    for AttackTileEvent { entity } in events.iter() {
+        cmd.entity(*entity).despawn();
+    }
+}
 
 pub struct EnemyPlugin;
 
@@ -169,7 +171,7 @@ impl Plugin for EnemyPlugin {
         app.add_event::<SpawnEnemyEvent>()
             .add_event::<EnemyUpdateEvent>()
             .add_system(spawn)
-            // .add_system(take_damage)
+            .add_system(take_damage)
             .add_system_set(
                 ConditionSet::new()
                     .run_on_event::<EnemyUpdateEvent>()
