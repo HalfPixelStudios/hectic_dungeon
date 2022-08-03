@@ -8,6 +8,8 @@ use crate::{
     utils::Dir,
 };
 
+// TODO decouple attack / pattern logic from the visual logic
+
 // TODO unify this
 const CELLWIDTH: f32 = 8.;
 
@@ -100,18 +102,18 @@ fn spawn(
     }
 }
 
+// TODO this function is disgusting
 fn despawn(
     mut cmd: Commands,
     mut events: EventReader<DespawnAttackIndicatorEvent>,
-    query: Query<(Entity, &AttackIndicator)>,
+    query: Query<(Entity, &AttackIndicator), Without<Player>>,
+    player_query: Query<&GridEntity, With<Player>>,
 ) {
     for DespawnAttackIndicatorEvent { cancelled } in events.iter() {
         // TODO despawn all indicators for now
         for (e, attack_indicator) in query.iter() {
             // Spawn attack animations
-            if !cancelled {
-                // let grid_positions = attack_indicator.to_offsets();
-            }
+            if !cancelled {}
 
             cmd.entity(e).despawn_recursive();
         }
