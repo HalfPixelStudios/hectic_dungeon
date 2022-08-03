@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     animation::AniState,
     enemy::Enemy,
-    grid::{snap_to_grid, to_world_coords, GridPosition},
+    grid::{to_world_coords, GridEntity},
 };
 
 const THRESHOLD: f32 = 0.001;
@@ -31,12 +31,12 @@ impl Movement {
 }
 
 //time based lerp; make mv.frame/t = 1 where t = time to move between squares
-fn movement(mut query: Query<(&mut GridPosition, &mut Movement, &mut Transform)>) {
-    for (mut grid_pos, mut mv, mut transform) in query.iter_mut() {
+fn movement(mut query: Query<(&mut GridEntity, &mut Movement, &mut Transform)>) {
+    for (mut grid_entity, mut mv, mut transform) in query.iter_mut() {
         if mv.next_move == IVec2::ZERO {
             continue;
         }
-        let next_pos = to_world_coords(&(grid_pos.pos() + mv.next_move));
+        let next_pos = to_world_coords(&(grid_entity.pos + mv.next_move));
         let cur_pos = transform.translation.truncate();
         if cur_pos.distance(next_pos) > THRESHOLD {
             transform.translation.x = lerp(transform.translation.x, next_pos.x, mv.frame / 60.);
@@ -45,7 +45,7 @@ fn movement(mut query: Query<(&mut GridPosition, &mut Movement, &mut Transform)>
         } else {
             mv.frame = 0.;
             transform.translation = next_pos.extend(transform.translation.z);
-            grid_pos.move_relative(&mv.next_move);
+            grid_entity.pos += mv.next_move;
             mv.next_move = IVec2::ZERO;
         }
     }

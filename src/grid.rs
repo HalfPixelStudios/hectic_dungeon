@@ -16,7 +16,6 @@ const MAP_HEIGHT: i32 = 16;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum CellType {
-    Empty = 0,
     Player = 1,
     Enemy = 2,
     Wall = 3,
@@ -39,10 +38,10 @@ pub struct Grid<T: PartialEq> {
     grid: Vec<Vec<T>>,
 }
 
-impl<T> Grid<T> {
+impl<T: PartialEq> Grid<T> {
     pub fn new(width: i32, height: i32) -> Self {
-        let grid_vec = Vec::new();
-        grid_vec.reserve((width * height) as usize);
+        // TODO this is sorta stupid lol (maybe just force T to derive Clone)
+        let mut grid_vec = (0..width * height).into_iter().map(|_| vec![]).collect();
 
         Grid {
             width,
@@ -83,6 +82,10 @@ impl<T> Grid<T> {
         Ok(self.get_cell(pos)?.contains(&val))
     }
 
+    pub fn empty_at(&self, pos: &IVec2) -> Result<bool> {
+        Ok(self.get_cell(pos)?.is_empty())
+    }
+
     pub fn clear(&mut self) {
         for cell in self.grid.iter_mut() {
             cell.clear();
@@ -99,18 +102,18 @@ impl<T> Grid<T> {
 }
 
 #[derive(Component)]
-pub struct GridPosition {
+pub struct GridEntity {
     pub pos: IVec2,
     pub value: CellType,
 }
 
-impl GridPosition {
-    pub fn new(pos: &IVec2, value: CellType) -> GridPosition {
-        GridPosition { pos, value }
+impl GridEntity {
+    pub fn new(pos: IVec2, value: CellType) -> GridEntity {
+        GridEntity { pos, value }
     }
 }
 
-impl Deref for GridPosition {
+impl Deref for GridEntity {
     type Target = IVec2;
 
     fn deref(&self) -> &Self::Target {
@@ -118,13 +121,11 @@ impl Deref for GridPosition {
     }
 }
 
-fn sync_grid_positions(
-    mut query: Query<(&mut Transform, &GridPosition)>,
-    grid: Res<Grid<CellType>>,
-) {
+// TODO maybe don't use this (cant really lerp position anymore)
+fn sync_grid_positions(mut query: Query<(&mut Transform, &GridEntity)>, grid: Res<Grid<CellType>>) {
     for (mut transform, grid_position) in query.iter_mut() {
         let z = transform.translation.z;
-        transform.translation = grid_position.as_vec2().extend(z) * CELL_SIZE;
+        transform.translation = grid_position.as_vec2().extend(z) * (CELL_SIZE as f32);
     }
 }
 
@@ -133,7 +134,7 @@ fn sync_grid_positions(
 fn update_grid(
     mut grid: ResMut<Grid<CellType>>,
     collision_map: Res<CollisionMap>,
-    query: Query<&GridPosition>,
+    query: Query<&GridEntity>,
 ) {
     grid.clear();
 
@@ -152,7 +153,7 @@ pub struct GridPlugin;
 impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(update_grid)
-            .add_system(sync_grid_positions)
+            // .add_system(sync_grid_positions)
             // .add_system(gizmo)
             .add_system(debug)
             .insert_resource(Grid::<CellType>::new(MAP_WIDTH, MAP_HEIGHT));
@@ -163,4 +164,13 @@ fn debug(grid: Res<Grid<CellType>>, mut events: EventReader<PlayerMovedEvent>) {
     for _ in events.iter() {
         // info!("{:?}", grid);
     }
+}
+
+// TODO i dont like these funcionts
+pub fn to_world_coords(p: &IVec2) -> Vec2 {
+    Vec2::new((p.x * CELL_SIZE) as f32, (p.y * CELL_SIZE) as f32)
+}
+
+pub fn snap_to_grid(p: &Vec2) -> IVec2 {
+    Vec2::new(p.x / CELL_SIZE as f32, p.y / CELL_SIZE as f32).as_ivec2()
 }

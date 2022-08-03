@@ -10,7 +10,7 @@ use priority_queue::PriorityQueue;
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
-    grid::{CellType, Grid, GridPosition},
+    grid::{CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
 };
@@ -45,7 +45,7 @@ fn spawn(
                 ..default()
             })
             // .insert(Animation::new(&enemy.anim))
-            .insert(GridPosition::new(spawn_pos, CellType::Enemy))
+            .insert(GridEntity::new(spawn_pos.as_ivec2(), CellType::Enemy))
             .insert(Movement::new())
             .insert(Enemy);
     }
@@ -53,19 +53,19 @@ fn spawn(
 //TODO player cant move if go neg or enemy on top
 //Maybe both are knocked back when two beings try to move into the same cell
 fn ai(
-    mut player_query: Query<(&GridPosition), (With<Player>, Without<Enemy>)>,
+    mut player_query: Query<(&GridEntity), (With<Player>, Without<Enemy>)>,
     mut enemy_query: Query<
-        (&Transform, &mut GridPosition, &mut Movement),
+        (&Transform, &mut GridEntity, &mut Movement),
         (With<Enemy>, Without<Player>),
     >,
     mut events: EventReader<PlayerMovedEvent>,
-    grid: Res<Grid>,
+    grid: Res<Grid<CellType>>,
 ) {
     for _ in events.iter() {
-        let player_grid_pos = player_query.single().pos();
+        let player_grid_pos = player_query.single().pos;
 
         for (transform, mut grid_pos, mut mv) in enemy_query.iter_mut() {
-            let cur_pos = grid_pos.pos();
+            let cur_pos = grid_pos.pos;
             if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
                 let next_pos = path.get(0).unwrap_or(&cur_pos);
                 mv.next_move = *next_pos - cur_pos;
@@ -76,7 +76,7 @@ fn ai(
     }
 }
 
-pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2>> {
+pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid<CellType>>) -> Option<Vec<IVec2>> {
     // trivial case
     if start == dest {
         return Some(Vec::new());
@@ -126,7 +126,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2
     None
 }
 
-fn tiles_around(pos: &IVec2, grid: &Res<Grid>) -> Vec<IVec2> {
+fn tiles_around(pos: &IVec2, grid: &Res<Grid<CellType>>) -> Vec<IVec2> {
     use rand::{seq::SliceRandom, thread_rng};
 
     let mut dirs = [
@@ -140,7 +140,7 @@ fn tiles_around(pos: &IVec2, grid: &Res<Grid>) -> Vec<IVec2> {
 
     dirs.into_iter()
         .map(|d| *pos + d)
-        .filter(|pos| grid.inbounds(pos) && grid.at(pos) != CellType::Wall as i32)
+        .filter(|pos| grid.bounds_check(pos) && !grid.contains_at(pos, CellType::Wall).unwrap())
         .collect()
 }
 
