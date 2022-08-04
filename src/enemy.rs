@@ -10,7 +10,7 @@ use priority_queue::PriorityQueue;
 
 use crate::{
     animation::Animation,
-    assets::{BeingPrefab, PrefabData, SpriteSheets},
+    assets::{BeingPrefab, PrefabData, SpriteSheet},
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
@@ -32,7 +32,7 @@ pub struct DamageEnemyEvent {
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnEnemyEvent>,
-    asset_sheet: Res<SpriteSheets>,
+    asset_sheet: Res<SpriteSheet>,
     prefab_data: Res<PrefabData>,
     beings: Res<Assets<BeingPrefab>>,
 ) {
@@ -47,7 +47,7 @@ fn spawn(
                     color: Color::ORANGE,
                     ..default()
                 },
-                texture_atlas: asset_sheet.get("orc").unwrap().clone(),
+                texture_atlas: asset_sheet.clone(),
                 transform: Transform {
                     translation: to_world_coords(spawn_pos).extend(1.),
                     ..default()

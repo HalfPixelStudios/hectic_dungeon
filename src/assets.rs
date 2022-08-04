@@ -7,7 +7,7 @@ use super::animation::*;
 use crate::prefab::*;
 
 #[derive(Deref)]
-pub struct SpriteSheets(pub HashMap<String, Handle<TextureAtlas>>);
+pub struct SpriteSheet(Handle<TextureAtlas>);
 
 #[derive(Debug, Deref)]
 pub struct PrefabData(pub HashMap<String, HandleUntyped>);
@@ -25,7 +25,6 @@ pub fn load_assets(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     let mut data: HashMap<String, HandleUntyped> = HashMap::new();
-    let mut sheets = HashMap::new();
 
     let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
         assets.load("tilesheet/tilesheet.png"),
@@ -33,30 +32,12 @@ pub fn load_assets(
         8,
         8,
     ));
-    sheets.insert("tilesheet".into(), tilesheet_handle);
-
-    let archer_handle = texture_atlases.add(TextureAtlas::from_grid(
-        assets.load("tilesheet/player.png"),
-        Vec2::new(8.0, 8.0),
-        1,
-        1,
-    ));
-    sheets.insert("player".into(), archer_handle);
-
-    let orc_handle = texture_atlases.add(TextureAtlas::from_grid(
-        assets.load("tilesheet/orc.png"),
-        Vec2::new(8.0, 8.0),
-        1,
-        1,
-    ));
-    sheets.insert("orc".into(), orc_handle);
+    cmd.insert_resource(SpriteSheet(tilesheet_handle));
 
     // data.insert(
     //     "archer".to_string(),
     //     assets.load_untyped("beings/archer.being"),
     // );
-
-    cmd.insert_resource(SpriteSheets(sheets));
 
     cmd.insert_resource(PrefabData(data));
 }
