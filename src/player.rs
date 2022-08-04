@@ -2,12 +2,16 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_bobs::component::health::*;
+use iyes_loopless::{
+    prelude::{AppLooplessStateExt, IntoConditionalSystem},
+    state::NextState,
+};
 use leafwing_input_manager::prelude::*;
 
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheets},
-    attack::AttackPattern,
+    attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
@@ -18,7 +22,7 @@ use crate::{
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component)]
+#[derive(Component, Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum PlayerState {
     Move,
     Attack,
@@ -44,10 +48,11 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+            .add_loopless_state(PlayerState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
-            .add_system(move_controller)
-            .add_system(attack_controller)
+            .add_system(move_controller.run_in_state(PlayerState::Move))
+            .add_system(attack_controller.run_in_state(PlayerState::Attack))
             .add_system(spawn);
     }
 }
@@ -109,13 +114,24 @@ fn spawn(
 }
 
 //TODO check collision with tiled map
+// TODO i dont really like having to include AttackIndicator in query
 fn move_controller(
     mut cmd: Commands,
-    mut query: Query<(&mut GridEntity, &mut Movement, &ActionState<PlayerAction>), With<Player>>,
+    mut query: Query<
+        (
+            &mut GridEntity,
+            &mut Movement,
+            &mut AttackIndicator,
+            &ActionState<PlayerAction>,
+        ),
+        With<Player>,
+    >,
     mut player_moved: EventWriter<PlayerMovedEvent>,
     grid: Res<Grid<CellType>>,
 ) {
-    if let Ok((mut grid_position, mut movement, action_state)) = query.get_single_mut() {
+    if let Ok((mut grid_position, mut movement, mut attack_indicator, action_state)) =
+        query.get_single_mut()
+    {
         let mut dir = IVec2::ZERO;
 
         if action_state.just_pressed(PlayerAction::Left) {
@@ -130,7 +146,12 @@ fn move_controller(
         if action_state.just_pressed(PlayerAction::Down) {
             dir += IVec2::new(0, -1);
         }
+        if action_state.just_pressed(PlayerAction::Attack) {
+            attack_indicator.hidden = false;
+            cmd.insert_resource(NextState(PlayerState::Attack));
+        }
 
+        // TODO movement collision logic shouldn't be here?
         if movement.next_move == IVec2::ZERO {
             let next_pos = grid_position.pos + dir;
             if dir != IVec2::ZERO
@@ -138,7 +159,6 @@ fn move_controller(
                 && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
             {
                 player_moved.send(PlayerMovedEvent);
-                info!("player move {}", dir);
                 movement.next_move = dir;
             }
         }
@@ -147,24 +167,41 @@ fn move_controller(
 
 fn attack_controller(
     mut cmd: Commands,
-    keys: Res<Input<KeyCode>>,
-    mut query: Query<(Entity, &mut AttackIndicator), With<Player>>,
+    mut query: Query<
+        (
+            Entity,
+            &mut AttackIndicator,
+            &GridEntity,
+            &ActionState<PlayerAction>,
+        ),
+        With<Player>,
+    >,
+    mut writer: EventWriter<AttackEvent>,
 ) {
-    if let Ok((entity, mut attack_indicator)) = query.get_single_mut() {
-        if keys.just_pressed(KeyCode::Up) {
+    if let Ok((entity, mut attack_indicator, grid_entity, action_state)) = query.get_single_mut() {
+        if action_state.just_pressed(PlayerAction::Up) {
             attack_indicator.dir = Dir::North;
         }
-        if keys.just_pressed(KeyCode::Left) {
+        if action_state.just_pressed(PlayerAction::Left) {
             attack_indicator.dir = Dir::West;
         }
-        if keys.just_pressed(KeyCode::Down) {
+        if action_state.just_pressed(PlayerAction::Down) {
             attack_indicator.dir = Dir::South;
         }
-        if keys.just_pressed(KeyCode::Right) {
+        if action_state.just_pressed(PlayerAction::Right) {
             attack_indicator.dir = Dir::East;
         }
-        if keys.just_pressed(KeyCode::Space) {
-            attack_indicator.hidden = !attack_indicator.hidden;
+        if action_state.just_pressed(PlayerAction::Attack) {
+            attack_indicator.hidden = true;
+            cmd.insert_resource(NextState(PlayerState::Move));
+
+            // deal damage
+            let grid_positions = attack_indicator
+                .get_pattern()
+                .iter()
+                .map(|v| *v + grid_entity.pos)
+                .collect();
+            writer.send(AttackEvent { grid_positions });
         }
     }
 }
