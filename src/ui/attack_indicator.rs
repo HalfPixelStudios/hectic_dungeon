@@ -59,6 +59,7 @@ fn spawn(
     child_query: Query<&AttackIndicatorRoot>,
 ) {
     for (entity, attack_indictor, children) in query.iter() {
+        // despawn existing
         if let Some(children) = children {
             for child in children.iter() {
                 if let Ok(_) = child_query.get_component::<AttackIndicatorRoot>(*child) {

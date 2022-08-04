@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 
-use crate::utils::Dir;
+use crate::{
+    enemy::DamageEnemyEvent,
+    grid::{CellType, Grid},
+    utils::Dir,
+};
 
 pub enum AttackPattern {
     StraightOne,
@@ -32,5 +36,38 @@ pub fn rotate_offsets(vecs: Vec<IVec2>, dir: Dir) -> Vec<IVec2> {
         Dir::West => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
         Dir::South => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
         Dir::East => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
+    }
+}
+
+pub struct AttackEvent {
+    pub grid_positions: Vec<IVec2>,
+}
+
+pub struct AttackPlugin;
+
+impl Plugin for AttackPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_event::<AttackEvent>().add_system(process_attack);
+    }
+}
+
+fn process_attack(
+    mut events: EventReader<AttackEvent>,
+    mut writer: EventWriter<DamageEnemyEvent>,
+    grid: Res<Grid<CellType>>,
+) {
+    for AttackEvent { grid_positions } in events.iter() {
+        for grid_position in grid_positions.iter() {
+            if let Ok(cell) = grid.get_cell(grid_position) {
+                for cell_entity in cell.iter() {
+                    match cell_entity {
+                        CellType::Enemy(entity) => {
+                            writer.send(DamageEnemyEvent { entity: *entity });
+                        },
+                        _ => {},
+                    }
+                }
+            }
+        }
     }
 }

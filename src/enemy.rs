@@ -18,10 +18,17 @@ use crate::{
 
 #[derive(Component)]
 pub struct Enemy;
+
 pub struct SpawnEnemyEvent {
     pub spawn_pos: IVec2,
 }
+
 pub struct EnemyUpdateEvent;
+
+pub struct DamageEnemyEvent {
+    pub entity: Entity,
+}
+
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnEnemyEvent>,
@@ -153,17 +160,15 @@ fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
     (cur.x - dest.x).abs() + (cur.y - dest.y).abs()
 }
 
-/*
 fn take_damage(
     mut cmd: Commands,
-    mut events: EventReader<AttackTileEvent>,
+    mut events: EventReader<DamageEnemyEvent>,
     mut query: Query<(Entity, &mut Health), With<Enemy>>,
 ) {
-    for AttackTileEvent { entity } in events.iter() {
+    for DamageEnemyEvent { entity } in events.iter() {
         cmd.entity(*entity).despawn();
     }
 }
-*/
 
 pub struct EnemyPlugin;
 
@@ -171,8 +176,9 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnEnemyEvent>()
             .add_event::<EnemyUpdateEvent>()
+            .add_event::<DamageEnemyEvent>()
             .add_system(spawn)
-            // .add_system(take_damage)
+            .add_system(take_damage)
             .add_system_set(
                 ConditionSet::new()
                     .run_on_event::<EnemyUpdateEvent>()
