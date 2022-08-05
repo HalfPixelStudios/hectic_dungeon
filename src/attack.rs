@@ -7,6 +7,7 @@ use crate::{
 };
 
 pub enum AttackPattern {
+    None,
     StraightOne,
     StraightTwo,
     Hammer,
@@ -16,6 +17,7 @@ impl AttackPattern {
     // default north
     pub fn to_offsets(&self) -> Vec<IVec2> {
         match &self {
+            AttackPattern::None => vec![],
             AttackPattern::StraightOne => vec![IVec2::new(0, 1)],
             AttackPattern::StraightTwo => vec![IVec2::new(0, 1), IVec2::new(0, 2)],
             AttackPattern::Hammer => vec![
@@ -32,10 +34,11 @@ impl AttackPattern {
 
 pub fn rotate_offsets(vecs: Vec<IVec2>, dir: Dir) -> Vec<IVec2> {
     match dir {
-        Dir::North => vecs,
-        Dir::West => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
-        Dir::South => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
-        Dir::East => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
+        Dir::North | Dir::NorthEast => vecs,
+        Dir::East | Dir::SouthEast => vecs.into_iter().map(|v| IVec2::new(v.y, -v.x)).collect(),
+        Dir::South | Dir::SouthWest => vecs.into_iter().map(|v| IVec2::new(-v.x, -v.y)).collect(),
+        Dir::West | Dir::NorthWest => vecs.into_iter().map(|v| IVec2::new(-v.y, v.x)).collect(),
+        _ => vecs,
     }
 }
 

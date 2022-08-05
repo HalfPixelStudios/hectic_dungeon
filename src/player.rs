@@ -104,9 +104,8 @@ fn spawn(
             })
             .insert(CameraFollow)
             .insert(AttackIndicator {
-                dir: Dir::North,
                 pattern: AttackPattern::Hammer,
-                hidden: true,
+                ..default()
             })
             .insert(Children::default())
             .insert(Movement::new());

@@ -11,9 +11,12 @@ use priority_queue::PriorityQueue;
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
+    attack::AttackPattern,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
+    ui::attack_indicator::AttackIndicator,
+    utils::Dir,
 };
 
 #[derive(Component)]
@@ -57,6 +60,10 @@ fn spawn(
             // .insert(Animation::new(&enemy.anim))
             .insert(GridEntity::new(*spawn_pos, CellType::Enemy(id)))
             .insert(Movement::new())
+            .insert(AttackIndicator {
+                pattern: AttackPattern::StraightOne,
+                ..default()
+            })
             .insert(Enemy)
             .insert(Health::new(3));
     }
@@ -66,7 +73,12 @@ fn spawn(
 fn ai(
     mut player_query: Query<(&GridEntity), (With<Player>, Without<Enemy>)>,
     mut enemy_query: Query<
-        (&Transform, &mut GridEntity, &mut Movement),
+        (
+            &Transform,
+            &mut GridEntity,
+            &mut Movement,
+            &mut AttackIndicator,
+        ),
         (With<Enemy>, Without<Player>),
     >,
     mut events: EventReader<PlayerMovedEvent>,
@@ -75,13 +87,25 @@ fn ai(
     for _ in events.iter() {
         let player_grid_pos = player_query.single().pos;
 
-        for (transform, mut grid_pos, mut mv) in enemy_query.iter_mut() {
+        for (transform, mut grid_pos, mut mv, mut attack_indicator) in enemy_query.iter_mut() {
             let cur_pos = grid_pos.pos;
             if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
                 let next_pos = path.get(0).unwrap_or(&cur_pos);
                 mv.next_move = *next_pos - cur_pos;
             } else {
                 info!("failed to calculate path");
+            }
+
+            // attempt attack
+            // TODO hardcoded attack logic
+            if player_grid_pos.as_vec2().distance(cur_pos.as_vec2()) < 3. {
+                // determine direction to attack in
+                let dir: Dir = (player_grid_pos - cur_pos).into();
+
+                attack_indicator.dir = dir;
+                attack_indicator.hidden = false;
+            } else {
+                attack_indicator.hidden = true;
             }
         }
     }

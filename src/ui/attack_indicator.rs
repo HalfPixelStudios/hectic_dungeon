@@ -29,6 +29,16 @@ impl AttackIndicator {
     }
 }
 
+impl Default for AttackIndicator {
+    fn default() -> Self {
+        AttackIndicator {
+            dir: Dir::North,
+            pattern: AttackPattern::None,
+            hidden: true,
+        }
+    }
+}
+
 pub struct AttackIndicatorPlugin;
 
 impl Plugin for AttackIndicatorPlugin {
