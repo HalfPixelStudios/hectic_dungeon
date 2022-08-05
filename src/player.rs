@@ -17,6 +17,7 @@ use crate::{
     movement::Movement,
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
+    weapon::CurrentWeapon,
 };
 
 #[derive(Component)]
@@ -103,10 +104,8 @@ fn spawn(
                 input_map,
             })
             .insert(CameraFollow)
-            .insert(AttackIndicator {
-                pattern: AttackPattern::Hammer,
-                ..default()
-            })
+            .insert(CurrentWeapon("hammer".into()))
+            .insert(AttackIndicator::default())
             .insert(Children::default())
             .insert(Movement::new());
     }

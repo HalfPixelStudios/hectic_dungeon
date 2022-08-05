@@ -7,7 +7,7 @@ use crate::{
     utils::{variant_eq, Dir},
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 pub enum AttackPattern {
     None,
     StraightOne,

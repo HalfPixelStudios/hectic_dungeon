@@ -21,6 +21,7 @@ use crate::{
     player::{Player, PlayerMovedEvent},
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
+    weapon::CurrentWeapon,
 };
 
 #[derive(Component)]
@@ -64,10 +65,8 @@ fn spawn(
             // .insert(Animation::new(&enemy.anim))
             .insert(GridEntity::new(*spawn_pos, CellType::Enemy(id)))
             .insert(Movement::new())
-            .insert(AttackIndicator {
-                pattern: AttackPattern::StraightOne,
-                ..default()
-            })
+            .insert(AttackIndicator::default())
+            .insert(CurrentWeapon("dagger".into()))
             .insert(Enemy)
             .insert(Health::new(3));
 

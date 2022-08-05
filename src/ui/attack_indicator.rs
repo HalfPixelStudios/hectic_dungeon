@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_bobs::prefab::PrefabLib;
 
 use crate::{
     assets::{PrefabData, SpriteSheet},
@@ -6,6 +7,7 @@ use crate::{
     grid::GridEntity,
     player::Player,
     utils::Dir,
+    weapon::{CurrentWeapon, WeaponPrefab},
 };
 
 // TODO unify this
@@ -44,7 +46,7 @@ pub struct AttackIndicatorPlugin;
 impl Plugin for AttackIndicatorPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(spawn)
-            // .add_system(despawn)
+            .add_system(sync_attack_pattern)
             .add_system(render);
     }
 }
@@ -117,5 +119,15 @@ fn spawn(
             });
             cmd.entity(root).add_child(child);
         }
+    }
+}
+
+fn sync_attack_pattern(
+    mut query: Query<(&mut CurrentWeapon, &mut AttackIndicator)>,
+    prefabs: Res<PrefabLib<WeaponPrefab>>,
+) {
+    for (cur_weapon, mut attack_indicator) in query.iter_mut() {
+        let prefab = prefabs.get(&cur_weapon).unwrap();
+        attack_indicator.pattern = prefab.attack_pattern;
     }
 }
