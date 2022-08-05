@@ -200,7 +200,12 @@ fn attack_controller(
                 .iter()
                 .map(|v| *v + grid_entity.pos)
                 .collect();
-            writer.send(AttackEvent { grid_positions });
+            // TODO the entity in the CellType::ENemy is just a dummy value, this is pretty
+            // disgusting
+            writer.send(AttackEvent {
+                grid_positions,
+                cell_type: CellType::Enemy(entity),
+            });
         }
     }
 }

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     enemy::DamageEnemyEvent,
     grid::{CellType, Grid},
-    utils::Dir,
+    utils::{variant_eq, Dir},
 };
 
 pub enum AttackPattern {
@@ -44,6 +44,8 @@ pub fn rotate_offsets(vecs: Vec<IVec2>, dir: Dir) -> Vec<IVec2> {
 
 pub struct AttackEvent {
     pub grid_positions: Vec<IVec2>,
+    /// target cell type to hit
+    pub cell_type: CellType,
 }
 
 pub struct AttackPlugin;
@@ -59,13 +61,24 @@ fn process_attack(
     mut writer: EventWriter<DamageEnemyEvent>,
     grid: Res<Grid<CellType>>,
 ) {
-    for AttackEvent { grid_positions } in events.iter() {
+    for AttackEvent {
+        grid_positions,
+        cell_type,
+    } in events.iter()
+    {
         for grid_position in grid_positions.iter() {
             if let Ok(cell) = grid.get_cell(grid_position) {
                 for cell_entity in cell.iter() {
+                    if !variant_eq::<CellType>(cell_entity, cell_type) {
+                        continue;
+                    }
+
                     match cell_entity {
                         CellType::Enemy(entity) => {
                             writer.send(DamageEnemyEvent { entity: *entity });
+                        },
+                        CellType::Player(entity) => {
+                            info!("player hit!");
                         },
                         _ => {},
                     }

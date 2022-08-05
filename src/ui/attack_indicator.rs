@@ -116,22 +116,3 @@ fn spawn(
         }
     }
 }
-
-// TODO remove detection
-/*
-fn despawn(
-    mut cmd: Commands,
-    mut events: EventReader<DespawnAttackIndicatorEvent>,
-    query: Query<(Entity, &AttackIndicator)>,
-) {
-    for DespawnAttackIndicatorEvent { cancelled } in events.iter() {
-        // TODO despawn all indicators for now
-        for (e, attack_indicator) in query.iter() {
-            // Spawn attack animations
-            if !cancelled {}
-
-            cmd.entity(e).despawn_recursive();
-        }
-    }
-}
-*/
