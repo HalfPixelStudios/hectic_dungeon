@@ -18,7 +18,7 @@ pub enum Dir {
 
 impl From<IVec2> for Dir {
     fn from(v: IVec2) -> Self {
-        let clamped = v.clamp(IVec2::ZERO, IVec2::ONE);
+        let clamped = v.clamp(-IVec2::ONE, IVec2::ONE);
 
         // TODO can match directly in bevy 0.8
         match clamped.to_array() {
