@@ -43,7 +43,7 @@ fn spawn(
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: 0,
+                    index: 42,
                     color: Color::ORANGE,
                     ..default()
                 },
