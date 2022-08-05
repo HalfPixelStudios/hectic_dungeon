@@ -11,7 +11,7 @@ use priority_queue::PriorityQueue;
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
-    attack::AttackPattern,
+    attack::{AttackEvent, AttackPattern},
     grid::{to_world_coords, CellType, Grid, GridEntity},
     movement::Movement,
     player::{Player, PlayerMovedEvent},
@@ -74,6 +74,7 @@ fn ai(
     mut player_query: Query<(&GridEntity), (With<Player>, Without<Enemy>)>,
     mut enemy_query: Query<
         (
+            Entity,
             &Transform,
             &mut GridEntity,
             &mut Movement,
@@ -82,13 +83,34 @@ fn ai(
         (With<Enemy>, Without<Player>),
     >,
     mut events: EventReader<PlayerMovedEvent>,
+    mut writer: EventWriter<AttackEvent>,
     grid: Res<Grid<CellType>>,
 ) {
     for _ in events.iter() {
         let player_grid_pos = player_query.single().pos;
 
-        for (transform, mut grid_pos, mut mv, mut attack_indicator) in enemy_query.iter_mut() {
-            let cur_pos = grid_pos.pos;
+        for (entity, transform, mut grid_entity, mut mv, mut attack_indicator) in
+            enemy_query.iter_mut()
+        {
+            // run attack if queued in last turn
+            if attack_indicator.hidden == false {
+                let grid_positions = attack_indicator
+                    .get_pattern()
+                    .iter()
+                    .map(|v| *v + grid_entity.pos)
+                    .collect();
+
+                // TODO the entity in the CellType::Player is just a dummy value, this is pretty
+                // disgusting
+                writer.send(AttackEvent {
+                    grid_positions,
+                    cell_type: CellType::Player(entity),
+                });
+                attack_indicator.hidden = true;
+            }
+
+            // movement phase
+            let cur_pos = grid_entity.pos;
             if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
                 let next_pos = path.get(0).unwrap_or(&cur_pos);
                 mv.next_move = *next_pos - cur_pos;
@@ -190,7 +212,7 @@ fn take_damage(
     mut query: Query<(Entity, &mut Health), With<Enemy>>,
 ) {
     for DamageEnemyEvent { entity } in events.iter() {
-        cmd.entity(*entity).despawn();
+        cmd.entity(*entity).despawn_recursive();
     }
 }
 
