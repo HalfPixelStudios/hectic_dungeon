@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    assets::{PrefabData, SpriteSheets},
+    assets::{PrefabData, SpriteSheet},
     attack::{rotate_offsets, AttackPattern},
     grid::GridEntity,
     player::Player,
@@ -51,7 +51,7 @@ fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
 
 fn spawn(
     mut cmd: Commands,
-    asset_sheet: Res<SpriteSheets>,
+    asset_sheet: Res<SpriteSheet>,
     query: Query<
         (Entity, &AttackIndicator, Option<&Children>),
         Or<(Added<AttackIndicator>, Changed<AttackIndicator>)>,
@@ -95,7 +95,7 @@ fn spawn(
                     index: 8,
                     ..default()
                 },
-                texture_atlas: asset_sheet.get("tilesheet").unwrap().clone(),
+                texture_atlas: asset_sheet.clone(),
                 transform: Transform {
                     translation: offset,
                     ..default()

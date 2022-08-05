@@ -10,7 +10,7 @@ use leafwing_input_manager::prelude::*;
 
 use crate::{
     animation::Animation,
-    assets::{BeingPrefab, PrefabData, SpriteSheets},
+    assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
     grid::{to_world_coords, CellType, Grid, GridEntity},
@@ -60,7 +60,7 @@ impl Plugin for PlayerPlugin {
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnPlayerEvent>,
-    asset_sheet: Res<SpriteSheets>,
+    asset_sheet: Res<SpriteSheet>,
     prefab_data: Res<PrefabData>,
     beings: Res<Assets<BeingPrefab>>,
 ) {
@@ -85,10 +85,10 @@ fn spawn(
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: 0,
+                    index: 41,
                     ..default()
                 },
-                texture_atlas: asset_sheet.get("player").unwrap().clone(),
+                texture_atlas: asset_sheet.clone(),
                 transform: Transform {
                     translation: to_world_coords(spawn_pos).extend(1.),
                     ..default()
