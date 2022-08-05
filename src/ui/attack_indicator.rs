@@ -72,7 +72,10 @@ fn spawn(
         // despawn existing
         if let Some(children) = children {
             for child in children.iter() {
-                if let Ok(_) = child_query.get_component::<AttackIndicatorRoot>(*child) {
+                if child_query
+                    .get_component::<AttackIndicatorRoot>(*child)
+                    .is_ok()
+                {
                     cmd.entity(*child).despawn_recursive();
                 }
             }
