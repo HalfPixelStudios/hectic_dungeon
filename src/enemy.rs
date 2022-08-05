@@ -21,6 +21,7 @@ use crate::{
     player::{Player, PlayerMovedEvent},
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
+    weapon::CurrentWeapon,
 };
 
 #[derive(Component)]
@@ -64,10 +65,8 @@ fn spawn(
             // .insert(Animation::new(&enemy.anim))
             .insert(GridEntity::new(*spawn_pos, CellType::Enemy(id)))
             .insert(Movement::new())
-            .insert(AttackIndicator {
-                pattern: AttackPattern::StraightOne,
-                ..default()
-            })
+            .insert(AttackIndicator::default())
+            .insert(CurrentWeapon("dagger".into()))
             .insert(Enemy)
             .insert(Health::new(3));
 
@@ -108,7 +107,7 @@ fn ai(
             enemy_query.iter_mut()
         {
             // run attack if queued in last turn
-            if attack_indicator.hidden == false {
+            if !attack_indicator.hidden {
                 let grid_positions = attack_indicator
                     .get_pattern()
                     .iter()
@@ -163,7 +162,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid<CellType>>) -> Option
 
     costs.insert(*start, 0);
 
-    while search.len() > 0 {
+    while !search.is_empty() {
         let (cur_pos, cur_cost) = search.pop().unwrap();
         // info!("searching {:?}", cur_pos);
 

@@ -144,7 +144,7 @@ fn update_grid(
         grid.insert_at(col, CellType::Wall);
     }
     for grid_pos in query.iter() {
-        grid.insert_at(&grid_pos, grid_pos.value);
+        grid.insert_at(grid_pos, grid_pos.value);
     }
 }
 

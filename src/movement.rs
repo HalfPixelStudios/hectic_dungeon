@@ -23,10 +23,10 @@ pub struct Movement {
 
 impl Movement {
     pub fn new() -> Self {
-        return Movement {
+        Movement {
             next_move: IVec2::ZERO,
             frame: 0.,
-        };
+        }
     }
 }
 

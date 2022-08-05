@@ -15,6 +15,7 @@ mod player;
 mod prefab;
 mod ui;
 mod utils;
+mod weapon;
 
 fn main() {
     app::app();
