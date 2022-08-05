@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use serde::Deserialize;
 
 use crate::{
     enemy::DamageEnemyEvent,
@@ -6,6 +7,7 @@ use crate::{
     utils::{variant_eq, Dir},
 };
 
+#[derive(Deserialize)]
 pub enum AttackPattern {
     None,
     StraightOne,
