@@ -1,10 +1,14 @@
 use std::{
     cmp::Reverse,
     collections::{HashMap, HashSet},
+    sync,
 };
 
 use bevy::prelude::*;
-use bevy_bobs::component::health::Health;
+use bevy_bobs::{
+    component::health::Health,
+    health_bar::{spawn_health_bar, HealthBar},
+};
 use iyes_loopless::prelude::ConditionSet;
 use priority_queue::PriorityQueue;
 
@@ -66,6 +70,17 @@ fn spawn(
             })
             .insert(Enemy)
             .insert(Health::new(3));
+
+        let hp_bar = spawn_health_bar(
+            &mut cmd,
+            bevy_bobs::health_bar::HealthBarPrefab {
+                dimension: Vec2::new(8., 2.),
+                bg_color: Color::BLACK,
+                fg_color: Color::GREEN,
+                translation: Vec3::ZERO,
+            },
+        );
+        cmd.entity(id).add_child(hp_bar);
     }
 }
 //TODO player cant move if go neg or enemy on top
@@ -209,10 +224,15 @@ fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
 fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<DamageEnemyEvent>,
-    mut query: Query<(Entity, &mut Health), With<Enemy>>,
+    mut query: Query<&mut Health, With<Enemy>>,
 ) {
     for DamageEnemyEvent { entity } in events.iter() {
-        cmd.entity(*entity).despawn_recursive();
+        let mut health = query.get_mut(*entity).unwrap();
+
+        health.take(1);
+        if health.is_zero() {
+            cmd.entity(*entity).despawn_recursive();
+        }
     }
 }
 
@@ -225,11 +245,22 @@ impl Plugin for EnemyPlugin {
             .add_event::<DamageEnemyEvent>()
             .add_system(spawn)
             .add_system(take_damage)
+            .add_system(sync_health_bars)
             .add_system_set(
                 ConditionSet::new()
                     .run_on_event::<EnemyUpdateEvent>()
                     .with_system(ai)
                     .into(),
             );
+    }
+}
+
+fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<&mut HealthBar>) {
+    for (health, children) in query.iter() {
+        for child in children.iter() {
+            if let Ok(mut hp_bar) = hp_bar_query.get_mut(*child) {
+                hp_bar.set_percent(health.percent());
+            }
+        }
     }
 }

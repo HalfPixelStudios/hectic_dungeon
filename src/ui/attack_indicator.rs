@@ -90,7 +90,7 @@ fn spawn(
             ))
             .insert(AttackIndicatorRoot);
 
-        cmd.entity(entity).push_children(&[root]);
+        cmd.entity(entity).add_child(root);
 
         // spawn children
         for offset in attack_indictor
@@ -112,7 +112,7 @@ fn spawn(
                 },
                 ..default()
             });
-            cmd.entity(root).push_children(&[child]);
+            cmd.entity(root).add_child(child);
         }
     }
 }

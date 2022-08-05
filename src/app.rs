@@ -1,4 +1,5 @@
 use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
+use bevy_bobs::health_bar::HealthBarPlugin;
 use bevy_prototype_debug_lines::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
@@ -46,6 +47,7 @@ pub fn app() {
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(MapPlugin)
+        .add_plugin(HealthBarPlugin)
         .add_plugin(GridPlugin);
 
     app.add_startup_system(setup).add_system(debug);
