@@ -6,6 +6,7 @@ mod assets;
 mod attack;
 mod camera;
 mod enemy;
+mod enviro;
 mod game;
 mod grid;
 mod layers;
