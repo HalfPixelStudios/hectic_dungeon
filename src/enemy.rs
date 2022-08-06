@@ -9,6 +9,7 @@ use bevy_bobs::{
     component::health::Health,
     health_bar::{spawn_health_bar, HealthBar},
 };
+use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::prelude::ConditionSet;
 use priority_queue::PriorityQueue;
 
@@ -17,6 +18,7 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     grid::{to_world_coords, CellType, Grid, GridEntity},
+    map::ldtk_to_bevy,
     movement::Movement,
     player::{Player, PlayerMovedEvent},
     ui::attack_indicator::AttackIndicator,
@@ -245,6 +247,7 @@ impl Plugin for EnemyPlugin {
             .add_system(spawn)
             .add_system(take_damage)
             .add_system(sync_health_bars)
+            .add_system(spawn_from_ldtk)
             .add_system_set(
                 ConditionSet::new()
                     .run_on_event::<EnemyUpdateEvent>()
@@ -259,6 +262,26 @@ fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<
         for child in children.iter() {
             if let Ok(mut hp_bar) = hp_bar_query.get_mut(*child) {
                 hp_bar.set_percent(health.percent());
+            }
+        }
+    }
+}
+
+fn spawn_from_ldtk(
+    query: Query<&EntityInstance, Added<EntityInstance>>,
+    mut writer: EventWriter<SpawnEnemyEvent>,
+) {
+    for entity_instance in query.iter() {
+        // TODO handle not found
+        if let Some(field) = entity_instance
+            .field_instances
+            .iter()
+            .find(|field| field.identifier == "id")
+        {
+            if let FieldValue::String(Some(v)) = &field.value {
+                writer.send(SpawnEnemyEvent {
+                    spawn_pos: ldtk_to_bevy(&entity_instance.grid),
+                });
             }
         }
     }

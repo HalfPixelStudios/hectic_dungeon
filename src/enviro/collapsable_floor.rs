@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
-use bevy_ecs_ldtk::{EntityInstance, TileMetadata};
+use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
+
+use crate::{assets::SpriteSheet, grid::to_world_coords};
 
 const FLOOR_HEALTH: u32 = 2;
 
@@ -31,8 +33,26 @@ fn update(query: Query<&CollapsableFloor, Changed<CollapsableFloor>>) {
     }
 }
 
-fn spawn_from_ldtk(query: Query<&TileMetadata, Added<TileMetadata>>) {
-    for tile_meta in query.iter() {
-        info!("tile_meta {:?}", tile_meta);
+fn spawn_from_ldtk(
+    mut cmd: Commands,
+    query: Query<&EntityInstance, Added<EntityInstance>>,
+    asset_sheet: Res<SpriteSheet>,
+) {
+    for entity_instance in query.iter().filter(|t| t.identifier == "CollapsableFloor") {
+        info!("tile_meta {:?}", entity_instance);
+
+        cmd.spawn_bundle(SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: 32,
+                ..default()
+            },
+            texture_atlas: asset_sheet.clone(),
+            transform: Transform {
+                translation: to_world_coords(&entity_instance.grid).extend(1.),
+                ..default()
+            },
+            ..default()
+        })
+        .insert(CollapsableFloor::new());
     }
 }

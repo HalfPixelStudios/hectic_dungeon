@@ -20,8 +20,7 @@ impl Plugin for MapPlugin {
             .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_startup_system(setup)
-            .add_system(register_collision_int_cell)
-            .add_system(register_spawn_points);
+            .add_system(register_collision_int_cell);
     }
 }
 
@@ -44,34 +43,9 @@ fn register_collision_int_cell(
     }
 }
 
-fn register_spawn_points(
-    query: Query<&EntityInstance, Added<EntityInstance>>,
-    mut writer: EventWriter<SpawnEnemyEvent>,
-) {
-    for entity_instance in query.iter() {
-        // TODO handle not found
-        if let Some(field) = entity_instance
-            .field_instances
-            .iter()
-            .find(|field| field.identifier == "id")
-        {
-            if let FieldValue::String(Some(v)) = &field.value {
-                info!(
-                    "field instance {:?} {:?}",
-                    v,
-                    entity_instance.grid.as_vec2() * TILEWIDTH
-                );
-                writer.send(SpawnEnemyEvent {
-                    spawn_pos: ldtk_to_bevy(&entity_instance.grid),
-                });
-            }
-        }
-    }
-}
-
 /// Converts ldtk coordinates to bevy coordinates
 ///
 /// Ldtk uses down position, right positive whereas bevy uses up positive, right positive
-fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
+pub fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
     IVec2::new(v.x, (MAPHEIGHT as i32) - v.y - 1)
 }

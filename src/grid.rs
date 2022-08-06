@@ -19,6 +19,7 @@ pub enum CellType {
     Player(Entity),
     Enemy(Entity),
     Wall,
+    CollapsableFloor(Entity),
 }
 
 #[derive(Error, Debug)]
