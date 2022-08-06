@@ -5,7 +5,7 @@ use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
 use crate::{
     assets::SpriteSheet,
     grid::{to_world_coords, CellType, Grid, GridEntity},
-    map::CollisionMap,
+    map::{ldtk_to_bevy, CollisionMap},
     player::PlayerMovedEvent,
 };
 
@@ -59,7 +59,7 @@ fn spawn_from_ldtk(
             },
             texture_atlas: asset_sheet.clone(),
             transform: Transform {
-                translation: to_world_coords(&entity_instance.grid).extend(1.),
+                translation: to_world_coords(&ldtk_to_bevy(&entity_instance.grid)).extend(1.),
                 ..default()
             },
             ..default()
