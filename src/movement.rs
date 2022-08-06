@@ -33,20 +33,20 @@ impl Movement {
 //time based lerp; make mv.frame/t = 1 where t = time to move between squares
 fn movement(mut query: Query<(&mut GridEntity, &mut Movement, &mut Transform)>) {
     for (mut grid_entity, mut mv, mut transform) in query.iter_mut() {
-        if mv.next_move == IVec2::ZERO {
-            continue;
+        if mv.next_move != IVec2::ZERO {
+            grid_entity.pos += mv.next_move;
+            mv.next_move = IVec2::ZERO;
         }
-        let next_pos = to_world_coords(&(grid_entity.pos + mv.next_move));
+        let next_pos = to_world_coords(&grid_entity.pos);
         let cur_pos = transform.translation.truncate();
         if cur_pos.distance(next_pos) > THRESHOLD {
             transform.translation.x = lerp(transform.translation.x, next_pos.x, mv.frame / 60.);
             transform.translation.y = lerp(transform.translation.y, next_pos.y, mv.frame / 60.);
             mv.frame += 1.;
+            grid_entity.pos += mv.next_move;
         } else {
             mv.frame = 0.;
             transform.translation = next_pos.extend(transform.translation.z);
-            grid_entity.pos += mv.next_move;
-            mv.next_move = IVec2::ZERO;
         }
     }
 }

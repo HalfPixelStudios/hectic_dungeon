@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 // TODO make a proper 2d direction utility
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub enum Dir {
     None,
 
@@ -38,4 +38,16 @@ impl From<IVec2> for Dir {
 
 pub fn variant_eq<T>(a: &T, b: &T) -> bool {
     std::mem::discriminant(a) == std::mem::discriminant(b)
+}
+
+impl From<String> for Dir {
+    fn from(s: String) -> Self {
+        match s.to_lowercase().as_str() {
+            "north" => Dir::North,
+            "south" => Dir::South,
+            "east" => Dir::East,
+            "west" => Dir::West,
+            _ => Dir::None,
+        }
+    }
 }
