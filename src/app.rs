@@ -61,9 +61,6 @@ fn setup(
     mut spawn_player: EventWriter<SpawnPlayerEvent>,
     mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
 ) {
-    spawn_player.send(SpawnPlayerEvent {
-        spawn_pos: IVec2::new(8, 8),
-    });
 }
 
 fn debug(

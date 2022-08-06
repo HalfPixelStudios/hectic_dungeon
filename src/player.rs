@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_bobs::component::health::*;
+use bevy_ecs_ldtk::EntityInstance;
 use iyes_loopless::{
     prelude::{AppLooplessStateExt, IntoConditionalSystem},
     state::NextState,
@@ -14,6 +15,7 @@ use crate::{
     attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
     grid::{to_world_coords, CellType, Grid, GridEntity},
+    map::ldtk_to_bevy,
     movement::Movement,
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
@@ -54,7 +56,8 @@ impl Plugin for PlayerPlugin {
             .add_event::<PlayerMovedEvent>()
             .add_system(move_controller.run_in_state(PlayerState::Move))
             .add_system(attack_controller.run_in_state(PlayerState::Attack))
-            .add_system(spawn);
+            .add_system(spawn)
+            .add_system(spawn_from_ldtk);
     }
 }
 
@@ -209,5 +212,16 @@ fn attack_controller(
 
             player_moved.send(PlayerMovedEvent);
         }
+    }
+}
+
+fn spawn_from_ldtk(
+    query: Query<&EntityInstance, Added<EntityInstance>>,
+    mut writer: EventWriter<SpawnPlayerEvent>,
+) {
+    for entity_instance in query.iter().filter(|e| e.identifier == "PlayerSpawn") {
+        writer.send(SpawnPlayerEvent {
+            spawn_pos: ldtk_to_bevy(&entity_instance.grid),
+        });
     }
 }
