@@ -1,5 +1,6 @@
 use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
 use bevy_bobs::health_bar::HealthBarPlugin;
+use bevy_editor_pls::prelude::*;
 use bevy_prototype_debug_lines::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
@@ -42,6 +43,7 @@ pub fn app() {
         .add_plugin(PlayerPlugin)
         // .add_plugin(AnimatePlugin)
         .add_plugin(AttackPlugin)
+        .add_plugin(EditorPlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
         .add_plugin(MovementPlugin)
