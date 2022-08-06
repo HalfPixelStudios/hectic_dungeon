@@ -175,6 +175,7 @@ fn attack_controller(
         With<Player>,
     >,
     mut writer: EventWriter<AttackEvent>,
+    mut player_moved: EventWriter<PlayerMovedEvent>,
 ) {
     if let Ok((entity, mut attack_indicator, grid_entity, action_state)) = query.get_single_mut() {
         if action_state.just_pressed(PlayerAction::Up) {
@@ -205,6 +206,8 @@ fn attack_controller(
                 grid_positions,
                 cell_type: CellType::Enemy(entity),
             });
+
+            player_moved.send(PlayerMovedEvent);
         }
     }
 }

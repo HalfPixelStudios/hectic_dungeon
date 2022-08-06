@@ -14,7 +14,7 @@ use super::{
     player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
     ui::UIPlugin,
 };
-use crate::{attack::AttackPlugin, map::MapPlugin, weapon::WeaponPlugin};
+use crate::{attack::AttackPlugin, enviro::EnviroPlugin, map::MapPlugin, weapon::WeaponPlugin};
 
 pub fn app() {
     let window_descriptor = WindowDescriptor {
@@ -48,6 +48,7 @@ pub fn app() {
         .add_plugin(EnemyPlugin)
         .add_plugin(MapPlugin)
         .add_plugin(HealthBarPlugin)
+        .add_plugin(EnviroPlugin)
         .add_plugin(WeaponPlugin)
         .add_plugin(GridPlugin);
 
