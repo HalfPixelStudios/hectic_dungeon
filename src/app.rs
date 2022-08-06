@@ -1,6 +1,5 @@
 use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
 use bevy_bobs::health_bar::HealthBarPlugin;
-use bevy_prototype_debug_lines::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
 use super::{
@@ -34,9 +33,7 @@ pub fn app() {
     //     ..default()
     // });
 
-    app.add_loopless_state(GameState::EnemyPhase)
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DebugLinesPlugin::default())
+    app.add_plugins(DefaultPlugins)
         .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)

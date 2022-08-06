@@ -2,7 +2,6 @@ use std::{fmt::Debug, ops::Deref};
 
 use anyhow::{anyhow, Result};
 use bevy::prelude::*;
-use bevy_prototype_debug_lines::*;
 use thiserror::Error;
 
 use crate::{map::CollisionMap, player::PlayerMovedEvent};
