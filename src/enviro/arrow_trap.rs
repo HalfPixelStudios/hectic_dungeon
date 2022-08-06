@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
+use iyes_loopless::prelude::*;
 
 use crate::{
     assets::SpriteSheet,
     attack::AttackEvent,
+    game::GameState,
     grid::{to_world_coords, CellType, GridEntity},
     map::ldtk_to_bevy,
-    player::PlayerMovedEvent,
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
     weapon::CurrentWeapon,
@@ -30,37 +31,35 @@ pub struct ArrowTrapPlugin;
 
 impl Plugin for ArrowTrapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_from_ldtk).add_system(ai);
+        app.add_system(spawn_from_ldtk)
+            .add_enter_system(GameState::EnemyInput, ai);
     }
 }
 
 fn ai(
     mut query: Query<(Entity, &GridEntity, &mut ArrowTrap, &mut AttackIndicator)>,
-    mut events: EventReader<PlayerMovedEvent>,
     mut writer: EventWriter<AttackEvent>,
 ) {
-    for event in events.iter() {
-        for (entity, grid_entity, mut arrow_trap, mut attack_indicator) in query.iter_mut() {
-            if attack_indicator.hidden == false {
-                let grid_positions = attack_indicator
-                    .get_pattern()
-                    .iter()
-                    .map(|v| *v + grid_entity.pos)
-                    .collect();
+    for (entity, grid_entity, mut arrow_trap, mut attack_indicator) in query.iter_mut() {
+        if attack_indicator.hidden == false {
+            let grid_positions = attack_indicator
+                .get_pattern()
+                .iter()
+                .map(|v| *v + grid_entity.pos)
+                .collect();
 
-                // TODO dummy entity (super stupid)
-                writer.send(AttackEvent {
-                    grid_positions,
-                    cell_type: CellType::Player(entity),
-                });
-            }
+            // TODO dummy entity (super stupid)
+            writer.send(AttackEvent {
+                grid_positions,
+                cell_type: CellType::Player(entity),
+            });
+        }
 
-            attack_indicator.hidden = true;
-            arrow_trap.turn_count += 1;
-            if arrow_trap.turn_count >= ATTACK_SPEED {
-                arrow_trap.turn_count = 0;
-                attack_indicator.hidden = false;
-            }
+        attack_indicator.hidden = true;
+        arrow_trap.turn_count += 1;
+        if arrow_trap.turn_count >= ATTACK_SPEED {
+            arrow_trap.turn_count = 0;
+            attack_indicator.hidden = false;
         }
     }
 }

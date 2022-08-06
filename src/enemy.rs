@@ -10,17 +10,18 @@ use bevy_bobs::{
     health_bar::{spawn_health_bar, HealthBar},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
-use iyes_loopless::prelude::ConditionSet;
+use iyes_loopless::prelude::*;
 use priority_queue::PriorityQueue;
 
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
+    game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
-    player::{Player, PlayerMovedEvent},
+    player::Player,
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
     weapon::CurrentWeapon,
@@ -33,10 +34,22 @@ pub struct SpawnEnemyEvent {
     pub spawn_pos: IVec2,
 }
 
-pub struct EnemyUpdateEvent;
-
 pub struct DamageEnemyEvent {
     pub entity: Entity,
+}
+
+pub struct EnemyPlugin;
+
+impl Plugin for EnemyPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_event::<SpawnEnemyEvent>()
+            .add_event::<DamageEnemyEvent>()
+            .add_system(spawn)
+            .add_system(take_damage)
+            .add_system(sync_health_bars)
+            .add_system(spawn_from_ldtk)
+            .add_enter_system(GameState::EnemyInput, ai);
+    }
 }
 
 fn spawn(
@@ -98,52 +111,48 @@ fn ai(
         ),
         (With<Enemy>, Without<Player>),
     >,
-    mut events: EventReader<PlayerMovedEvent>,
     mut writer: EventWriter<AttackEvent>,
     grid: Res<Grid<CellType>>,
 ) {
-    for _ in events.iter() {
-        let player_grid_pos = player_query.single().pos;
+    let player_grid_pos = player_query.single().pos;
 
-        for (entity, transform, mut grid_entity, mut mv, mut attack_indicator) in
-            enemy_query.iter_mut()
-        {
-            // run attack if queued in last turn
-            if !attack_indicator.hidden {
-                let grid_positions = attack_indicator
-                    .get_pattern()
-                    .iter()
-                    .map(|v| *v + grid_entity.pos)
-                    .collect();
+    for (entity, transform, mut grid_entity, mut mv, mut attack_indicator) in enemy_query.iter_mut()
+    {
+        // run attack if queued in last turn
+        if !attack_indicator.hidden {
+            let grid_positions = attack_indicator
+                .get_pattern()
+                .iter()
+                .map(|v| *v + grid_entity.pos)
+                .collect();
 
-                // TODO the entity in the CellType::Player is just a dummy value, this is pretty
-                // disgusting
-                writer.send(AttackEvent {
-                    grid_positions,
-                    cell_type: CellType::Player(entity),
-                });
-                attack_indicator.hidden = true;
+            // TODO the entity in the CellType::Player is just a dummy value, this is pretty
+            // disgusting
+            writer.send(AttackEvent {
+                grid_positions,
+                cell_type: CellType::Player(entity),
+            });
+            attack_indicator.hidden = true;
+        } else {
+            // movement phase
+            let cur_pos = grid_entity.pos;
+            if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
+                let next_pos = path.get(0).unwrap_or(&cur_pos);
+                mv.next_move = *next_pos - cur_pos;
             } else {
-                // movement phase
-                let cur_pos = grid_entity.pos;
-                if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
-                    let next_pos = path.get(0).unwrap_or(&cur_pos);
-                    mv.next_move = *next_pos - cur_pos;
-                } else {
-                    info!("failed to calculate path");
-                }
+                info!("failed to calculate path");
+            }
 
-                // attempt attack
-                // TODO hardcoded attack logic
-                if player_grid_pos.as_vec2().distance(cur_pos.as_vec2()) < 3. {
-                    // determine direction to attack in
-                    let dir: Dir = (player_grid_pos - cur_pos).into();
+            // attempt attack
+            // TODO hardcoded attack logic
+            if player_grid_pos.as_vec2().distance(cur_pos.as_vec2()) < 3. {
+                // determine direction to attack in
+                let dir: Dir = (player_grid_pos - cur_pos).into();
 
-                    attack_indicator.dir = dir;
-                    attack_indicator.hidden = false;
-                } else {
-                    attack_indicator.hidden = true;
-                }
+                attack_indicator.dir = dir;
+                attack_indicator.hidden = false;
+            } else {
+                attack_indicator.hidden = true;
             }
         }
     }
@@ -234,26 +243,6 @@ fn take_damage(
         if health.is_zero() {
             cmd.entity(*entity).despawn_recursive();
         }
-    }
-}
-
-pub struct EnemyPlugin;
-
-impl Plugin for EnemyPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_event::<SpawnEnemyEvent>()
-            .add_event::<EnemyUpdateEvent>()
-            .add_event::<DamageEnemyEvent>()
-            .add_system(spawn)
-            .add_system(take_damage)
-            .add_system(sync_health_bars)
-            .add_system(spawn_from_ldtk)
-            .add_system_set(
-                ConditionSet::new()
-                    .run_on_event::<EnemyUpdateEvent>()
-                    .with_system(ai)
-                    .into(),
-            );
     }
 }
 

@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
+use iyes_loopless::prelude::*;
 
 use crate::{
     assets::SpriteSheet,
+    game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::{ldtk_to_bevy, CollisionMap},
-    player::PlayerMovedEvent,
 };
 
 const FLOOR_HEALTH: u32 = 2;
@@ -30,7 +31,7 @@ impl Plugin for CollapsableFloorPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(update)
             .add_system(spawn_from_ldtk)
-            .add_system(detect_step_on)
+            .add_exit_system(GameState::PlayerInput, detect_step_on)
             .add_system(despawn);
     }
 }
@@ -74,18 +75,14 @@ fn spawn_from_ldtk(
 }
 
 /// Detect whenever a player steps on a collapsable floor
-// TODO better turn system (don't depend on PlayerMovedEvent)
 fn detect_step_on(
     grid: Res<Grid<CellType>>,
     mut query: Query<(&mut CollapsableFloor, &GridEntity)>,
-    mut events: EventReader<PlayerMovedEvent>,
 ) {
-    for event in events.iter() {
-        for (mut floor, grid_entity) in query.iter_mut() {
-            for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
-                if let CellType::Player(_) = cell_entity {
-                    floor.health.take(1);
-                }
+    for (mut floor, grid_entity) in query.iter_mut() {
+        for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
+            if let CellType::Player(_) = cell_entity {
+                floor.health.take(1);
             }
         }
     }

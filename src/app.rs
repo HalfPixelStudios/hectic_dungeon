@@ -1,6 +1,5 @@
 use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
 use bevy_bobs::health_bar::HealthBarPlugin;
-use bevy_prototype_debug_lines::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
 use super::{
@@ -34,9 +33,7 @@ pub fn app() {
     //     ..default()
     // });
 
-    app.add_loopless_state(GameState::EnemyPhase)
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DebugLinesPlugin::default())
+    app.add_plugins(DefaultPlugins)
         .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
@@ -52,23 +49,5 @@ pub fn app() {
         .add_plugin(WeaponPlugin)
         .add_plugin(GridPlugin);
 
-    app.add_startup_system(setup).add_system(debug);
-
     app.run();
-}
-
-fn setup(
-    mut spawn_player: EventWriter<SpawnPlayerEvent>,
-    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
-) {
-}
-
-fn debug(
-    keys: Res<Input<KeyCode>>,
-    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
-    mut player_move: EventWriter<PlayerMovedEvent>,
-) {
-    // if keys.just_pressed(KeyCode::Y) {
-    //     player_move.send(PlayerMovedEvent);
-    // }
 }
