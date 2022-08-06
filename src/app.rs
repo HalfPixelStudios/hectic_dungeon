@@ -49,23 +49,5 @@ pub fn app() {
         .add_plugin(WeaponPlugin)
         .add_plugin(GridPlugin);
 
-    app.add_startup_system(setup).add_system(debug);
-
     app.run();
-}
-
-fn setup(
-    mut spawn_player: EventWriter<SpawnPlayerEvent>,
-    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
-) {
-}
-
-fn debug(
-    keys: Res<Input<KeyCode>>,
-    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
-    mut player_move: EventWriter<PlayerMovedEvent>,
-) {
-    // if keys.just_pressed(KeyCode::Y) {
-    //     player_move.send(PlayerMovedEvent);
-    // }
 }

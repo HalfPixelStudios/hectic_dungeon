@@ -4,7 +4,7 @@ use anyhow::{anyhow, Result};
 use bevy::prelude::*;
 use thiserror::Error;
 
-use crate::{map::CollisionMap, player::PlayerMovedEvent};
+use crate::map::CollisionMap;
 
 // TODO: make grid not have a constant size, we need to be able to switch out the map later
 
@@ -154,15 +154,7 @@ impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(update_grid)
             // .add_system(sync_grid_positions)
-            // .add_system(gizmo)
-            .add_system(debug)
             .insert_resource(Grid::<CellType>::new(MAP_WIDTH, MAP_HEIGHT));
-    }
-}
-
-fn debug(grid: Res<Grid<CellType>>, mut events: EventReader<PlayerMovedEvent>) {
-    for _ in events.iter() {
-        // info!("{:?}", grid);
     }
 }
 

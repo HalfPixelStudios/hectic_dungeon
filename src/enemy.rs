@@ -21,7 +21,7 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
-    player::{Player, PlayerMovedEvent},
+    player::Player,
     ui::attack_indicator::AttackIndicator,
     utils::Dir,
     weapon::CurrentWeapon,
@@ -34,8 +34,6 @@ pub struct SpawnEnemyEvent {
     pub spawn_pos: IVec2,
 }
 
-pub struct EnemyUpdateEvent;
-
 pub struct DamageEnemyEvent {
     pub entity: Entity,
 }
@@ -45,7 +43,6 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnEnemyEvent>()
-            .add_event::<EnemyUpdateEvent>()
             .add_event::<DamageEnemyEvent>()
             .add_system(spawn)
             .add_system(take_damage)

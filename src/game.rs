@@ -4,12 +4,12 @@ use iyes_loopless::{
     state::{CurrentState, NextState},
 };
 
-use crate::{enemy::EnemyUpdateEvent, player::PlayerMovedEvent};
+use crate::player::PlayerMovedEvent;
 
-const PLAYER_INPUT_TIME_LIMIT: f32 = 3.;
-const PLAYER_ANIM_TIME_LIMIT: f32 = 0.5;
-const ENEMY_INPUT_TIME_LIMIT: f32 = 1.;
-const ENEMY_ANIM_TIME_LIMIT: f32 = 0.5;
+const PLAYER_INPUT_TIME_LIMIT: f32 = 2.;
+const PLAYER_ANIM_TIME_LIMIT: f32 = 0.25;
+const ENEMY_INPUT_TIME_LIMIT: f32 = 0.5;
+const ENEMY_ANIM_TIME_LIMIT: f32 = 0.25;
 
 /// Four phases of the game loop
 ///
