@@ -3,10 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_bobs::component::health::*;
 use bevy_ecs_ldtk::EntityInstance;
-use iyes_loopless::{
-    prelude::{AppLooplessStateExt, IntoConditionalSystem},
-    state::NextState,
-};
+use iyes_loopless::{prelude::*, state::NextState};
 use leafwing_input_manager::prelude::*;
 
 use crate::{
@@ -14,6 +11,7 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
+    game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
@@ -54,8 +52,16 @@ impl Plugin for PlayerPlugin {
             .add_loopless_state(PlayerState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
-            .add_system(move_controller.run_in_state(PlayerState::Move))
-            .add_system(attack_controller.run_in_state(PlayerState::Attack))
+            .add_system(
+                move_controller
+                    .run_in_state(GameState::PlayerInput)
+                    .run_in_state(PlayerState::Move),
+            )
+            .add_system(
+                attack_controller
+                    .run_in_state(GameState::PlayerInput)
+                    .run_in_state(PlayerState::Attack),
+            )
             .add_system(spawn)
             .add_system(spawn_from_ldtk);
     }
