@@ -2,7 +2,12 @@ use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
 
-use crate::{assets::SpriteSheet, grid::to_world_coords};
+use crate::{
+    assets::SpriteSheet,
+    grid::{to_world_coords, CellType, Grid, GridEntity},
+    map::CollisionMap,
+    player::PlayerMovedEvent,
+};
 
 const FLOOR_HEALTH: u32 = 2;
 
@@ -23,7 +28,10 @@ pub struct CollapsableFloorPlugin;
 
 impl Plugin for CollapsableFloorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(update).add_system(spawn_from_ldtk);
+        app.add_system(update)
+            .add_system(spawn_from_ldtk)
+            .add_system(detect_step_on)
+            .add_system(despawn);
     }
 }
 
@@ -35,10 +43,13 @@ fn update(query: Query<&CollapsableFloor, Changed<CollapsableFloor>>) {
 
 fn spawn_from_ldtk(
     mut cmd: Commands,
-    query: Query<&EntityInstance, Added<EntityInstance>>,
+    query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for entity_instance in query.iter().filter(|t| t.identifier == "CollapsableFloor") {
+    for (entity, entity_instance) in query
+        .iter()
+        .filter(|(_, t)| t.identifier == "CollapsableFloor")
+    {
         info!("tile_meta {:?}", entity_instance);
 
         cmd.spawn_bundle(SpriteSheetBundle {
@@ -53,6 +64,41 @@ fn spawn_from_ldtk(
             },
             ..default()
         })
-        .insert(CollapsableFloor::new());
+        .insert(CollapsableFloor::new())
+        .insert(GridEntity {
+            pos: entity_instance.grid,
+            value: CellType::CollapsableFloor(entity),
+        });
+    }
+}
+
+/// Detect whenever a player steps on a collapsable floor
+// TODO run on once per update
+fn detect_step_on(
+    grid: Res<Grid<CellType>>,
+    mut query: Query<(&mut CollapsableFloor, &GridEntity)>,
+    mut events: EventReader<PlayerMovedEvent>,
+) {
+    for event in events.iter() {
+        for (mut floor, grid_entity) in query.iter_mut() {
+            for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
+                if let CellType::Player(_) = cell_entity {
+                    floor.health.take(1);
+                }
+            }
+        }
+    }
+}
+
+fn despawn(
+    mut cmd: Commands,
+    query: Query<(Entity, &CollapsableFloor, &GridEntity)>,
+    mut collision_map: ResMut<CollisionMap>,
+) {
+    for (entity, floor, grid_entity) in query.iter() {
+        if floor.health.is_zero() {
+            cmd.entity(entity).despawn();
+            collision_map.push(grid_entity.pos);
+        }
     }
 }
