@@ -271,7 +271,7 @@ fn spawn_from_ldtk(
     query: Query<&EntityInstance, Added<EntityInstance>>,
     mut writer: EventWriter<SpawnEnemyEvent>,
 ) {
-    for entity_instance in query.iter() {
+    for entity_instance in query.iter().filter(|e| e.identifier == "EnemySpawn") {
         // TODO handle not found
         if let Some(field) = entity_instance
             .field_instances
