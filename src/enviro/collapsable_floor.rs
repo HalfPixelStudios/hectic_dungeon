@@ -73,7 +73,7 @@ fn spawn_from_ldtk(
 }
 
 /// Detect whenever a player steps on a collapsable floor
-// TODO run on once per update
+// TODO better turn system (don't depend on PlayerMovedEvent)
 fn detect_step_on(
     grid: Res<Grid<CellType>>,
     mut query: Query<(&mut CollapsableFloor, &GridEntity)>,
