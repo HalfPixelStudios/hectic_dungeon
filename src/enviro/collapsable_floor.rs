@@ -52,6 +52,7 @@ fn spawn_from_ldtk(
     {
         info!("tile_meta {:?}", entity_instance);
 
+        let grid_coords = ldtk_to_bevy(&entity_instance.grid);
         cmd.spawn_bundle(SpriteSheetBundle {
             sprite: TextureAtlasSprite {
                 index: 32,
@@ -59,14 +60,14 @@ fn spawn_from_ldtk(
             },
             texture_atlas: asset_sheet.clone(),
             transform: Transform {
-                translation: to_world_coords(&ldtk_to_bevy(&entity_instance.grid)).extend(1.),
+                translation: to_world_coords(&grid_coords).extend(1.),
                 ..default()
             },
             ..default()
         })
         .insert(CollapsableFloor::new())
         .insert(GridEntity {
-            pos: entity_instance.grid,
+            pos: grid_coords,
             value: CellType::CollapsableFloor(entity),
         });
     }

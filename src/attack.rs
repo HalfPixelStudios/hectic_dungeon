@@ -12,6 +12,7 @@ pub enum AttackPattern {
     None,
     StraightOne,
     StraightTwo,
+    StraightSix,
     Hammer,
 }
 
@@ -22,6 +23,7 @@ impl AttackPattern {
             AttackPattern::None => vec![],
             AttackPattern::StraightOne => vec![IVec2::new(0, 1)],
             AttackPattern::StraightTwo => vec![IVec2::new(0, 1), IVec2::new(0, 2)],
+            AttackPattern::StraightSix => (1..=6).map(|i| IVec2::new(0, i)).collect(),
             AttackPattern::Hammer => vec![
                 IVec2::new(-1, 1),
                 IVec2::new(0, 1),
