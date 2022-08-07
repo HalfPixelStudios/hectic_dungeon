@@ -17,10 +17,11 @@ pub struct CollisionMap(pub Vec<IVec2>);
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(LdtkPlugin)
-            .insert_resource(LevelSelection::Index(1))
+            .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_startup_system(setup)
-            .add_system(register_collision_int_cell);
+            .add_system(register_collision_int_cell)
+            .add_system(switch_level);
     }
 }
 
@@ -48,4 +49,13 @@ fn register_collision_int_cell(
 /// Ldtk uses down position, right positive whereas bevy uses up positive, right positive
 pub fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
     IVec2::new(v.x, (MAPHEIGHT as i32) - v.y - 1)
+}
+
+fn switch_level(mut cmd: Commands, keys: Res<Input<KeyCode>>) {
+    if keys.just_pressed(KeyCode::Key1) {
+        cmd.insert_resource(LevelSelection::Index(0));
+    }
+    if keys.just_pressed(KeyCode::Key2) {
+        cmd.insert_resource(LevelSelection::Index(1));
+    }
 }

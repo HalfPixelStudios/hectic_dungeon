@@ -19,7 +19,7 @@
 	"defaultLevelHeight": 256,
 	"defaultPivotX": 0,
 	"defaultPivotY": 0,
-	"defaultGridSize": 16,
+	"defaultGridSize": 8,
 	"bgColor": "#40465B",
 	"defaultLevelBgColor": "#696A79",
 	"minifyJson": false,
@@ -1161,6 +1161,23 @@
 							"defUid": 9,
 							"px": [32,88],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "EnemySpawn",
+							"__grid": [12,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "e5e74430-02f0-11ed-87ea-7fb3423d1b78",
+							"width": 8,
+							"height": 8,
+							"defUid": 5,
+							"px": [96,88],
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["orc"]
+							}] }]
 						}
 					]
 				},
