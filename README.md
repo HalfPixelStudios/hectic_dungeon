@@ -28,9 +28,11 @@ $ just
 - [x] basic player and enemy movement
 - [x] enemy pathfinding
 - [x] player attacking
-- [ ] enemy attacking
+- [x] enemy attacking
 - [x] map loading
-- [ ] traps / environemntal hazards
+- [x] traps / environemntal hazards
 - [ ] item pickup
 - [ ] animation / tweening system
+- [ ] map generation (room system)
+- [ ] ui (might be blocked by 0.8)
 

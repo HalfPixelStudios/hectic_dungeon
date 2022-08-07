@@ -29,8 +29,8 @@ pub fn load_assets(
     let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
         assets.load("tilesheet/tilesheet.png"),
         Vec2::new(8.0, 8.0),
-        8,
-        8,
+        16,
+        16,
     ));
     cmd.insert_resource(SpriteSheet(tilesheet_handle));
 

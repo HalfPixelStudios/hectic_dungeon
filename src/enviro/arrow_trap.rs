@@ -86,8 +86,8 @@ fn spawn_from_ldtk(
         info!("arrow trap facing {:?}", dir);
 
         let sprite_index = match dir {
-            Dir::North => 28,
-            Dir::East => 20,
+            Dir::North => 53,
+            Dir::East => 37,
             _ => unreachable!(),
         };
 

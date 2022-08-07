@@ -14,6 +14,7 @@ mod map;
 mod movement;
 mod player;
 mod prefab;
+mod room;
 mod ui;
 mod utils;
 mod weapon;

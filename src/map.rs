@@ -4,8 +4,8 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{enemy::SpawnEnemyEvent, grid::snap_to_grid};
 
-pub const MAPWIDTH: f32 = 16.;
-pub const MAPHEIGHT: f32 = 16.;
+pub const MAPWIDTH: f32 = 24.;
+pub const MAPHEIGHT: f32 = 24.;
 pub const TILEWIDTH: f32 = 8.;
 
 pub struct MapPlugin;

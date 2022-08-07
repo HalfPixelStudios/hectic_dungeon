@@ -95,7 +95,7 @@ fn spawn(
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: 41,
+                    index: 81,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
