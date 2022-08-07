@@ -15,7 +15,7 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
-    ui::attack_indicator::AttackIndicator,
+    ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::Dir,
     weapon::CurrentWeapon,
 };
@@ -184,6 +184,7 @@ fn attack_controller(
         With<Player>,
     >,
     mut writer: EventWriter<AttackEvent>,
+    mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     mut player_moved: EventWriter<PlayerMovedEvent>,
 ) {
     if let Ok((entity, mut attack_indicator, grid_entity, action_state)) = query.get_single_mut() {
@@ -208,9 +209,19 @@ fn attack_controller(
                 .get_pattern()
                 .iter()
                 .map(|v| *v + grid_entity.pos)
-                .collect();
+                .collect::<Vec<_>>();
             // TODO the entity in the CellType::ENemy is just a dummy value, this is pretty
             // disgusting
+
+            // spawn attack animation
+            for pos in grid_positions.iter() {
+                anim_writer.send(SpawnAttackAnimEvent {
+                    frames: vec![144, 145, 146, 147],
+                    animation_speed: 0.1,
+                    spawn_pos: *pos,
+                });
+            }
+
             writer.send(AttackEvent {
                 grid_positions,
                 cell_type: CellType::Enemy(entity),

@@ -2,8 +2,16 @@ use std::time::Duration;
 
 use bevy::{core::Stopwatch, prelude::*};
 
+use crate::{assets::SpriteSheet, grid::to_world_coords};
+
 // TODO this is simply a short lived sprite animation, should be replaced by general animation
 // system in future
+
+pub struct SpawnAttackAnimEvent {
+    pub frames: Vec<usize>,
+    pub animation_speed: f32,
+    pub spawn_pos: IVec2,
+}
 
 #[derive(Component)]
 pub struct AttackAnimation {
@@ -29,7 +37,10 @@ pub struct AttackAnimationPlugin;
 
 impl Plugin for AttackAnimationPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(animate);
+        app.add_event::<SpawnAttackAnimEvent>()
+            .add_system(animate)
+            .add_system(spawn)
+            .add_startup_system(debug);
     }
 }
 
@@ -53,4 +64,41 @@ fn animate(
             cmd.entity(entity).despawn_recursive();
         }
     }
+}
+
+fn spawn(
+    mut cmd: Commands,
+    mut events: EventReader<SpawnAttackAnimEvent>,
+    asset_sheet: Res<SpriteSheet>,
+) {
+    for SpawnAttackAnimEvent {
+        frames,
+        animation_speed,
+        spawn_pos,
+    } in events.iter()
+    {
+        let frames = frames.clone();
+
+        if frames.is_empty() {
+            continue;
+        }
+
+        cmd.spawn_bundle(SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: *frames.get(0).unwrap(),
+                ..default()
+            },
+            texture_atlas: asset_sheet.clone(),
+            transform: Transform {
+                translation: to_world_coords(spawn_pos).extend(2.),
+                ..default()
+            },
+            ..default()
+        })
+        .insert(AttackAnimation::new(frames, *animation_speed));
+    }
+}
+
+fn debug(mut writer: EventWriter<SpawnAttackAnimEvent>) {
+    // writer.send(SpawnAttackAnimEvent { frames: vec![128, 129, 130], animation_speed: 0.2, spawn_pos: IVec2::new(4, 4) });
 }
