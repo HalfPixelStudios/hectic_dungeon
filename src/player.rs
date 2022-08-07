@@ -37,6 +37,7 @@ pub enum PlayerAction {
     Up,
     Down,
     Attack,
+    Cancel,
 }
 pub struct PlayerMovedEvent;
 
@@ -62,6 +63,9 @@ impl Plugin for PlayerPlugin {
                     .run_in_state(GameState::PlayerInput)
                     .run_in_state(PlayerState::Attack),
             )
+            .add_enter_system(PlayerState::Attack, transition_to_attack)
+            .add_enter_system(PlayerState::Move, transition_to_move)
+            .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
             .add_system(spawn)
             .add_system(spawn_from_ldtk);
     }
@@ -85,6 +89,7 @@ fn spawn(
             // (KeyCode::Down, PlayerAction::Down),
             (KeyCode::S, PlayerAction::Down),
             (KeyCode::Space, PlayerAction::Attack),
+            (KeyCode::Escape, PlayerAction::Cancel),
         ]);
 
         // let handle = prefab_data.get("player").unwrap();
@@ -154,7 +159,6 @@ fn move_controller(
             dir += IVec2::new(0, -1);
         }
         if action_state.just_pressed(PlayerAction::Attack) {
-            attack_indicator.hidden = false;
             cmd.insert_resource(NextState(PlayerState::Attack));
         }
 
@@ -200,8 +204,10 @@ fn attack_controller(
         if action_state.just_pressed(PlayerAction::Right) {
             attack_indicator.dir = Dir::East;
         }
+        if action_state.just_pressed(PlayerAction::Cancel) {
+            cmd.insert_resource(NextState(PlayerState::Move));
+        }
         if action_state.just_pressed(PlayerAction::Attack) {
-            attack_indicator.hidden = true;
             cmd.insert_resource(NextState(PlayerState::Move));
 
             // deal damage
@@ -229,6 +235,22 @@ fn attack_controller(
 
             player_moved.send(PlayerMovedEvent);
         }
+    }
+}
+
+/// If player turn expires or ends, disable their AttackIndicator and reset them to move state
+fn reset_on_turn_end(mut cmd: Commands) {
+    cmd.insert_resource(NextState(PlayerState::Move));
+}
+
+fn transition_to_move(mut query: Query<&mut AttackIndicator, With<Player>>) {
+    if let Ok(mut attack_indicator) = query.get_single_mut() {
+        attack_indicator.hidden = true;
+    }
+}
+fn transition_to_attack(mut query: Query<&mut AttackIndicator, With<Player>>) {
+    if let Ok(mut attack_indicator) = query.get_single_mut() {
+        attack_indicator.hidden = false;
     }
 }
 
