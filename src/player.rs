@@ -15,8 +15,11 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
-    ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::Dir,
+    ui::{
+        attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
+        move_indicator::MoveIndicator,
+    },
+    utils::{cardinal_dirs, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -25,6 +28,7 @@ pub struct Player;
 
 #[derive(Component, Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum PlayerState {
+    None,
     Move,
     Attack,
 }
@@ -65,8 +69,11 @@ impl Plugin for PlayerPlugin {
             )
             .add_enter_system(PlayerState::Attack, transition_to_attack)
             .add_enter_system(PlayerState::Move, transition_to_move)
+            .add_enter_system(PlayerState::None, transition_to_none)
+            .add_enter_system(GameState::PlayerInput, on_turn_start)
             .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
             .add_system(spawn)
+            .add_system(update_move_indicator.run_in_state(GameState::PlayerInput))
             .add_system(spawn_from_ldtk);
     }
 }
@@ -120,6 +127,7 @@ fn spawn(
             .insert(CameraFollow)
             .insert(CurrentWeapon("hammer".into()))
             .insert(AttackIndicator::default())
+            .insert(MoveIndicator::default())
             .insert(Children::default())
             .insert(Movement::new());
     }
@@ -176,6 +184,23 @@ fn move_controller(
     }
 }
 
+fn update_move_indicator(
+    mut query: Query<(&GridEntity, &mut MoveIndicator), With<Player>>,
+    grid: Res<Grid<CellType>>,
+) {
+    if let Ok((grid_entity, mut move_indicator)) = query.get_single_mut() {
+        // TODO duplicated valid move checking logic from move_controller function
+        move_indicator.dirs.clear();
+        for dir in cardinal_dirs().iter() {
+            let next_pos = IVec2::from(*dir) + grid_entity.pos;
+            if grid.bounds_check(&next_pos) && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
+            {
+                move_indicator.dirs.push(*dir);
+            }
+        }
+    }
+}
+
 fn attack_controller(
     mut cmd: Commands,
     mut query: Query<
@@ -208,8 +233,6 @@ fn attack_controller(
             cmd.insert_resource(NextState(PlayerState::Move));
         }
         if action_state.just_pressed(PlayerAction::Attack) {
-            cmd.insert_resource(NextState(PlayerState::Move));
-
             // deal damage
             let grid_positions = attack_indicator
                 .get_pattern()
@@ -240,17 +263,31 @@ fn attack_controller(
 
 /// If player turn expires or ends, disable their AttackIndicator and reset them to move state
 fn reset_on_turn_end(mut cmd: Commands) {
+    cmd.insert_resource(NextState(PlayerState::None));
+}
+/// Default to move state on turn start
+fn on_turn_start(mut cmd: Commands) {
     cmd.insert_resource(NextState(PlayerState::Move));
 }
 
-fn transition_to_move(mut query: Query<&mut AttackIndicator, With<Player>>) {
-    if let Ok(mut attack_indicator) = query.get_single_mut() {
+fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
+    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
         attack_indicator.hidden = true;
+        move_indicator.hidden = false;
     }
 }
-fn transition_to_attack(mut query: Query<&mut AttackIndicator, With<Player>>) {
-    if let Ok(mut attack_indicator) = query.get_single_mut() {
+fn transition_to_attack(
+    mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>,
+) {
+    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
         attack_indicator.hidden = false;
+        move_indicator.hidden = true;
+    }
+}
+fn transition_to_none(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
+    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
+        attack_indicator.hidden = true;
+        move_indicator.hidden = true;
     }
 }
 

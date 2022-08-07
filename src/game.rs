@@ -61,7 +61,6 @@ pub fn game_loop(
 
     if state_timer.elapsed_secs() > time_limit {
         cmd.insert_resource(NextState(state.0.next_state()));
-        info!("advancing to next state {:?}", state.0.next_state());
         state_timer.reset();
     }
 
@@ -75,7 +74,6 @@ pub fn end_player_input(
     state: Res<CurrentState<GameState>>,
 ) {
     cmd.insert_resource(NextState(state.0.next_state()));
-    info!("skipping player input");
     state_timer.reset();
 }
 
