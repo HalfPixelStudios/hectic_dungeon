@@ -15,7 +15,10 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
-    ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
+    ui::{
+        attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
+        move_indicator::MoveIndicator,
+    },
     utils::Dir,
     weapon::CurrentWeapon,
 };
@@ -120,6 +123,10 @@ fn spawn(
             .insert(CameraFollow)
             .insert(CurrentWeapon("hammer".into()))
             .insert(AttackIndicator::default())
+            .insert(MoveIndicator {
+                hidden: false,
+                dirs: vec![Dir::North, Dir::South, Dir::East, Dir::West],
+            })
             .insert(Children::default())
             .insert(Movement::new());
     }

@@ -36,8 +36,21 @@ impl From<IVec2> for Dir {
     }
 }
 
-pub fn variant_eq<T>(a: &T, b: &T) -> bool {
-    std::mem::discriminant(a) == std::mem::discriminant(b)
+impl From<Dir> for IVec2 {
+    fn from(d: Dir) -> Self {
+        match d {
+            Dir::None => IVec2::new(0, 0),
+            Dir::North => IVec2::new(0, 1),
+            Dir::East => IVec2::new(1, 0),
+            Dir::South => IVec2::new(0, -1),
+            Dir::West => IVec2::new(-1, 0),
+            Dir::NorthEast => IVec2::new(1, 1),
+            Dir::NorthWest => IVec2::new(-1, 1),
+            Dir::SouthEast => IVec2::new(1, -1),
+            Dir::SouthWest => IVec2::new(-1, -1),
+            _ => unreachable!(),
+        }
+    }
 }
 
 impl From<String> for Dir {
@@ -50,4 +63,8 @@ impl From<String> for Dir {
             _ => Dir::None,
         }
     }
+}
+
+pub fn variant_eq<T>(a: &T, b: &T) -> bool {
+    std::mem::discriminant(a) == std::mem::discriminant(b)
 }
