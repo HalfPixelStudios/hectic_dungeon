@@ -22,7 +22,7 @@ use crate::{
     map::ldtk_to_bevy,
     movement::Movement,
     player::Player,
-    ui::attack_indicator::AttackIndicator,
+    ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::Dir,
     weapon::CurrentWeapon,
 };
@@ -112,6 +112,7 @@ fn ai(
         (With<Enemy>, Without<Player>),
     >,
     mut writer: EventWriter<AttackEvent>,
+    mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     grid: Res<Grid<CellType>>,
 ) {
     let player_grid_pos = player_query.single().pos;
@@ -124,7 +125,16 @@ fn ai(
                 .get_pattern()
                 .iter()
                 .map(|v| *v + grid_entity.pos)
-                .collect();
+                .collect::<Vec<_>>();
+
+            // spawn attack animation
+            for pos in grid_positions.iter() {
+                anim_writer.send(SpawnAttackAnimEvent {
+                    frames: vec![128, 129, 130],
+                    animation_speed: 0.1,
+                    spawn_pos: *pos,
+                });
+            }
 
             // TODO the entity in the CellType::Player is just a dummy value, this is pretty
             // disgusting
