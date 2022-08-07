@@ -12,6 +12,15 @@ pub struct MoveIndicator {
     pub dirs: Vec<Dir>,
 }
 
+impl Default for MoveIndicator {
+    fn default() -> Self {
+        MoveIndicator {
+            hidden: true,
+            dirs: vec![],
+        }
+    }
+}
+
 #[derive(Component)]
 struct MoveIndicatorRoot;
 

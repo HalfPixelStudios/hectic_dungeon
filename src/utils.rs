@@ -65,6 +65,10 @@ impl From<String> for Dir {
     }
 }
 
+pub fn cardinal_dirs() -> Vec<Dir> {
+    vec![Dir::North, Dir::South, Dir::East, Dir::West]
+}
+
 pub fn variant_eq<T>(a: &T, b: &T) -> bool {
     std::mem::discriminant(a) == std::mem::discriminant(b)
 }
