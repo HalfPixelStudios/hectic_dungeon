@@ -28,6 +28,7 @@ pub struct Player;
 
 #[derive(Component, Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum PlayerState {
+    None,
     Move,
     Attack,
 }
@@ -68,6 +69,8 @@ impl Plugin for PlayerPlugin {
             )
             .add_enter_system(PlayerState::Attack, transition_to_attack)
             .add_enter_system(PlayerState::Move, transition_to_move)
+            .add_enter_system(PlayerState::None, transition_to_none)
+            .add_enter_system(GameState::PlayerInput, on_turn_start)
             .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
             .add_system(spawn)
             .add_system(spawn_from_ldtk);
@@ -247,17 +250,31 @@ fn attack_controller(
 
 /// If player turn expires or ends, disable their AttackIndicator and reset them to move state
 fn reset_on_turn_end(mut cmd: Commands) {
+    cmd.insert_resource(NextState(PlayerState::None));
+}
+/// Default to move state on turn start
+fn on_turn_start(mut cmd: Commands) {
     cmd.insert_resource(NextState(PlayerState::Move));
 }
 
-fn transition_to_move(mut query: Query<&mut AttackIndicator, With<Player>>) {
-    if let Ok(mut attack_indicator) = query.get_single_mut() {
+fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
+    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
         attack_indicator.hidden = true;
+        move_indicator.hidden = false;
     }
 }
-fn transition_to_attack(mut query: Query<&mut AttackIndicator, With<Player>>) {
-    if let Ok(mut attack_indicator) = query.get_single_mut() {
+fn transition_to_attack(
+    mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>,
+) {
+    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
         attack_indicator.hidden = false;
+        move_indicator.hidden = true;
+    }
+}
+fn transition_to_none(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
+    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
+        attack_indicator.hidden = true;
+        move_indicator.hidden = true;
     }
 }
 

@@ -43,6 +43,10 @@ fn spawn(
             }
         }
 
+        if move_indicator.hidden {
+            continue;
+        }
+
         let root = cmd.spawn().id();
         cmd.entity(root)
             .insert_bundle(TransformBundle::from_transform(
