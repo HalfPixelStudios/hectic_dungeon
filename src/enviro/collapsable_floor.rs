@@ -56,7 +56,7 @@ fn spawn_from_ldtk(
         let grid_coords = ldtk_to_bevy(&entity_instance.grid);
         cmd.spawn_bundle(SpriteSheetBundle {
             sprite: TextureAtlasSprite {
-                index: 32,
+                index: 64,
                 ..default()
             },
             texture_atlas: asset_sheet.clone(),

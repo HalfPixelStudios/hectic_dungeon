@@ -13,7 +13,10 @@ use super::{
     player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
     ui::UIPlugin,
 };
-use crate::{attack::AttackPlugin, enviro::EnviroPlugin, map::MapPlugin, weapon::WeaponPlugin};
+use crate::{
+    attack::AttackPlugin, enviro::EnviroPlugin, map::MapPlugin, room::RoomPlugin,
+    weapon::WeaponPlugin,
+};
 
 pub fn app() {
     let window_descriptor = WindowDescriptor {
@@ -37,6 +40,7 @@ pub fn app() {
         .add_plugin(GamePlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(RoomPlugin)
         // .add_plugin(AnimatePlugin)
         .add_plugin(AttackPlugin)
         .add_plugin(CameraPlugin)

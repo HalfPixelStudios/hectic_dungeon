@@ -4,8 +4,8 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{enemy::SpawnEnemyEvent, grid::snap_to_grid};
 
-pub const MAPWIDTH: f32 = 16.;
-pub const MAPHEIGHT: f32 = 16.;
+pub const MAPWIDTH: f32 = 24.;
+pub const MAPHEIGHT: f32 = 24.;
 pub const TILEWIDTH: f32 = 8.;
 
 pub struct MapPlugin;
@@ -20,7 +20,8 @@ impl Plugin for MapPlugin {
             .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_startup_system(setup)
-            .add_system(register_collision_int_cell);
+            .add_system(register_collision_int_cell)
+            .add_system(switch_level);
     }
 }
 
@@ -48,4 +49,13 @@ fn register_collision_int_cell(
 /// Ldtk uses down position, right positive whereas bevy uses up positive, right positive
 pub fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
     IVec2::new(v.x, (MAPHEIGHT as i32) - v.y - 1)
+}
+
+fn switch_level(mut cmd: Commands, keys: Res<Input<KeyCode>>) {
+    if keys.just_pressed(KeyCode::Key1) {
+        cmd.insert_resource(LevelSelection::Index(0));
+    }
+    if keys.just_pressed(KeyCode::Key2) {
+        cmd.insert_resource(LevelSelection::Index(1));
+    }
 }
