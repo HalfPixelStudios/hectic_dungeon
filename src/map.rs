@@ -17,7 +17,7 @@ pub struct CollisionMap(pub Vec<IVec2>);
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(LdtkPlugin)
-            .insert_resource(LevelSelection::Index(0))
+            .insert_resource(LevelSelection::Index(1))
             .insert_resource(CollisionMap(Vec::new()))
             .add_startup_system(setup)
             .add_system(register_collision_int_cell);
