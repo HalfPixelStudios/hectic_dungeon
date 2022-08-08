@@ -8,22 +8,24 @@ use crate::{
     game::GameState,
     grid::{to_world_coords, CellType, GridEntity},
     map::ldtk_to_bevy,
-    ui::attack_indicator::AttackIndicator,
+    ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
     utils::Dir,
     weapon::CurrentWeapon,
 };
 
 // how many turns between each attack
 const ATTACK_SPEED: u32 = 3;
+const CELL_TYPE: u32 = 8;
 
 #[derive(Component)]
 pub struct ArrowTrap {
     turn_count: u32,
+    dir: Dir,
 }
 
 impl ArrowTrap {
-    pub fn new() -> Self {
-        ArrowTrap { turn_count: 0 }
+    pub fn new(dir: Dir) -> Self {
+        ArrowTrap { turn_count: 0, dir }
     }
 }
 
@@ -39,6 +41,7 @@ impl Plugin for ArrowTrapPlugin {
 fn ai(
     mut query: Query<(Entity, &GridEntity, &mut ArrowTrap, &mut AttackIndicator)>,
     mut writer: EventWriter<AttackEvent>,
+    mut projectile_writer: EventWriter<SpawnProjectileEvent>,
 ) {
     for (entity, grid_entity, mut arrow_trap, mut attack_indicator) in query.iter_mut() {
         if attack_indicator.hidden == false {
@@ -52,6 +55,14 @@ fn ai(
             writer.send(AttackEvent {
                 grid_positions,
                 cell_type: CellType::Player(entity),
+            });
+
+            projectile_writer.send(SpawnProjectileEvent {
+                sprite_index: 144,
+                spawn_pos: grid_entity.pos,
+                dir: arrow_trap.dir,
+                distance: 6 * CELL_TYPE,
+                speed: 200.,
             });
         }
 
@@ -83,8 +94,6 @@ fn spawn_from_ldtk(
                 }
             });
 
-        info!("arrow trap facing {:?}", dir);
-
         let sprite_index = match dir {
             Dir::North => 53,
             Dir::East => 37,
@@ -105,7 +114,7 @@ fn spawn_from_ldtk(
             },
             ..default()
         })
-        .insert(ArrowTrap::new())
+        .insert(ArrowTrap::new(dir))
         .insert(AttackIndicator { dir, ..default() })
         .insert(CurrentWeapon("arrow_trap".into()))
         .insert(GridEntity {

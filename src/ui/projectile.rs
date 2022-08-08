@@ -12,6 +12,7 @@ const CELL_TYPE: u32 = 8;
 pub struct Projectile;
 
 pub struct SpawnProjectileEvent {
+    pub sprite_index: usize,
     pub spawn_pos: IVec2,
     pub dir: Dir,
     pub distance: u32,
@@ -38,6 +39,7 @@ fn spawn(
     asset_sheet: Res<SpriteSheet>,
 ) {
     for SpawnProjectileEvent {
+        sprite_index,
         spawn_pos,
         dir,
         distance,
@@ -46,7 +48,7 @@ fn spawn(
     {
         cmd.spawn_bundle(SpriteSheetBundle {
             sprite: TextureAtlasSprite {
-                index: 144,
+                index: *sprite_index,
                 ..default()
             },
             texture_atlas: asset_sheet.clone(),
@@ -77,6 +79,7 @@ fn despawn(mut cmd: Commands, query: Query<(Entity, &DistanceLifetime), With<Pro
 fn debug(mut writer: EventWriter<SpawnProjectileEvent>, keys: Res<Input<KeyCode>>) {
     if keys.just_pressed(KeyCode::E) {
         writer.send(SpawnProjectileEvent {
+            sprite_index: 144,
             spawn_pos: IVec2::new(4, 4),
             dir: Dir::North,
             distance: 5 * CELL_TYPE,
