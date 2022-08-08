@@ -65,6 +65,18 @@ impl From<String> for Dir {
     }
 }
 
+pub fn to_rotation(dir: Dir) -> f32 {
+    use std::f32::consts::PI;
+
+    match dir {
+        Dir::East => 0.,
+        Dir::North => PI / 2.,
+        Dir::West => PI,
+        Dir::South => 3. * PI / 2.,
+        _ => unreachable!(),
+    }
+}
+
 pub fn cardinal_dirs() -> Vec<Dir> {
     vec![Dir::North, Dir::South, Dir::East, Dir::West]
 }

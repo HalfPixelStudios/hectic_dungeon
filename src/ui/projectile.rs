@@ -4,7 +4,11 @@ use bevy_bobs::{
     physics_2d::{PhysicsPlugin, RigidBody},
 };
 
-use crate::{assets::SpriteSheet, grid::to_world_coords, utils::Dir};
+use crate::{
+    assets::SpriteSheet,
+    grid::to_world_coords,
+    utils::{to_rotation, Dir},
+};
 
 const CELL_TYPE: u32 = 8;
 
@@ -38,6 +42,8 @@ fn spawn(
     mut events: EventReader<SpawnProjectileEvent>,
     asset_sheet: Res<SpriteSheet>,
 ) {
+    use std::f32::consts::PI;
+
     for SpawnProjectileEvent {
         sprite_index,
         spawn_pos,
@@ -54,6 +60,7 @@ fn spawn(
             texture_atlas: asset_sheet.clone(),
             transform: Transform {
                 translation: to_world_coords(spawn_pos).extend(2.),
+                rotation: Quat::from_rotation_z(to_rotation(*dir) - PI / 2.),
                 ..default()
             },
             ..default()
@@ -79,7 +86,7 @@ fn despawn(mut cmd: Commands, query: Query<(Entity, &DistanceLifetime), With<Pro
 fn debug(mut writer: EventWriter<SpawnProjectileEvent>, keys: Res<Input<KeyCode>>) {
     if keys.just_pressed(KeyCode::E) {
         writer.send(SpawnProjectileEvent {
-            sprite_index: 144,
+            sprite_index: 39,
             spawn_pos: IVec2::new(4, 4),
             dir: Dir::North,
             distance: 5 * CELL_TYPE,

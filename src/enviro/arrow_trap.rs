@@ -9,7 +9,7 @@ use crate::{
     grid::{to_world_coords, CellType, GridEntity},
     map::ldtk_to_bevy,
     ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
-    utils::Dir,
+    utils::{to_rotation, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -58,7 +58,7 @@ fn ai(
             });
 
             projectile_writer.send(SpawnProjectileEvent {
-                sprite_index: 144,
+                sprite_index: 39,
                 spawn_pos: grid_entity.pos,
                 dir: arrow_trap.dir,
                 distance: 6 * CELL_TYPE,
