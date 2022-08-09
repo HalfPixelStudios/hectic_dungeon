@@ -14,8 +14,8 @@ use super::{
     ui::UIPlugin,
 };
 use crate::{
-    ai::AIPlugin, attack::AttackPlugin, enviro::EnviroPlugin, map::MapPlugin, room::RoomPlugin,
-    weapon::WeaponPlugin,
+    ability::AbilityPlugin, ai::AIPlugin, attack::AttackPlugin, enviro::EnviroPlugin,
+    map::MapPlugin, room::RoomPlugin, weapon::WeaponPlugin,
 };
 
 pub fn app() {
@@ -39,6 +39,7 @@ pub fn app() {
     app.add_plugins(DefaultPlugins)
         .add_plugin(GamePlugin)
         .add_plugin(AIPlugin)
+        .add_plugin(AbilityPlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(RoomPlugin)

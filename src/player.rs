@@ -42,6 +42,7 @@ pub enum PlayerAction {
     Down,
     Attack,
     Cancel,
+    Interact,
 }
 pub struct PlayerMovedEvent;
 
@@ -97,6 +98,7 @@ fn spawn(
             (KeyCode::S, PlayerAction::Down),
             (KeyCode::Space, PlayerAction::Attack),
             (KeyCode::Escape, PlayerAction::Cancel),
+            (KeyCode::E, PlayerAction::Interact),
         ]);
 
         // let handle = prefab_data.get("player").unwrap();
