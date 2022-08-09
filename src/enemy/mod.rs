@@ -1,3 +1,5 @@
+pub mod simple_ai;
+
 use std::{
     cmp::Reverse,
     collections::{HashMap, HashSet},
@@ -10,9 +12,11 @@ use bevy_bobs::{
     health_bar::{spawn_health_bar, HealthBar},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
+use big_brain::BigBrainPlugin;
 use iyes_loopless::prelude::*;
 use priority_queue::PriorityQueue;
 
+use self::simple_ai::SimpleAIPlugin;
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
@@ -44,6 +48,8 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnEnemyEvent>()
             .add_event::<DamageEnemyEvent>()
+            .add_plugin(BigBrainPlugin)
+            .add_plugin(SimpleAIPlugin)
             .add_system(spawn)
             .add_system(take_damage)
             .add_system(sync_health_bars)
