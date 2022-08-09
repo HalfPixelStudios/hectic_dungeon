@@ -4,8 +4,10 @@ use iyes_loopless::prelude::*;
 
 use crate::{
     attack::AttackEvent,
+    enemy::pathfinding::a_star,
     game::GameState,
     grid::{CellType, Grid, GridEntity},
+    movement::Movement,
     player::Player,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::Dir,
@@ -111,21 +113,34 @@ fn attack_action(
     }
 }
 
+/// Pathfind to player
 #[derive(Component, Clone, Debug)]
 pub struct MoveAction;
 
-fn move_action(grid: Res<Grid<CellType>>) {
-
-    /*
-    // movement phase
-    let cur_pos = grid_entity.pos;
-    if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
-        let next_pos = path.get(0).unwrap_or(&cur_pos);
-        mv.next_move = *next_pos - cur_pos;
-    } else {
-        info!("failed to calculate path");
+fn move_action(
+    grid: Res<Grid<CellType>>,
+    mut player_query: Query<(&GridEntity), With<Player>>,
+    mut action_query: Query<(&Actor, &mut ActionState), With<MoveAction>>,
+    mut query: Query<(&GridEntity, &mut Movement, &mut AttackIndicator), Without<Player>>,
+) {
+    let player_grid_entity = player_query.get_single();
+    if player_grid_entity.is_err() {
+        return;
     }
-    */
+    let player_grid_entity = player_grid_entity.unwrap();
+
+    for (Actor(actor), mut state) in action_query.iter_mut() {
+        if let Ok((grid_entity, mut movement, mut attack_indicator)) = query.get_mut(*actor) {
+            // movement phase
+            let cur_pos = grid_entity.pos;
+            if let Some(path) = a_star(&cur_pos, &player_grid_entity.pos, &grid) {
+                let next_pos = path.get(0).unwrap_or(&cur_pos);
+                movement.next_move = *next_pos - cur_pos;
+            } else {
+                info!("failed to calculate path");
+            }
+        }
+    }
 }
 
 pub struct SimpleAIPlugin;

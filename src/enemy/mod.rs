@@ -16,7 +16,7 @@ use big_brain::{prelude::FirstToScore, thinker::Thinker, BigBrainPlugin};
 use iyes_loopless::prelude::*;
 
 use crate::{
-    ai::simple_ai::{AttackAction, AttackRangeScorer},
+    ai::simple_ai::{AttackAction, AttackRangeScorer, MoveAction},
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
@@ -89,7 +89,8 @@ fn spawn(
             .insert(
                 Thinker::build()
                     .picker(FirstToScore { threshold: 0.8 })
-                    .when(AttackRangeScorer { range: 3. }, AttackAction),
+                    .when(AttackRangeScorer { range: 3. }, AttackAction)
+                    .otherwise(MoveAction),
             );
 
         let hp_bar = spawn_health_bar(

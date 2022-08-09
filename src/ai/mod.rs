@@ -1,3 +1,4 @@
+pub mod picker;
 pub mod simple_ai;
 
 use bevy::prelude::*;
