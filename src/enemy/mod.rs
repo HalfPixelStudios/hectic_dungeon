@@ -12,11 +12,11 @@ use bevy_bobs::{
     health_bar::{spawn_health_bar, HealthBar},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
-use big_brain::BigBrainPlugin;
+use big_brain::{prelude::FirstToScore, thinker::Thinker, BigBrainPlugin};
 use iyes_loopless::prelude::*;
 use priority_queue::PriorityQueue;
 
-use self::simple_ai::SimpleAIPlugin;
+use self::simple_ai::{AttackAction, AttackRangeScorer, SimpleAIPlugin};
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
@@ -89,7 +89,12 @@ fn spawn(
             .insert(AttackIndicator::default())
             .insert(CurrentWeapon("dagger".into()))
             .insert(Enemy)
-            .insert(Health::new(3));
+            .insert(Health::new(3))
+            .insert(
+                Thinker::build()
+                    .picker(FirstToScore { threshold: 0.8 })
+                    .when(AttackRangeScorer { range: 3. }, AttackAction),
+            );
 
         let hp_bar = spawn_health_bar(
             &mut cmd,
@@ -125,6 +130,7 @@ fn ai(
 
     for (entity, transform, mut grid_entity, mut mv, mut attack_indicator) in enemy_query.iter_mut()
     {
+        /*
         // run attack if queued in last turn
         if !attack_indicator.hidden {
             let grid_positions = attack_indicator
@@ -171,6 +177,7 @@ fn ai(
                 attack_indicator.hidden = true;
             }
         }
+        */
     }
 }
 
