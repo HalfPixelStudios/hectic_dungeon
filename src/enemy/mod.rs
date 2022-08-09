@@ -1,4 +1,4 @@
-pub mod simple_ai;
+pub mod pathfinding;
 
 use std::{
     cmp::Reverse,
@@ -14,10 +14,9 @@ use bevy_bobs::{
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use big_brain::{prelude::FirstToScore, thinker::Thinker, BigBrainPlugin};
 use iyes_loopless::prelude::*;
-use priority_queue::PriorityQueue;
 
-use self::simple_ai::{AttackAction, AttackRangeScorer, SimpleAIPlugin};
 use crate::{
+    ai::simple_ai::{AttackAction, AttackRangeScorer},
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
@@ -48,13 +47,10 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnEnemyEvent>()
             .add_event::<DamageEnemyEvent>()
-            .add_plugin(BigBrainPlugin)
-            .add_plugin(SimpleAIPlugin)
             .add_system(spawn)
             .add_system(take_damage)
             .add_system(sync_health_bars)
-            .add_system(spawn_from_ldtk)
-            .add_enter_system(GameState::EnemyInput, ai);
+            .add_system(spawn_from_ldtk);
     }
 }
 
@@ -107,151 +103,6 @@ fn spawn(
         );
         cmd.entity(id).add_child(hp_bar);
     }
-}
-//TODO player cant move if go neg or enemy on top
-//Maybe both are knocked back when two beings try to move into the same cell
-fn ai(
-    mut player_query: Query<(&GridEntity), (With<Player>, Without<Enemy>)>,
-    mut enemy_query: Query<
-        (
-            Entity,
-            &Transform,
-            &mut GridEntity,
-            &mut Movement,
-            &mut AttackIndicator,
-        ),
-        (With<Enemy>, Without<Player>),
-    >,
-    mut writer: EventWriter<AttackEvent>,
-    mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
-    grid: Res<Grid<CellType>>,
-) {
-    let player_grid_pos = player_query.single().pos;
-
-    for (entity, transform, mut grid_entity, mut mv, mut attack_indicator) in enemy_query.iter_mut()
-    {
-        /*
-        // run attack if queued in last turn
-        if !attack_indicator.hidden {
-            let grid_positions = attack_indicator
-                .get_pattern()
-                .iter()
-                .map(|v| *v + grid_entity.pos)
-                .collect::<Vec<_>>();
-
-            // spawn attack animation
-            for pos in grid_positions.iter() {
-                anim_writer.send(SpawnAttackAnimEvent {
-                    frames: vec![128, 129, 130],
-                    animation_speed: 0.1,
-                    spawn_pos: *pos,
-                });
-            }
-
-            // TODO the entity in the CellType::Player is just a dummy value, this is pretty
-            // disgusting
-            writer.send(AttackEvent {
-                grid_positions,
-                cell_type: CellType::Player(entity),
-            });
-            attack_indicator.hidden = true;
-        } else {
-            // movement phase
-            let cur_pos = grid_entity.pos;
-            if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
-                let next_pos = path.get(0).unwrap_or(&cur_pos);
-                mv.next_move = *next_pos - cur_pos;
-            } else {
-                info!("failed to calculate path");
-            }
-
-            // attempt attack
-            // TODO hardcoded attack logic
-            if player_grid_pos.as_vec2().distance(cur_pos.as_vec2()) < 3. {
-                // determine direction to attack in
-                let dir: Dir = (player_grid_pos - cur_pos).into();
-
-                attack_indicator.dir = dir;
-                attack_indicator.hidden = false;
-            } else {
-                attack_indicator.hidden = true;
-            }
-        }
-        */
-    }
-}
-
-pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid<CellType>>) -> Option<Vec<IVec2>> {
-    // trivial case
-    if start == dest {
-        return Some(Vec::new());
-    }
-
-    // info!("starting a star search {:?} {:?}", start, dest);
-    let mut search: PriorityQueue<IVec2, Reverse<i32>> = PriorityQueue::new();
-    search.push_decrease(*start, Reverse(0));
-
-    let mut costs: HashMap<IVec2, i32> = HashMap::new();
-    let mut came_from: HashMap<IVec2, IVec2> = HashMap::new();
-
-    costs.insert(*start, 0);
-
-    while !search.is_empty() {
-        let (cur_pos, cur_cost) = search.pop().unwrap();
-        // info!("searching {:?}", cur_pos);
-
-        // done
-        if cur_pos == *dest {
-            let mut pos = dest;
-            let mut path: Vec<IVec2> = Vec::new();
-            loop {
-                let prev_pos = came_from.get(pos).unwrap();
-                if prev_pos == start {
-                    break;
-                }
-                path.push(*prev_pos);
-                pos = prev_pos;
-            }
-            path.reverse();
-            // info!("path {:?}", path);
-            return Some(path);
-        }
-
-        // insert potential search cells
-        for next_pos in tiles_around(&cur_pos, grid).iter() {
-            let new_cost = costs.get(&cur_pos).unwrap() + 1;
-            if costs.get(next_pos).unwrap_or(&std::i32::MAX) > &new_cost {
-                search.push_decrease(*next_pos, Reverse(new_cost + heuristic(next_pos, dest)));
-                costs.insert(*next_pos, new_cost);
-                came_from.insert(*next_pos, cur_pos);
-            }
-        }
-    }
-
-    None
-}
-
-fn tiles_around(pos: &IVec2, grid: &Res<Grid<CellType>>) -> Vec<IVec2> {
-    use rand::{seq::SliceRandom, thread_rng};
-
-    let mut dirs = [
-        IVec2::new(1, 0),
-        IVec2::new(-1, 0),
-        IVec2::new(0, 1),
-        IVec2::new(0, -1),
-    ];
-
-    dirs.shuffle(&mut thread_rng());
-
-    dirs.into_iter()
-        .map(|d| *pos + d)
-        .filter(|pos| grid.bounds_check(pos) && !grid.contains_at(pos, CellType::Wall).unwrap())
-        .collect()
-}
-
-fn heuristic(cur: &IVec2, dest: &IVec2) -> i32 {
-    // manhatten distance
-    (cur.x - dest.x).abs() + (cur.y - dest.y).abs()
 }
 
 fn take_damage(

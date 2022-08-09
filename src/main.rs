@@ -1,5 +1,6 @@
 #![allow(unused)]
 #![allow(dead_code)]
+mod ai;
 mod animation;
 mod app;
 mod assets;

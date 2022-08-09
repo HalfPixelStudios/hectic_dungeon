@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 use big_brain::prelude::*;
-use iyes_loopless::prelude::AppLooplessStateExt;
+use iyes_loopless::prelude::*;
 
 use crate::{
     attack::AttackEvent,
     game::GameState,
-    grid::{CellType, GridEntity},
+    grid::{CellType, Grid, GridEntity},
     player::Player,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::Dir,
@@ -45,6 +45,7 @@ pub struct AttackPatternScorer {}
 #[derive(Component, Clone, Debug)]
 pub struct AttackAction;
 
+// TODO this action is doing too many things
 fn attack_action(
     mut player_query: Query<(&GridEntity), With<Player>>,
     mut action_query: Query<(&Actor, &mut ActionState), With<AttackAction>>,
@@ -113,6 +114,20 @@ fn attack_action(
 #[derive(Component, Clone, Debug)]
 pub struct MoveAction;
 
+fn move_action(grid: Res<Grid<CellType>>) {
+
+    /*
+    // movement phase
+    let cur_pos = grid_entity.pos;
+    if let Some(path) = a_star(&cur_pos, &player_grid_pos, &grid) {
+        let next_pos = path.get(0).unwrap_or(&cur_pos);
+        mv.next_move = *next_pos - cur_pos;
+    } else {
+        info!("failed to calculate path");
+    }
+    */
+}
+
 pub struct SimpleAIPlugin;
 
 impl Plugin for SimpleAIPlugin {
@@ -120,6 +135,7 @@ impl Plugin for SimpleAIPlugin {
         // app.add_system_to_stage(BigBrainStage::Scorers, attack_range_scorer)
         //     .add_system_to_stage(BigBrainStage::Actions, attack_action);
         app.add_enter_system(GameState::EnemyInput, attack_action)
+            .add_enter_system(GameState::EnemyInput, move_action)
             .add_enter_system(GameState::EnemyInput, attack_range_scorer);
     }
 }
