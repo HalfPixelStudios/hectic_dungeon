@@ -131,13 +131,24 @@ fn move_action(
 
     for (Actor(actor), mut state) in action_query.iter_mut() {
         if let Ok((grid_entity, mut movement, mut attack_indicator)) = query.get_mut(*actor) {
-            // movement phase
-            let cur_pos = grid_entity.pos;
-            if let Some(path) = a_star(&cur_pos, &player_grid_entity.pos, &grid) {
-                let next_pos = path.get(0).unwrap_or(&cur_pos);
-                movement.next_move = *next_pos - cur_pos;
-            } else {
-                info!("failed to calculate path");
+            match *state {
+                ActionState::Requested => {
+                    // movement phase
+                    let cur_pos = grid_entity.pos;
+                    if let Some(path) = a_star(&cur_pos, &player_grid_entity.pos, &grid) {
+                        let next_pos = path.get(0).unwrap_or(&cur_pos);
+                        movement.next_move = *next_pos - cur_pos;
+                    } else {
+                        info!("failed to calculate path");
+                        *state = ActionState::Failure;
+                    }
+                    *state = ActionState::Success;
+                },
+                ActionState::Cancelled => {
+                    *state = ActionState::Failure;
+                    info!("attack cancelled");
+                },
+                _ => {},
             }
         }
     }
