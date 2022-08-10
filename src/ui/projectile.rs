@@ -6,11 +6,10 @@ use bevy_bobs::{
 
 use crate::{
     assets::SpriteSheet,
+    constants::TILE_SIZE,
     grid::to_world_coords,
     utils::{to_rotation, Dir},
 };
-
-const CELL_TYPE: u32 = 8;
 
 #[derive(Component)]
 pub struct Projectile;
@@ -89,7 +88,7 @@ fn debug(mut writer: EventWriter<SpawnProjectileEvent>, keys: Res<Input<KeyCode>
             sprite_index: 39,
             spawn_pos: IVec2::new(4, 4),
             dir: Dir::North,
-            distance: 5 * CELL_TYPE,
+            distance: 5 * (TILE_SIZE as u32),
             speed: 200.,
         });
     }

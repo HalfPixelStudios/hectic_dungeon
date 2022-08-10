@@ -6,7 +6,7 @@ use iyes_loopless::{
 
 use crate::player::PlayerMovedEvent;
 
-const PLAYER_INPUT_TIME_LIMIT: f32 = 1.;
+const PLAYER_INPUT_TIME_LIMIT: f32 = 1.2;
 const PLAYER_ANIM_TIME_LIMIT: f32 = 0.1;
 const ENEMY_INPUT_TIME_LIMIT: f32 = 0.3;
 const ENEMY_ANIM_TIME_LIMIT: f32 = 0.1;

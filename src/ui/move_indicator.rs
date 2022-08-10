@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{assets::SpriteSheet, utils::Dir};
-
-const CELLWIDTH: f32 = 8.;
+use crate::{assets::SpriteSheet, constants::TILE_SIZE, utils::Dir};
 
 pub struct MoveIndicatorPlugin;
 
@@ -76,7 +74,7 @@ fn spawn(
             };
 
             let child = cmd.spawn().id();
-            let offset = IVec2::from(*dir).as_vec2() * CELLWIDTH;
+            let offset = IVec2::from(*dir).as_vec2() * (TILE_SIZE as f32);
 
             cmd.entity(child).insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {

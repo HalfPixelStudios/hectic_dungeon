@@ -2,11 +2,11 @@ use autodefault::autodefault;
 use bevy::{ecs::query, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::{enemy::SpawnEnemyEvent, grid::snap_to_grid};
-
-pub const MAPWIDTH: f32 = 24.;
-pub const MAPHEIGHT: f32 = 24.;
-pub const TILEWIDTH: f32 = 8.;
+use crate::{
+    constants::{MAP_HEIGHT, TILE_SIZE},
+    enemy::SpawnEnemyEvent,
+    grid::snap_to_grid,
+};
 
 pub struct MapPlugin;
 
@@ -29,7 +29,7 @@ impl Plugin for MapPlugin {
 fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
     cmd.spawn_bundle(LdtkWorldBundle {
         transform: Transform {
-            translation: Vec3::new(-TILEWIDTH / 2., -TILEWIDTH / 2., -1.),
+            translation: Vec3::new((-TILE_SIZE / 2) as f32, (-TILE_SIZE / 2) as f32, -1.),
         },
         ldtk_handle: asset_server.load("maps/testing.ldtk"),
     });
@@ -48,7 +48,7 @@ fn register_collision_int_cell(
 ///
 /// Ldtk uses down position, right positive whereas bevy uses up positive, right positive
 pub fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
-    IVec2::new(v.x, (MAPHEIGHT as i32) - v.y - 1)
+    IVec2::new(v.x, (MAP_HEIGHT as i32) - v.y - 1)
 }
 
 fn switch_level(mut cmd: Commands, keys: Res<Input<KeyCode>>) {

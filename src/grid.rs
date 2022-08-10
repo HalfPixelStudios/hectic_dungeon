@@ -5,14 +5,10 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::PrefabId;
 use thiserror::Error;
 
-use crate::map::CollisionMap;
-
-// TODO: make grid not have a constant size, we need to be able to switch out the map later
-
-// TODO unify these constants with the map constants
-const CELL_SIZE: i32 = 8;
-const MAP_WIDTH: i32 = 16;
-const MAP_HEIGHT: i32 = 16;
+use crate::{
+    constants::{MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
+    map::CollisionMap,
+};
 
 #[derive(Clone, PartialEq)]
 pub enum CellType {
@@ -127,7 +123,7 @@ impl Deref for GridEntity {
 fn sync_grid_positions(mut query: Query<(&mut Transform, &GridEntity)>, grid: Res<Grid<CellType>>) {
     for (mut transform, grid_position) in query.iter_mut() {
         let z = transform.translation.z;
-        transform.translation = grid_position.as_vec2().extend(z) * (CELL_SIZE as f32);
+        transform.translation = grid_position.as_vec2().extend(z) * (TILE_SIZE as f32);
     }
 }
 
@@ -156,15 +152,15 @@ impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(update_grid)
             // .add_system(sync_grid_positions)
-            .insert_resource(Grid::<CellType>::new(MAP_WIDTH, MAP_HEIGHT));
+            .insert_resource(Grid::<CellType>::new(MAP_WIDTH as i32, MAP_HEIGHT as i32));
     }
 }
 
 // TODO i dont like these funcionts
 pub fn to_world_coords(p: &IVec2) -> Vec2 {
-    Vec2::new((p.x * CELL_SIZE) as f32, (p.y * CELL_SIZE) as f32)
+    Vec2::new((p.x * TILE_SIZE) as f32, (p.y * TILE_SIZE) as f32)
 }
 
 pub fn snap_to_grid(p: &Vec2) -> IVec2 {
-    Vec2::new(p.x / CELL_SIZE as f32, p.y / CELL_SIZE as f32).as_ivec2()
+    Vec2::new(p.x / TILE_SIZE as f32, p.y / TILE_SIZE as f32).as_ivec2()
 }
