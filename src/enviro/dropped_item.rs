@@ -1,21 +1,27 @@
 use bevy::prelude::*;
-use bevy_bobs::prefab::PrefabId;
+use bevy_bobs::prefab::{PrefabId, PrefabLib};
 
-use crate::grid::{CellType, Grid};
+use crate::{
+    assets::SpriteSheet,
+    grid::{to_world_coords, CellType, Grid, GridEntity},
+    item::ItemPrefab,
+};
 
 #[derive(Component)]
 pub struct DroppedItem;
 
 pub struct SpawnDroppedItemEvent {
-    pub pos: IVec2,
-    pub id: PrefabId,
+    pub spawn_pos: IVec2,
+    pub prefab_id: PrefabId,
 }
 
 pub struct DroppedItemPlugin;
 
 impl Plugin for DroppedItemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<SpawnDroppedItemEvent>();
+        app.add_event::<SpawnDroppedItemEvent>()
+            .add_system(spawn)
+            .add_system(debug);
     }
 }
 
@@ -23,8 +29,44 @@ fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnDroppedItemEvent>,
     grid: Res<Grid<CellType>>,
+    asset_sheet: Res<SpriteSheet>,
+    prefab_lib: Res<PrefabLib<ItemPrefab>>,
 ) {
-    for SpawnDroppedItemEvent { pos, id } in events.iter() {
-        let id = cmd.spawn().id();
+    for SpawnDroppedItemEvent {
+        spawn_pos,
+        prefab_id,
+    } in events.iter()
+    {
+        if let Some(prefab) = prefab_lib.get(&prefab_id) {
+            let id = cmd.spawn().id();
+
+            cmd.entity(id)
+                .insert_bundle(SpriteSheetBundle {
+                    sprite: TextureAtlasSprite {
+                        index: prefab.sprite_index,
+                        ..default()
+                    },
+                    texture_atlas: asset_sheet.clone(),
+                    transform: Transform {
+                        translation: to_world_coords(spawn_pos).extend(1.),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .insert(DroppedItem)
+                .insert(GridEntity::new(
+                    *spawn_pos,
+                    CellType::DroppedItem(prefab_id.to_owned()),
+                ));
+        }
+    }
+}
+
+fn debug(keys: Res<Input<KeyCode>>, mut writer: EventWriter<SpawnDroppedItemEvent>) {
+    if keys.just_pressed(KeyCode::P) {
+        writer.send(SpawnDroppedItemEvent {
+            spawn_pos: IVec2::new(4, 4),
+            prefab_id: "steel_sword".into(),
+        });
     }
 }
