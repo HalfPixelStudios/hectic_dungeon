@@ -84,3 +84,23 @@ pub fn cardinal_dirs() -> Vec<Dir> {
 pub fn variant_eq<T>(a: &T, b: &T) -> bool {
     std::mem::discriminant(a) == std::mem::discriminant(b)
 }
+
+macro_rules! unwrap_or_return {
+    ( $e:expr ) => {
+        match $e {
+            Ok(x) => x,
+            Err(_) => return,
+        }
+    };
+}
+pub(crate) use unwrap_or_return;
+
+macro_rules! unwrap_or_continue {
+    ( $e:expr ) => {
+        match $e {
+            Ok(x) => x,
+            Err(_) => continue,
+        }
+    };
+}
+pub(crate) use unwrap_or_continue;
