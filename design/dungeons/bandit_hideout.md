@@ -1,6 +1,8 @@
 
 # bandit hideout
 
+the bandit hideout is a makeshift base set in a forest
+
 ## enemies
 
 various simple bandit enemies with different weapons and stats
