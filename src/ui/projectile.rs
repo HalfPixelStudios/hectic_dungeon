@@ -31,8 +31,8 @@ impl Plugin for ProjectilePlugin {
             .add_system(duration_lifetime_system)
             .add_system(distance_lifetime_system)
             .add_system(spawn)
-            .add_system(despawn)
-            .add_system(debug);
+            .add_system(despawn);
+        // .add_system(debug);
     }
 }
 

@@ -11,6 +11,7 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
+    enviro::dropped_item::DroppedItem,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
@@ -19,7 +20,7 @@ use crate::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
         move_indicator::MoveIndicator,
     },
-    utils::{cardinal_dirs, Dir},
+    utils::{cardinal_dirs, ok_or_return, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -42,6 +43,7 @@ pub enum PlayerAction {
     Down,
     Attack,
     Cancel,
+    Interact,
 }
 pub struct PlayerMovedEvent;
 
@@ -57,6 +59,7 @@ impl Plugin for PlayerPlugin {
             .add_loopless_state(PlayerState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
+            .add_system(controller.run_in_state(GameState::PlayerInput))
             .add_system(
                 move_controller
                     .run_in_state(GameState::PlayerInput)
@@ -97,6 +100,7 @@ fn spawn(
             (KeyCode::S, PlayerAction::Down),
             (KeyCode::Space, PlayerAction::Attack),
             (KeyCode::Escape, PlayerAction::Cancel),
+            (KeyCode::E, PlayerAction::Interact),
         ]);
 
         // let handle = prefab_data.get("player").unwrap();
@@ -133,6 +137,27 @@ fn spawn(
     }
 }
 
+fn controller(
+    mut cmd: Commands,
+    mut query: Query<(&GridEntity, &ActionState<PlayerAction>), With<Player>>,
+    item_query: Query<&DroppedItem, Without<Player>>,
+    grid: Res<Grid<CellType>>,
+) {
+    let (grid_entity, action_state) = ok_or_return!(query.get_single_mut());
+
+    if action_state.just_pressed(PlayerAction::Interact) {
+        for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
+            if let CellType::DroppedItem(entity) = cell_entity {
+                let dropped_item = item_query.get(*entity).unwrap();
+
+                info!("picked up {}", dropped_item.prefab_id);
+
+                cmd.entity(*entity).despawn();
+            }
+        }
+    }
+}
+
 //TODO check collision with tiled map
 // TODO i dont really like having to include AttackIndicator in query
 fn move_controller(
@@ -149,37 +174,35 @@ fn move_controller(
     mut player_moved: EventWriter<PlayerMovedEvent>,
     grid: Res<Grid<CellType>>,
 ) {
-    if let Ok((mut grid_position, mut movement, mut attack_indicator, action_state)) =
-        query.get_single_mut()
-    {
-        let mut dir = IVec2::ZERO;
+    let (mut grid_position, mut movement, mut attack_indicator, action_state) =
+        ok_or_return!(query.get_single_mut());
+    let mut dir = IVec2::ZERO;
 
-        if action_state.just_pressed(PlayerAction::Left) {
-            dir += IVec2::new(-1, 0);
-        }
-        if action_state.just_pressed(PlayerAction::Right) {
-            dir += IVec2::new(1, 0);
-        }
-        if action_state.just_pressed(PlayerAction::Up) {
-            dir += IVec2::new(0, 1);
-        }
-        if action_state.just_pressed(PlayerAction::Down) {
-            dir += IVec2::new(0, -1);
-        }
-        if action_state.just_pressed(PlayerAction::Attack) {
-            cmd.insert_resource(NextState(PlayerState::Attack));
-        }
+    if action_state.just_pressed(PlayerAction::Left) {
+        dir += IVec2::new(-1, 0);
+    }
+    if action_state.just_pressed(PlayerAction::Right) {
+        dir += IVec2::new(1, 0);
+    }
+    if action_state.just_pressed(PlayerAction::Up) {
+        dir += IVec2::new(0, 1);
+    }
+    if action_state.just_pressed(PlayerAction::Down) {
+        dir += IVec2::new(0, -1);
+    }
+    if action_state.just_pressed(PlayerAction::Attack) {
+        cmd.insert_resource(NextState(PlayerState::Attack));
+    }
 
-        // TODO movement collision logic shouldn't be here?
-        if movement.next_move == IVec2::ZERO {
-            let next_pos = grid_position.pos + dir;
-            if dir != IVec2::ZERO
-                && grid.bounds_check(&next_pos)
-                && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
-            {
-                player_moved.send(PlayerMovedEvent);
-                movement.next_move = dir;
-            }
+    // TODO movement collision logic shouldn't be here?
+    if movement.next_move == IVec2::ZERO {
+        let next_pos = grid_position.pos + dir;
+        if dir != IVec2::ZERO
+            && grid.bounds_check(&next_pos)
+            && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
+        {
+            player_moved.send(PlayerMovedEvent);
+            movement.next_move = dir;
         }
     }
 }
@@ -188,15 +211,13 @@ fn update_move_indicator(
     mut query: Query<(&GridEntity, &mut MoveIndicator), With<Player>>,
     grid: Res<Grid<CellType>>,
 ) {
-    if let Ok((grid_entity, mut move_indicator)) = query.get_single_mut() {
-        // TODO duplicated valid move checking logic from move_controller function
-        move_indicator.dirs.clear();
-        for dir in cardinal_dirs().iter() {
-            let next_pos = IVec2::from(*dir) + grid_entity.pos;
-            if grid.bounds_check(&next_pos) && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
-            {
-                move_indicator.dirs.push(*dir);
-            }
+    let (grid_entity, mut move_indicator) = ok_or_return!(query.get_single_mut());
+    // TODO duplicated valid move checking logic from move_controller function
+    move_indicator.dirs.clear();
+    for dir in cardinal_dirs().iter() {
+        let next_pos = IVec2::from(*dir) + grid_entity.pos;
+        if grid.bounds_check(&next_pos) && !grid.contains_at(&next_pos, CellType::Wall).unwrap() {
+            move_indicator.dirs.push(*dir);
         }
     }
 }
@@ -216,48 +237,49 @@ fn attack_controller(
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     mut player_moved: EventWriter<PlayerMovedEvent>,
 ) {
-    if let Ok((entity, mut attack_indicator, grid_entity, action_state)) = query.get_single_mut() {
-        if action_state.just_pressed(PlayerAction::Up) {
-            attack_indicator.dir = Dir::North;
-        }
-        if action_state.just_pressed(PlayerAction::Left) {
-            attack_indicator.dir = Dir::West;
-        }
-        if action_state.just_pressed(PlayerAction::Down) {
-            attack_indicator.dir = Dir::South;
-        }
-        if action_state.just_pressed(PlayerAction::Right) {
-            attack_indicator.dir = Dir::East;
-        }
-        if action_state.just_pressed(PlayerAction::Cancel) {
-            cmd.insert_resource(NextState(PlayerState::Move));
-        }
-        if action_state.just_pressed(PlayerAction::Attack) {
-            // deal damage
-            let grid_positions = attack_indicator
-                .get_pattern()
-                .iter()
-                .map(|v| *v + grid_entity.pos)
-                .collect::<Vec<_>>();
-            // TODO the entity in the CellType::ENemy is just a dummy value, this is pretty
-            // disgusting
+    let (entity, mut attack_indicator, grid_entity, action_state) =
+        ok_or_return!(query.get_single_mut());
 
-            // spawn attack animation
-            for pos in grid_positions.iter() {
-                anim_writer.send(SpawnAttackAnimEvent {
-                    frames: vec![144, 145, 146, 147],
-                    animation_speed: 0.1,
-                    spawn_pos: *pos,
-                });
-            }
+    if action_state.just_pressed(PlayerAction::Up) {
+        attack_indicator.dir = Dir::North;
+    }
+    if action_state.just_pressed(PlayerAction::Left) {
+        attack_indicator.dir = Dir::West;
+    }
+    if action_state.just_pressed(PlayerAction::Down) {
+        attack_indicator.dir = Dir::South;
+    }
+    if action_state.just_pressed(PlayerAction::Right) {
+        attack_indicator.dir = Dir::East;
+    }
+    if action_state.just_pressed(PlayerAction::Cancel) {
+        cmd.insert_resource(NextState(PlayerState::Move));
+    }
+    if action_state.just_pressed(PlayerAction::Attack) {
+        // deal damage
+        let grid_positions = attack_indicator
+            .get_pattern()
+            .iter()
+            .map(|v| *v + grid_entity.pos)
+            .collect::<Vec<_>>();
+        // TODO the entity in the CellType::ENemy is just a dummy value, this is pretty
+        // disgusting
 
-            writer.send(AttackEvent {
-                grid_positions,
-                cell_type: CellType::Enemy(entity),
+        // spawn attack animation
+        for pos in grid_positions.iter() {
+            anim_writer.send(SpawnAttackAnimEvent {
+                frames: vec![144, 145, 146, 147],
+                animation_speed: 0.1,
+                spawn_pos: *pos,
             });
-
-            player_moved.send(PlayerMovedEvent);
         }
+
+        writer.send(AttackEvent {
+            grid_positions,
+            cell_type: CellType::Enemy(entity),
+        });
+
+        player_moved.send(PlayerMovedEvent);
     }
 }
 
@@ -271,24 +293,21 @@ fn on_turn_start(mut cmd: Commands) {
 }
 
 fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
-        attack_indicator.hidden = true;
-        move_indicator.hidden = false;
-    }
+    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
+    attack_indicator.hidden = true;
+    move_indicator.hidden = false;
 }
 fn transition_to_attack(
     mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>,
 ) {
-    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
-        attack_indicator.hidden = false;
-        move_indicator.hidden = true;
-    }
+    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
+    attack_indicator.hidden = false;
+    move_indicator.hidden = true;
 }
 fn transition_to_none(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    if let Ok((mut attack_indicator, mut move_indicator)) = query.get_single_mut() {
-        attack_indicator.hidden = true;
-        move_indicator.hidden = true;
-    }
+    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
+    attack_indicator.hidden = true;
+    move_indicator.hidden = true;
 }
 
 fn spawn_from_ldtk(

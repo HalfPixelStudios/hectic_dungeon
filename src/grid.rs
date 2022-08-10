@@ -2,6 +2,7 @@ use std::{fmt::Debug, ops::Deref};
 
 use anyhow::{anyhow, Result};
 use bevy::prelude::*;
+use bevy_bobs::prefab::PrefabId;
 use thiserror::Error;
 
 use crate::{
@@ -9,12 +10,13 @@ use crate::{
     map::CollisionMap,
 };
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum CellType {
     Player(Entity),
     Enemy(Entity),
     Wall,
     CollapsableFloor(Entity),
+    DroppedItem(Entity),
 }
 
 #[derive(Error, Debug)]
@@ -140,7 +142,7 @@ fn update_grid(
         grid.insert_at(col, CellType::Wall);
     }
     for grid_pos in query.iter() {
-        grid.insert_at(grid_pos, grid_pos.value);
+        grid.insert_at(grid_pos, grid_pos.value.clone());
     }
 }
 

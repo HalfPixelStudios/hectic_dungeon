@@ -69,7 +69,6 @@ fn spawn(
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
                     index: 82,
-                    color: Color::ORANGE,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),

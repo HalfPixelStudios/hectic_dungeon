@@ -10,7 +10,7 @@ use crate::{
     movement::Movement,
     player::Player,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::Dir,
+    utils::{ok_or_continue, ok_or_return, Dir},
 };
 
 /// Track distance to the player
@@ -26,16 +26,16 @@ fn attack_range_scorer(
     mut score_query: Query<(&Actor, &mut Score, &AttackRangeScorer), Without<Player>>,
     query: Query<&GridEntity, Without<Player>>,
 ) {
-    if let Ok(player_grid_entity) = player_query.get_single() {
-        for (Actor(actor), mut score, scorer) in score_query.iter_mut() {
-            if let Ok(grid_entity) = query.get(*actor) {
-                let distance = player_grid_entity
-                    .pos
-                    .as_vec2()
-                    .distance(grid_entity.pos.as_vec2());
-                score.set(if distance < scorer.range { 1. } else { 0. });
-            }
-        }
+    let player_grid_entity = ok_or_return!(player_query.get_single());
+
+    for (Actor(actor), mut score, scorer) in score_query.iter_mut() {
+        let grid_entity = ok_or_continue!(query.get(*actor));
+
+        let distance = player_grid_entity
+            .pos
+            .as_vec2()
+            .distance(grid_entity.pos.as_vec2());
+        score.set(if distance < scorer.range { 1. } else { 0. });
     }
 }
 
@@ -55,60 +55,55 @@ fn attack_action(
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     mut attack_writer: EventWriter<AttackEvent>,
 ) {
-    let player_grid_entity = player_query.get_single();
-    if player_grid_entity.is_err() {
-        return;
-    }
-    let player_grid_entity = player_grid_entity.unwrap();
+    let player_grid_entity = ok_or_return!(player_query.get_single());
 
     for (Actor(actor), mut state) in action_query.iter_mut() {
-        if let Ok((grid_entity, mut attack_indicator)) = query.get_mut(*actor) {
-            match *state {
-                ActionState::Requested => {
-                    info!("attack requested");
+        let (grid_entity, mut attack_indicator) = ok_or_continue!(query.get_mut(*actor));
+        match *state {
+            ActionState::Requested => {
+                // info!("attack requested");
 
-                    // enable attack animation
-                    let dir: Dir = (player_grid_entity.pos - grid_entity.pos).into();
+                // enable attack animation
+                let dir: Dir = (player_grid_entity.pos - grid_entity.pos).into();
 
-                    attack_indicator.dir = dir;
-                    attack_indicator.hidden = false;
+                attack_indicator.dir = dir;
+                attack_indicator.hidden = false;
 
-                    *state = ActionState::Executing;
-                },
-                ActionState::Executing => {
-                    info!("attack executing");
+                *state = ActionState::Executing;
+            },
+            ActionState::Executing => {
+                // info!("attack executing");
 
-                    // perform attack
-                    let grid_positions = attack_indicator
-                        .get_pattern()
-                        .iter()
-                        .map(|v| *v + grid_entity.pos)
-                        .collect::<Vec<_>>();
+                // perform attack
+                let grid_positions = attack_indicator
+                    .get_pattern()
+                    .iter()
+                    .map(|v| *v + grid_entity.pos)
+                    .collect::<Vec<_>>();
 
-                    for pos in grid_positions.iter() {
-                        anim_writer.send(SpawnAttackAnimEvent {
-                            frames: vec![128, 129, 130],
-                            animation_speed: 0.1,
-                            spawn_pos: *pos,
-                        });
-                    }
-
-                    // TODO the entity in the CellType::Player is just a dummy value, this is pretty
-                    // disgusting
-                    attack_writer.send(AttackEvent {
-                        grid_positions,
-                        cell_type: CellType::Player(*actor),
+                for pos in grid_positions.iter() {
+                    anim_writer.send(SpawnAttackAnimEvent {
+                        frames: vec![128, 129, 130],
+                        animation_speed: 0.1,
+                        spawn_pos: *pos,
                     });
+                }
 
-                    attack_indicator.hidden = true;
-                    *state = ActionState::Success;
-                },
-                ActionState::Cancelled => {
-                    *state = ActionState::Failure;
-                    info!("attack cancelled");
-                },
-                _ => {},
-            }
+                // TODO the entity in the CellType::Player is just a dummy value, this is pretty
+                // disgusting
+                attack_writer.send(AttackEvent {
+                    grid_positions,
+                    cell_type: CellType::Player(*actor),
+                });
+
+                attack_indicator.hidden = true;
+                *state = ActionState::Success;
+            },
+            ActionState::Cancelled => {
+                *state = ActionState::Failure;
+                info!("attack cancelled");
+            },
+            _ => {},
         }
     }
 }
@@ -123,33 +118,29 @@ fn move_action(
     mut action_query: Query<(&Actor, &mut ActionState), With<MoveAction>>,
     mut query: Query<(&GridEntity, &mut Movement, &mut AttackIndicator), Without<Player>>,
 ) {
-    let player_grid_entity = player_query.get_single();
-    if player_grid_entity.is_err() {
-        return;
-    }
-    let player_grid_entity = player_grid_entity.unwrap();
+    let player_grid_entity = ok_or_return!(player_query.get_single());
 
     for (Actor(actor), mut state) in action_query.iter_mut() {
-        if let Ok((grid_entity, mut movement, mut attack_indicator)) = query.get_mut(*actor) {
-            match *state {
-                ActionState::Requested => {
-                    // movement phase
-                    let cur_pos = grid_entity.pos;
-                    if let Some(path) = a_star(&cur_pos, &player_grid_entity.pos, &grid) {
-                        let next_pos = path.get(0).unwrap_or(&cur_pos);
-                        movement.next_move = *next_pos - cur_pos;
-                    } else {
-                        info!("failed to calculate path");
-                        *state = ActionState::Failure;
-                    }
-                    *state = ActionState::Success;
-                },
-                ActionState::Cancelled => {
+        let (grid_entity, mut movement, mut attack_indicator) =
+            ok_or_continue!(query.get_mut(*actor));
+        match *state {
+            ActionState::Requested => {
+                // movement phase
+                let cur_pos = grid_entity.pos;
+                if let Some(path) = a_star(&cur_pos, &player_grid_entity.pos, &grid) {
+                    let next_pos = path.get(0).unwrap_or(&cur_pos);
+                    movement.next_move = *next_pos - cur_pos;
+                } else {
+                    info!("failed to calculate path");
                     *state = ActionState::Failure;
-                    info!("attack cancelled");
-                },
-                _ => {},
-            }
+                }
+                *state = ActionState::Success;
+            },
+            ActionState::Cancelled => {
+                *state = ActionState::Failure;
+                info!("attack cancelled");
+            },
+            _ => {},
         }
     }
 }
