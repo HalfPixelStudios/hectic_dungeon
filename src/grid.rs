@@ -20,7 +20,7 @@ pub enum CellType {
     Enemy(Entity),
     Wall,
     CollapsableFloor(Entity),
-    DroppedItem(PrefabId),
+    DroppedItem(Entity),
 }
 
 #[derive(Error, Debug)]

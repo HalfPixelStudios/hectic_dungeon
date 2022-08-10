@@ -11,6 +11,7 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
+    enviro::dropped_item::DroppedItem,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
@@ -58,6 +59,7 @@ impl Plugin for PlayerPlugin {
             .add_loopless_state(PlayerState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
+            .add_system(controller.run_in_state(GameState::PlayerInput))
             .add_system(
                 move_controller
                     .run_in_state(GameState::PlayerInput)
@@ -132,6 +134,27 @@ fn spawn(
             .insert(MoveIndicator::default())
             .insert(Children::default())
             .insert(Movement::new());
+    }
+}
+
+fn controller(
+    mut cmd: Commands,
+    mut query: Query<(&GridEntity, &ActionState<PlayerAction>), With<Player>>,
+    item_query: Query<&DroppedItem, Without<Player>>,
+    grid: Res<Grid<CellType>>,
+) {
+    if let Ok((grid_entity, action_state)) = query.get_single_mut() {
+        if action_state.just_pressed(PlayerAction::Interact) {
+            for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
+                if let CellType::DroppedItem(entity) = cell_entity {
+                    let dropped_item = item_query.get(*entity).unwrap();
+
+                    info!("picked up {}", dropped_item.prefab_id);
+
+                    cmd.entity(*entity).despawn();
+                }
+            }
+        }
     }
 }
 

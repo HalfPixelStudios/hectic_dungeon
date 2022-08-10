@@ -8,7 +8,9 @@ use crate::{
 };
 
 #[derive(Component)]
-pub struct DroppedItem;
+pub struct DroppedItem {
+    pub prefab_id: PrefabId,
+}
 
 pub struct SpawnDroppedItemEvent {
     pub spawn_pos: IVec2,
@@ -53,11 +55,10 @@ fn spawn(
                     },
                     ..default()
                 })
-                .insert(DroppedItem)
-                .insert(GridEntity::new(
-                    *spawn_pos,
-                    CellType::DroppedItem(prefab_id.to_owned()),
-                ));
+                .insert(DroppedItem {
+                    prefab_id: prefab_id.to_owned(),
+                })
+                .insert(GridEntity::new(*spawn_pos, CellType::DroppedItem(id)));
         }
     }
 }
