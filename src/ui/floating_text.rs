@@ -44,13 +44,13 @@ fn spawn(
         let id = cmd.spawn().id();
 
         cmd.entity(id).insert_bundle(Text2dBundle {
-            transform: Transform::from_translation(offset.extend(0.)),
+            transform: Transform::from_translation(offset.extend(3.)),
             text: Text::with_section(
                 text,
                 TextStyle {
                     font: font.clone(),
                     font_size: FONT_SIZE,
-                    color: Color::WHITE,
+                    color: Color::BLACK,
                 },
                 TextAlignment {
                     vertical: VerticalAlign::Center,

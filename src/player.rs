@@ -136,12 +136,12 @@ fn spawn(
         // ui related
         cmd.entity(id)
             .insert(AttackIndicator::default())
-            .insert(MoveIndicator::default())
-            .insert(FloatingText {
-                text: "hello world".into(),
-                offset: Vec2::new(0., 8.),
-                ..default()
-            });
+            .insert(MoveIndicator::default());
+        // .insert(FloatingText {
+        //     text: "hello world".into(),
+        //     offset: Vec2::new(0., 8.),
+        //     ..default()
+        // });
     }
 }
 
