@@ -1,5 +1,6 @@
 pub mod attack_animation;
 pub mod attack_indicator;
+pub mod floating_text;
 pub mod move_indicator;
 pub mod projectile;
 
