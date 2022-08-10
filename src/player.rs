@@ -18,7 +18,7 @@ use crate::{
     movement::Movement,
     ui::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
-        move_indicator::MoveIndicator,
+        floating_text::FloatingText, move_indicator::MoveIndicator,
     },
     utils::{cardinal_dirs, ok_or_return, Dir},
     weapon::CurrentWeapon,
@@ -130,10 +130,18 @@ fn spawn(
             })
             .insert(CameraFollow)
             .insert(CurrentWeapon("hammer".into()))
-            .insert(AttackIndicator::default())
-            .insert(MoveIndicator::default())
             .insert(Children::default())
             .insert(Movement::new());
+
+        // ui related
+        cmd.entity(id)
+            .insert(AttackIndicator::default())
+            .insert(MoveIndicator::default());
+        // .insert(FloatingText {
+        //     text: "hello world".into(),
+        //     offset: Vec2::new(0., 8.),
+        //     ..default()
+        // });
     }
 }
 

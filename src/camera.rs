@@ -22,7 +22,7 @@ impl Plugin for CameraPlugin {
 fn setup(mut cmd: Commands) {
     cmd.spawn_bundle(OrthographicCameraBundle {
         orthographic_projection: OrthographicProjection {
-            scale: 0.5,
+            scale: 0.4,
             ..default()
         },
         ..OrthographicCameraBundle::new_2d()
