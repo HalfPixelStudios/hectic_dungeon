@@ -65,7 +65,7 @@ fn attack_action(
         if let Ok((grid_entity, mut attack_indicator)) = query.get_mut(*actor) {
             match *state {
                 ActionState::Requested => {
-                    info!("attack requested");
+                    // info!("attack requested");
 
                     // enable attack animation
                     let dir: Dir = (player_grid_entity.pos - grid_entity.pos).into();
@@ -76,7 +76,7 @@ fn attack_action(
                     *state = ActionState::Executing;
                 },
                 ActionState::Executing => {
-                    info!("attack executing");
+                    // info!("attack executing");
 
                     // perform attack
                     let grid_positions = attack_indicator

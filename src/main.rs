@@ -1,5 +1,6 @@
 #![allow(unused)]
 #![allow(dead_code)]
+mod ability;
 mod ai;
 mod animation;
 mod app;
@@ -10,6 +11,7 @@ mod enemy;
 mod enviro;
 mod game;
 mod grid;
+mod item;
 mod layers;
 mod map;
 mod movement;
