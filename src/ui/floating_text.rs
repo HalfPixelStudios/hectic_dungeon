@@ -23,6 +23,8 @@ fn spawn(
     asset_server: Res<AssetServer>,
     query: Query<(&FloatingText, Option<&Children>), Added<FloatingText>>,
 ) {
+    let font = asset_server.load("fonts/arcadeclassic.tff");
+
     for (
         FloatingText {
             text,
@@ -32,8 +34,11 @@ fn spawn(
         children,
     ) in query.iter()
     {
+        if *hidden {
+            continue;
+        }
+
         let id = cmd.spawn().id();
-        let font = asset_server.load("fonts/arcadeclassic.tff");
 
         cmd.entity(id).insert_bundle(Text2dBundle {
             transform: Transform::from_translation(offset.extend(0.)),
