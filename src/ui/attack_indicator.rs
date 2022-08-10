@@ -4,14 +4,12 @@ use bevy_bobs::prefab::PrefabLib;
 use crate::{
     assets::{PrefabData, SpriteSheet},
     attack::{rotate_offsets, AttackPattern},
+    constants::TILE_SIZE,
     grid::GridEntity,
     player::Player,
     utils::Dir,
     weapon::{CurrentWeapon, WeaponPrefab},
 };
-
-// TODO unify this
-const CELLWIDTH: f32 = 8.;
 
 #[derive(Component)]
 pub struct AttackIndicator {
@@ -101,7 +99,7 @@ fn spawn(
         for offset in attack_indictor
             .get_pattern()
             .iter()
-            .map(|v| v.as_vec2().extend(0.) * CELLWIDTH)
+            .map(|v| v.as_vec2().extend(0.) * (TILE_SIZE as f32))
         {
             let child = cmd.spawn().id();
 

@@ -6,6 +6,7 @@ mod app;
 mod assets;
 mod attack;
 mod camera;
+mod constants;
 mod enemy;
 mod enviro;
 mod game;
