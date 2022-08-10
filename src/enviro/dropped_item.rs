@@ -31,7 +31,7 @@ impl Plugin for DroppedItemPlugin {
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnDroppedItemEvent>,
-    grid: Res<Grid<CellType>>,
+    grid: Res<Grid>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<ItemPrefab>>,
 ) {

@@ -75,10 +75,7 @@ fn spawn_from_ldtk(
 }
 
 /// Detect whenever a player steps on a collapsable floor
-fn detect_step_on(
-    grid: Res<Grid<CellType>>,
-    mut query: Query<(&mut CollapsableFloor, &GridEntity)>,
-) {
+fn detect_step_on(grid: Res<Grid>, mut query: Query<(&mut CollapsableFloor, &GridEntity)>) {
     for (mut floor, grid_entity) in query.iter_mut() {
         for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
             if let CellType::Player(_) = cell_entity {

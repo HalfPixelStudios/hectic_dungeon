@@ -113,7 +113,7 @@ fn attack_action(
 pub struct MoveAction;
 
 fn move_action(
-    grid: Res<Grid<CellType>>,
+    grid: Res<Grid>,
     mut player_query: Query<(&GridEntity), With<Player>>,
     mut action_query: Query<(&Actor, &mut ActionState), With<MoveAction>>,
     mut query: Query<(&GridEntity, &mut Movement, &mut AttackIndicator), Without<Player>>,

@@ -63,7 +63,7 @@ impl Plugin for AttackPlugin {
 fn process_attack(
     mut events: EventReader<AttackEvent>,
     mut writer: EventWriter<DamageEnemyEvent>,
-    grid: Res<Grid<CellType>>,
+    grid: Res<Grid>,
 ) {
     for AttackEvent {
         grid_positions,

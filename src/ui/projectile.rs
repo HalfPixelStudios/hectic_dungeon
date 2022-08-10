@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_bobs::{
-    component::lifetime::*,
+    component::lifetime::{LifetimePlugin, *},
     physics_2d::{PhysicsPlugin, RigidBody},
 };
 
@@ -28,8 +28,7 @@ impl Plugin for ProjectilePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(PhysicsPlugin)
             .add_event::<SpawnProjectileEvent>()
-            .add_system(duration_lifetime_system)
-            .add_system(distance_lifetime_system)
+            .add_plugin(LifetimePlugin)
             .add_system(spawn)
             .add_system(despawn);
         // .add_system(debug);

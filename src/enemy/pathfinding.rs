@@ -5,7 +5,7 @@ use priority_queue::PriorityQueue;
 
 use crate::grid::{CellType, Grid};
 
-pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid<CellType>>) -> Option<Vec<IVec2>> {
+pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2>> {
     // trivial case
     if start == dest {
         return Some(Vec::new());
@@ -55,7 +55,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid<CellType>>) -> Option
     None
 }
 
-fn tiles_around(pos: &IVec2, grid: &Res<Grid<CellType>>) -> Vec<IVec2> {
+fn tiles_around(pos: &IVec2, grid: &Res<Grid>) -> Vec<IVec2> {
     use rand::{seq::SliceRandom, thread_rng};
 
     let mut dirs = [

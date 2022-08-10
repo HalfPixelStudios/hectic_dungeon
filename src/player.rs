@@ -149,7 +149,7 @@ fn controller(
     mut cmd: Commands,
     mut query: Query<(&GridEntity, &ActionState<PlayerAction>), With<Player>>,
     item_query: Query<&DroppedItem, Without<Player>>,
-    grid: Res<Grid<CellType>>,
+    grid: Res<Grid>,
 ) {
     let (grid_entity, action_state) = ok_or_return!(query.get_single_mut());
 
@@ -180,7 +180,7 @@ fn move_controller(
         With<Player>,
     >,
     mut player_moved: EventWriter<PlayerMovedEvent>,
-    grid: Res<Grid<CellType>>,
+    grid: Res<Grid>,
 ) {
     let (mut grid_position, mut movement, mut attack_indicator, action_state) =
         ok_or_return!(query.get_single_mut());
@@ -217,7 +217,7 @@ fn move_controller(
 
 fn update_move_indicator(
     mut query: Query<(&GridEntity, &mut MoveIndicator), With<Player>>,
-    grid: Res<Grid<CellType>>,
+    grid: Res<Grid>,
 ) {
     let (grid_entity, mut move_indicator) = ok_or_return!(query.get_single_mut());
     // TODO duplicated valid move checking logic from move_controller function
