@@ -10,7 +10,7 @@ use crate::{
     movement::Movement,
     player::Player,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::{unwrap_or_continue, unwrap_or_return, Dir},
+    utils::{ok_or_continue, ok_or_return, Dir},
 };
 
 /// Track distance to the player
@@ -26,10 +26,10 @@ fn attack_range_scorer(
     mut score_query: Query<(&Actor, &mut Score, &AttackRangeScorer), Without<Player>>,
     query: Query<&GridEntity, Without<Player>>,
 ) {
-    let player_grid_entity = unwrap_or_return!(player_query.get_single());
+    let player_grid_entity = ok_or_return!(player_query.get_single());
 
     for (Actor(actor), mut score, scorer) in score_query.iter_mut() {
-        let grid_entity = unwrap_or_continue!(query.get(*actor));
+        let grid_entity = ok_or_continue!(query.get(*actor));
 
         let distance = player_grid_entity
             .pos
@@ -55,10 +55,10 @@ fn attack_action(
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     mut attack_writer: EventWriter<AttackEvent>,
 ) {
-    let player_grid_entity = unwrap_or_return!(player_query.get_single());
+    let player_grid_entity = ok_or_return!(player_query.get_single());
 
     for (Actor(actor), mut state) in action_query.iter_mut() {
-        let (grid_entity, mut attack_indicator) = unwrap_or_continue!(query.get_mut(*actor));
+        let (grid_entity, mut attack_indicator) = ok_or_continue!(query.get_mut(*actor));
         match *state {
             ActionState::Requested => {
                 // info!("attack requested");
@@ -118,11 +118,11 @@ fn move_action(
     mut action_query: Query<(&Actor, &mut ActionState), With<MoveAction>>,
     mut query: Query<(&GridEntity, &mut Movement, &mut AttackIndicator), Without<Player>>,
 ) {
-    let player_grid_entity = unwrap_or_return!(player_query.get_single());
+    let player_grid_entity = ok_or_return!(player_query.get_single());
 
     for (Actor(actor), mut state) in action_query.iter_mut() {
         let (grid_entity, mut movement, mut attack_indicator) =
-            unwrap_or_continue!(query.get_mut(*actor));
+            ok_or_continue!(query.get_mut(*actor));
         match *state {
             ActionState::Requested => {
                 // movement phase

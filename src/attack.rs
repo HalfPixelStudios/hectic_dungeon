@@ -4,7 +4,7 @@ use serde::Deserialize;
 use crate::{
     enemy::DamageEnemyEvent,
     grid::{CellType, Grid},
-    utils::{unwrap_or_continue, variant_eq, Dir},
+    utils::{ok_or_continue, variant_eq, Dir},
 };
 
 #[derive(Deserialize, Clone, Copy)]
@@ -71,7 +71,7 @@ fn process_attack(
     } in events.iter()
     {
         for grid_position in grid_positions.iter() {
-            let cell = unwrap_or_continue!(grid.get_cell(grid_position));
+            let cell = ok_or_continue!(grid.get_cell(grid_position));
             for cell_entity in cell.iter() {
                 if !variant_eq::<CellType>(cell_entity, cell_type) {
                     continue;

@@ -20,7 +20,7 @@ use crate::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
         move_indicator::MoveIndicator,
     },
-    utils::{cardinal_dirs, unwrap_or_return, Dir},
+    utils::{cardinal_dirs, ok_or_return, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -143,7 +143,7 @@ fn controller(
     item_query: Query<&DroppedItem, Without<Player>>,
     grid: Res<Grid<CellType>>,
 ) {
-    let (grid_entity, action_state) = unwrap_or_return!(query.get_single_mut());
+    let (grid_entity, action_state) = ok_or_return!(query.get_single_mut());
 
     if action_state.just_pressed(PlayerAction::Interact) {
         for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
@@ -175,7 +175,7 @@ fn move_controller(
     grid: Res<Grid<CellType>>,
 ) {
     let (mut grid_position, mut movement, mut attack_indicator, action_state) =
-        unwrap_or_return!(query.get_single_mut());
+        ok_or_return!(query.get_single_mut());
     let mut dir = IVec2::ZERO;
 
     if action_state.just_pressed(PlayerAction::Left) {
@@ -211,7 +211,7 @@ fn update_move_indicator(
     mut query: Query<(&GridEntity, &mut MoveIndicator), With<Player>>,
     grid: Res<Grid<CellType>>,
 ) {
-    let (grid_entity, mut move_indicator) = unwrap_or_return!(query.get_single_mut());
+    let (grid_entity, mut move_indicator) = ok_or_return!(query.get_single_mut());
     // TODO duplicated valid move checking logic from move_controller function
     move_indicator.dirs.clear();
     for dir in cardinal_dirs().iter() {
@@ -238,7 +238,7 @@ fn attack_controller(
     mut player_moved: EventWriter<PlayerMovedEvent>,
 ) {
     let (entity, mut attack_indicator, grid_entity, action_state) =
-        unwrap_or_return!(query.get_single_mut());
+        ok_or_return!(query.get_single_mut());
 
     if action_state.just_pressed(PlayerAction::Up) {
         attack_indicator.dir = Dir::North;
@@ -293,19 +293,19 @@ fn on_turn_start(mut cmd: Commands) {
 }
 
 fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    let (mut attack_indicator, mut move_indicator) = unwrap_or_return!(query.get_single_mut());
+    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
     attack_indicator.hidden = true;
     move_indicator.hidden = false;
 }
 fn transition_to_attack(
     mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>,
 ) {
-    let (mut attack_indicator, mut move_indicator) = unwrap_or_return!(query.get_single_mut());
+    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
     attack_indicator.hidden = false;
     move_indicator.hidden = true;
 }
 fn transition_to_none(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    let (mut attack_indicator, mut move_indicator) = unwrap_or_return!(query.get_single_mut());
+    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
     attack_indicator.hidden = true;
     move_indicator.hidden = true;
 }

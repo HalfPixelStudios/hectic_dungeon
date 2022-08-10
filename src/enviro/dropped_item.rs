@@ -5,6 +5,7 @@ use crate::{
     assets::SpriteSheet,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     item::ItemPrefab,
+    utils::some_or_return,
 };
 
 #[derive(Component)]
@@ -39,27 +40,26 @@ fn spawn(
         prefab_id,
     } in events.iter()
     {
-        if let Some(prefab) = prefab_lib.get(&prefab_id) {
-            let id = cmd.spawn().id();
+        let prefab = some_or_return!(prefab_lib.get(&prefab_id));
+        let id = cmd.spawn().id();
 
-            cmd.entity(id)
-                .insert_bundle(SpriteSheetBundle {
-                    sprite: TextureAtlasSprite {
-                        index: prefab.sprite_index,
-                        ..default()
-                    },
-                    texture_atlas: asset_sheet.clone(),
-                    transform: Transform {
-                        translation: to_world_coords(spawn_pos).extend(1.),
-                        ..default()
-                    },
+        cmd.entity(id)
+            .insert_bundle(SpriteSheetBundle {
+                sprite: TextureAtlasSprite {
+                    index: prefab.sprite_index,
                     ..default()
-                })
-                .insert(DroppedItem {
-                    prefab_id: prefab_id.to_owned(),
-                })
-                .insert(GridEntity::new(*spawn_pos, CellType::DroppedItem(id)));
-        }
+                },
+                texture_atlas: asset_sheet.clone(),
+                transform: Transform {
+                    translation: to_world_coords(spawn_pos).extend(1.),
+                    ..default()
+                },
+                ..default()
+            })
+            .insert(DroppedItem {
+                prefab_id: prefab_id.to_owned(),
+            })
+            .insert(GridEntity::new(*spawn_pos, CellType::DroppedItem(id)));
     }
 }
 

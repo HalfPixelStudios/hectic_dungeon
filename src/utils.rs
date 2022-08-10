@@ -85,7 +85,7 @@ pub fn variant_eq<T>(a: &T, b: &T) -> bool {
     std::mem::discriminant(a) == std::mem::discriminant(b)
 }
 
-macro_rules! unwrap_or_return {
+macro_rules! ok_or_return {
     ( $e:expr ) => {
         match $e {
             Ok(x) => x,
@@ -93,9 +93,9 @@ macro_rules! unwrap_or_return {
         }
     };
 }
-pub(crate) use unwrap_or_return;
+pub(crate) use ok_or_return;
 
-macro_rules! unwrap_or_continue {
+macro_rules! ok_or_continue {
     ( $e:expr ) => {
         match $e {
             Ok(x) => x,
@@ -103,4 +103,24 @@ macro_rules! unwrap_or_continue {
         }
     };
 }
-pub(crate) use unwrap_or_continue;
+pub(crate) use ok_or_continue;
+
+macro_rules! some_or_return {
+    ( $e:expr ) => {
+        match $e {
+            Some(x) => x,
+            None => return,
+        }
+    };
+}
+pub(crate) use some_or_return;
+
+macro_rules! some_or_continue {
+    ( $e:expr ) => {
+        match $e {
+            Some(x) => x,
+            None => continue,
+        }
+    };
+}
+pub(crate) use some_or_continue;
