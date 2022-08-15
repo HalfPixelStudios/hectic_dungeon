@@ -20,16 +20,17 @@ impl Plugin for CameraPlugin {
 }
 
 fn setup(mut cmd: Commands) {
-    cmd.spawn_bundle(OrthographicCameraBundle {
-        orthographic_projection: OrthographicProjection {
+    cmd.spawn_bundle(Camera2dBundle {
+        projection: OrthographicProjection {
             scale: 0.4,
             ..default()
         },
-        ..OrthographicCameraBundle::new_2d()
+        ..default()
     })
     .insert(PanCam::default())
     .insert(MainCamera);
 }
+
 fn camera_controller(
     entity_query: Query<&mut GlobalTransform, (With<CameraFollow>, Without<MainCamera>)>,
     mut camera_query: Query<
@@ -42,17 +43,18 @@ fn camera_controller(
     let mut pos: Vec2 = Vec2::ZERO;
     let mut query_len = 0.;
     for (transform) in entity_query.iter() {
-        pos.x += transform.translation.x;
-        pos.y += transform.translation.y;
+        pos.x += transform.translation().x;
+        pos.y += transform.translation().y;
         query_len += 1.;
     }
     if (query_len == 0.) {
         return;
     }
     pos /= query_len;
-    cam_transform.translation.x = lerp(cam_transform.translation.x, pos.x, 0.1);
-    cam_transform.translation.y = lerp(cam_transform.translation.y, pos.y, 0.1);
+    cam_transform.translation().x = lerp(cam_transform.translation().x, pos.x, 0.1);
+    cam_transform.translation().y = lerp(cam_transform.translation().y, pos.y, 0.1);
 }
+
 fn camera_zoom(
     mut query: Query<(&PanCam, &mut OrthographicProjection)>,
     mut scroll_events: EventReader<MouseWheel>,
@@ -76,6 +78,7 @@ fn camera_zoom(
         }
     }
 }
+
 fn camera_movement(
     mut windows: ResMut<Windows>,
     mouse_buttons: Res<Input<MouseButton>>,
@@ -108,6 +111,7 @@ fn camera_movement(
     }
     *last_pos = Some(current_pos);
 }
+
 // from https://bevy-cheatbook.github.io/cookbook/cursor2world.html
 fn cursor_system(
     windows: Res<Windows>,
@@ -121,15 +125,17 @@ fn cursor_system(
     if let Some(pos) = win.cursor_position() {
         let window_size = Vec2::new(win.width() as f32, win.height() as f32);
         let ndc = (pos / window_size) * 2.0 - Vec2::ONE;
-        let ndc_to_world = transform.compute_matrix() * camera.projection_matrix.inverse();
+        let ndc_to_world = transform.compute_matrix() * camera.projection_matrix().inverse();
         let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
 
         cursor.0 = world_pos.truncate();
     }
 }
+
 pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
     x * (1. - by) + y * by
 }
+
 #[derive(Component)]
 pub struct PanCam {
     pub grab_buttons: Vec<MouseButton>,

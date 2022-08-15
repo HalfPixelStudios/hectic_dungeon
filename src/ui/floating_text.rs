@@ -45,18 +45,18 @@ fn spawn(
 
         cmd.entity(id).insert_bundle(Text2dBundle {
             transform: Transform::from_translation(offset.extend(3.)),
-            text: Text::with_section(
+            text: Text::from_section(
                 text,
                 TextStyle {
                     font: font.clone(),
                     font_size: FONT_SIZE,
                     color: Color::BLACK,
                 },
-                TextAlignment {
-                    vertical: VerticalAlign::Center,
-                    horizontal: HorizontalAlign::Center,
-                },
-            ),
+            )
+            .with_alignment(TextAlignment {
+                vertical: VerticalAlign::Center,
+                horizontal: HorizontalAlign::Center,
+            }),
             ..default()
         });
 

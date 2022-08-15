@@ -130,7 +130,6 @@ fn spawn(
             })
             .insert(CameraFollow)
             .insert(CurrentWeapon("hammer".into()))
-            .insert(Children::default())
             .insert(Movement::new());
 
         // ui related

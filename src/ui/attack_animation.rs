@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use bevy::{core::Stopwatch, prelude::*};
+use bevy::{prelude::*, time::Stopwatch};
 
 use crate::{assets::SpriteSheet, grid::to_world_coords};
 
