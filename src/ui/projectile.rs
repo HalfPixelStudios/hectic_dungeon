@@ -74,7 +74,7 @@ fn spawn(
 }
 
 fn despawn(mut cmd: Commands, query: Query<(Entity, &DistanceLifetime), With<Projectile>>) {
-    for (entity, distance_lifetime) in query.iter() {
+    for (entity, distance_lifetime) in &query {
         if distance_lifetime.is_expired() {
             cmd.entity(entity).despawn();
         }

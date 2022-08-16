@@ -28,7 +28,7 @@ fn attack_range_scorer(
 ) {
     let player_grid_entity = ok_or_return!(player_query.get_single());
 
-    for (Actor(actor), mut score, scorer) in score_query.iter_mut() {
+    for (Actor(actor), mut score, scorer) in &mut score_query {
         let grid_entity = ok_or_continue!(query.get(*actor));
 
         let distance = player_grid_entity
@@ -57,7 +57,7 @@ fn attack_action(
 ) {
     let player_grid_entity = ok_or_return!(player_query.get_single());
 
-    for (Actor(actor), mut state) in action_query.iter_mut() {
+    for (Actor(actor), mut state) in &mut action_query {
         let (grid_entity, mut attack_indicator) = ok_or_continue!(query.get_mut(*actor));
         match *state {
             ActionState::Requested => {
@@ -120,7 +120,7 @@ fn move_action(
 ) {
     let player_grid_entity = ok_or_return!(player_query.get_single());
 
-    for (Actor(actor), mut state) in action_query.iter_mut() {
+    for (Actor(actor), mut state) in &mut action_query {
         let (grid_entity, mut movement, mut attack_indicator) =
             ok_or_continue!(query.get_mut(*actor));
         match *state {

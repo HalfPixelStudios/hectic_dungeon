@@ -32,7 +32,7 @@ impl Movement {
 
 //time based lerp; make mv.frame/t = 1 where t = time to move between squares
 fn movement(mut query: Query<(&mut GridEntity, &mut Movement, &mut Transform)>) {
-    for (mut grid_entity, mut mv, mut transform) in query.iter_mut() {
+    for (mut grid_entity, mut mv, mut transform) in &mut query {
         if mv.next_move != IVec2::ZERO {
             grid_entity.pos += mv.next_move;
             mv.next_move = IVec2::ZERO;

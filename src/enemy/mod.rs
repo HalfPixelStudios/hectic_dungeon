@@ -98,10 +98,10 @@ fn spawn(
                 dimension: Vec2::new(8., 2.),
                 bg_color: Color::BLACK,
                 fg_color: Color::GREEN,
-                translation: Vec3::ZERO,
+                translation: Vec2::ZERO.extend(2.),
             },
         );
-        cmd.entity(id).add_child(hp_bar);
+        cmd.entity(id).push_children(&[hp_bar]);
     }
 }
 
@@ -121,7 +121,7 @@ fn take_damage(
 }
 
 fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<&mut HealthBar>) {
-    for (health, children) in query.iter() {
+    for (health, children) in &query {
         for child in children.iter() {
             if let Ok(mut hp_bar) = hp_bar_query.get_mut(*child) {
                 hp_bar.set_percent(health.percent());

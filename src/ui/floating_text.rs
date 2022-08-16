@@ -40,23 +40,23 @@ fn spawn(
 ) {
     let font = asset_server.load("fonts/arcadeclassic.ttf");
 
-    for (entity, FloatingText { text, offset }, children) in query.iter() {
+    for (entity, FloatingText { text, offset }, children) in &query {
         let id = cmd.spawn().id();
 
         cmd.entity(id).insert_bundle(Text2dBundle {
             transform: Transform::from_translation(offset.extend(3.)),
-            text: Text::with_section(
+            text: Text::from_section(
                 text,
                 TextStyle {
                     font: font.clone(),
                     font_size: FONT_SIZE,
                     color: Color::BLACK,
                 },
-                TextAlignment {
-                    vertical: VerticalAlign::Center,
-                    horizontal: HorizontalAlign::Center,
-                },
-            ),
+            )
+            .with_alignment(TextAlignment {
+                vertical: VerticalAlign::Center,
+                horizontal: HorizontalAlign::Center,
+            }),
             ..default()
         });
 

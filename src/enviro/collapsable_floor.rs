@@ -37,7 +37,7 @@ impl Plugin for CollapsableFloorPlugin {
 }
 
 fn update(query: Query<&CollapsableFloor, Changed<CollapsableFloor>>) {
-    for floor in query.iter() {
+    for floor in &query {
         if floor.health.is_zero() {}
     }
 }
@@ -76,7 +76,7 @@ fn spawn_from_ldtk(
 
 /// Detect whenever a player steps on a collapsable floor
 fn detect_step_on(grid: Res<Grid>, mut query: Query<(&mut CollapsableFloor, &GridEntity)>) {
-    for (mut floor, grid_entity) in query.iter_mut() {
+    for (mut floor, grid_entity) in &mut query {
         for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
             if let CellType::Player(_) = cell_entity {
                 floor.health.take(1);
@@ -90,7 +90,7 @@ fn despawn(
     query: Query<(Entity, &CollapsableFloor, &GridEntity)>,
     mut collision_map: ResMut<CollisionMap>,
 ) {
-    for (entity, floor, grid_entity) in query.iter() {
+    for (entity, floor, grid_entity) in &query {
         if floor.health.is_zero() {
             cmd.entity(entity).despawn();
             collision_map.push(grid_entity.pos);
