@@ -50,7 +50,7 @@ impl Plugin for AttackIndicatorPlugin {
 }
 
 fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
-    for (attack_indicator, grid_position) in query.iter() {
+    for (attack_indicator, grid_position) in &query {
         let pos: Vec<IVec2> = attack_indicator
             .get_pattern()
             .iter()
@@ -68,7 +68,7 @@ fn spawn(
     >,
     child_query: Query<&AttackIndicatorRoot>,
 ) {
-    for (entity, attack_indictor, children) in query.iter() {
+    for (entity, attack_indictor, children) in &query {
         // despawn existing
         if let Some(children) = children {
             for child in children.iter() {
@@ -124,7 +124,7 @@ fn sync_attack_pattern(
     mut query: Query<(&mut CurrentWeapon, &mut AttackIndicator)>,
     prefabs: Res<PrefabLib<WeaponPrefab>>,
 ) {
-    for (cur_weapon, mut attack_indicator) in query.iter_mut() {
+    for (cur_weapon, mut attack_indicator) in &mut query {
         let prefab = prefabs.get(&cur_weapon).unwrap();
         attack_indicator.pattern = prefab.attack_pattern;
     }
