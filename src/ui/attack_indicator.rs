@@ -88,12 +88,12 @@ fn spawn(
         // spawn root
         let root = cmd.spawn().id();
         cmd.entity(root)
-            .insert_bundle(TransformBundle::from_transform(
-                Transform::from_translation(Vec2::ZERO.extend(2.)),
-            ))
+            .insert_bundle(SpatialBundle::from_transform(Transform::from_translation(
+                Vec2::ZERO.extend(2.),
+            )))
             .insert(AttackIndicatorRoot);
 
-        cmd.entity(entity).add_child(root);
+        cmd.entity(entity).push_children(&[root]);
 
         // spawn children
         for offset in attack_indictor
@@ -115,7 +115,7 @@ fn spawn(
                 },
                 ..default()
             });
-            cmd.entity(root).add_child(child);
+            cmd.entity(root).push_children(&[child]);
         }
     }
 }

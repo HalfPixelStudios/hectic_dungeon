@@ -37,7 +37,7 @@ fn spawn(
     >,
     child_query: Query<&MoveIndicatorRoot>,
 ) {
-    for (entity, move_indicator, children) in query.iter() {
+    for (entity, move_indicator, children) in &query {
         // despawn existing (TODO duplicated code from attack_indicator.rs)
         if let Some(children) = children {
             for child in children.iter() {
@@ -56,9 +56,9 @@ fn spawn(
 
         let root = cmd.spawn().id();
         cmd.entity(root)
-            .insert_bundle(TransformBundle::from_transform(
-                Transform::from_translation(Vec2::ZERO.extend(2.)),
-            ))
+            .insert_bundle(SpatialBundle::from_transform(Transform::from_translation(
+                Vec2::ZERO.extend(2.),
+            )))
             .insert(MoveIndicatorRoot);
 
         cmd.entity(entity).add_child(root);
