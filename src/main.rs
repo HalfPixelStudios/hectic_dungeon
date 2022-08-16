@@ -19,6 +19,7 @@ mod movement;
 mod player;
 mod prefab;
 mod room;
+mod spritesheet_constants;
 mod ui;
 mod utils;
 mod weapon;

@@ -3,6 +3,7 @@ use bevy_bobs::prefab::{PrefabId, PrefabLib};
 
 use crate::{
     assets::SpriteSheet,
+    constants::BEING_LAYER,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     item::ItemPrefab,
     utils::some_or_return,
@@ -51,7 +52,7 @@ fn spawn(
                 },
                 texture_atlas: asset_sheet.clone(),
                 transform: Transform {
-                    translation: to_world_coords(spawn_pos).extend(1.),
+                    translation: to_world_coords(spawn_pos).extend(BEING_LAYER),
                     ..default()
                 },
                 ..default()
