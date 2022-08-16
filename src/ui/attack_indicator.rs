@@ -4,7 +4,7 @@ use bevy_bobs::prefab::PrefabLib;
 use crate::{
     assets::{PrefabData, SpriteSheet},
     attack::{rotate_offsets, AttackPattern},
-    constants::TILE_SIZE,
+    constants::{INGAME_UI_LAYER, TILE_SIZE},
     grid::GridEntity,
     player::Player,
     utils::Dir,
@@ -89,7 +89,7 @@ fn spawn(
         let root = cmd.spawn().id();
         cmd.entity(root)
             .insert_bundle(SpatialBundle::from_transform(Transform::from_translation(
-                Vec2::ZERO.extend(2.),
+                Vec2::ZERO.extend(INGAME_UI_LAYER),
             )))
             .insert(AttackIndicatorRoot);
 

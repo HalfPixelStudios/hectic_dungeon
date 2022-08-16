@@ -5,6 +5,7 @@ use iyes_loopless::prelude::*;
 
 use crate::{
     assets::SpriteSheet,
+    constants::BEING_LAYER,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::{ldtk_to_bevy, CollisionMap},
@@ -61,7 +62,7 @@ fn spawn_from_ldtk(
             },
             texture_atlas: asset_sheet.clone(),
             transform: Transform {
-                translation: to_world_coords(&grid_coords).extend(1.),
+                translation: to_world_coords(&grid_coords).extend(BEING_LAYER),
                 ..default()
             },
             ..default()

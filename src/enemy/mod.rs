@@ -20,11 +20,13 @@ use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
+    constants::{BEING_LAYER, INGAME_UI_LAYER},
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
     player::Player,
+    spritesheet_constants::SpriteIndex,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::Dir,
     weapon::CurrentWeapon,
@@ -68,12 +70,12 @@ fn spawn(
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: 82,
+                    index: SpriteIndex::OrcSwordsman as usize,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
                 transform: Transform {
-                    translation: to_world_coords(spawn_pos).extend(1.),
+                    translation: to_world_coords(spawn_pos).extend(BEING_LAYER),
                     ..default()
                 },
                 ..default()
@@ -98,7 +100,7 @@ fn spawn(
                 dimension: Vec2::new(8., 2.),
                 bg_color: Color::BLACK,
                 fg_color: Color::GREEN,
-                translation: Vec2::ZERO.extend(2.),
+                translation: Vec2::ZERO.extend(INGAME_UI_LAYER),
             },
         );
         cmd.entity(id).push_children(&[hp_bar]);

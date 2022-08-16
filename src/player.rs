@@ -11,11 +11,13 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
+    constants::BEING_LAYER,
     enviro::dropped_item::DroppedItem,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
+    spritesheet_constants::SpriteIndex,
     ui::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
         floating_text::FloatingText, move_indicator::MoveIndicator,
@@ -111,12 +113,12 @@ fn spawn(
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: 81,
+                    index: SpriteIndex::Player as usize,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
                 transform: Transform {
-                    translation: to_world_coords(spawn_pos).extend(1.),
+                    translation: to_world_coords(spawn_pos).extend(BEING_LAYER),
                     ..default()
                 },
                 ..default()
