@@ -39,7 +39,7 @@ fn register_collision_int_cell(
     mut collision_map: ResMut<CollisionMap>,
     query: Query<(&Transform, &IntGridCell), Added<IntGridCell>>,
 ) {
-    for (transform, int_cell) in query.iter() {
+    for (transform, int_cell) in &query {
         collision_map.push(snap_to_grid(&transform.translation.truncate()));
     }
 }

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use bevy::{core::Stopwatch, prelude::*};
+use bevy::{prelude::*, time::Stopwatch};
 
 use crate::{assets::SpriteSheet, grid::to_world_coords};
 
@@ -49,7 +49,7 @@ fn animate(
     time: Res<Time>,
     mut query: Query<(Entity, &mut AttackAnimation, &mut TextureAtlasSprite)>,
 ) {
-    for (entity, mut attack_anim, mut sprite) in query.iter_mut() {
+    for (entity, mut attack_anim, mut sprite) in &mut query {
         sprite.index = *attack_anim.frame_indices.get(attack_anim.frame).unwrap();
 
         if attack_anim.timer.elapsed_secs() > attack_anim.animation_speed {

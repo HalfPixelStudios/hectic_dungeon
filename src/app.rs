@@ -1,4 +1,6 @@
-use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
+use bevy::{
+    animation::*, asset::AssetLoader, log::LogSettings, prelude::*, render::texture::ImageSettings,
+};
 use bevy_bobs::health_bar::HealthBarPlugin;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
@@ -30,6 +32,7 @@ pub fn app() {
     let mut app = App::new();
 
     app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(ImageSettings::default_nearest())
         .insert_resource(window_descriptor);
     // .insert_resource(LogSettings {
     //     level: bevy::log::Level::DEBUG,
