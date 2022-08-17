@@ -15,6 +15,7 @@ mod grid;
 mod item;
 mod layers;
 mod map;
+mod material;
 mod movement;
 mod player;
 mod prefab;

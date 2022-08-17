@@ -11,6 +11,7 @@ use super::{
     enemy::{EnemyPlugin, SpawnEnemyEvent},
     game::{GamePlugin, GameState},
     grid::GridPlugin,
+    material::MaterialPlugin,
     movement::MovementPlugin,
     player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
     ui::UIPlugin,
@@ -51,6 +52,7 @@ pub fn app() {
         .add_plugin(ItemPlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
+        .add_plugin(MaterialPlugin)
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(MapPlugin)
