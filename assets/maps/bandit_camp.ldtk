@@ -641,6 +641,23 @@
 								"id": "V_String",
 								"params": ["orc_swordsman"]
 							}] }]
+						},
+						{
+							"__identifier": "EnemySpawn",
+							"__grid": [9,23],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "c539f8e0-02f0-11ed-a288-07982062283a",
+							"width": 8,
+							"height": 8,
+							"defUid": 41,
+							"px": [72,184],
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc_twinblade", "__type": "String", "__tile": null, "defUid": 42, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["orc_twinblade"]
+							}] }]
 						}
 					]
 				},

@@ -32,6 +32,12 @@ const RON_STRING: &str = r#"
         ai: Simple ( attack_range: 3. ),
         weapon_id: "steel_sword",
         sprite_index: OrcSwordsman
-    )
+    ),
+    "orc_twinblade": (
+        health: 3,
+        ai: Simple ( attack_range: 3. ),
+        weapon_id: "twin_blade",
+        sprite_index: OrcTwinblade
+    ),
 }
 "#;

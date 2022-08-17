@@ -30,6 +30,10 @@ const RON_STRING: &str = r#"
         attack_pattern: StraightOne,
         damage: Fixed(1),
     ),
+    "twin_blade": (
+        attack_pattern: TwinBlade,
+        damage: Fixed(1),
+    ),
     "steel_sword": (
         attack_pattern: StraightTwo,
         damage: Fixed(1),

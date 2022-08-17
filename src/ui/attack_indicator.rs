@@ -7,6 +7,7 @@ use crate::{
     constants::{INGAME_UI_LAYER, TILE_SIZE},
     grid::GridEntity,
     player::Player,
+    spritesheet_constants::SpriteIndex,
     utils::Dir,
     weapon::{CurrentWeapon, WeaponPrefab},
 };
@@ -105,7 +106,7 @@ fn spawn(
 
             cmd.entity(child).insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: 16,
+                    index: SpriteIndex::AttackIndicator as usize,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),

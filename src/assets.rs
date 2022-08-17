@@ -4,7 +4,10 @@ use bevy::{prelude::*, reflect::TypeUuid};
 use serde::*;
 
 use super::animation::*;
-use crate::prefab::*;
+use crate::{
+    prefab::*,
+    spritesheet_constants::{SPRITE_SIZE, TILESHEET_HEIGHT, TILESHEET_WIDTH},
+};
 
 #[derive(Deref)]
 pub struct SpriteSheet(Handle<TextureAtlas>);
@@ -27,10 +30,10 @@ pub fn load_assets(
     let mut data: HashMap<String, HandleUntyped> = HashMap::new();
 
     let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
-        assets.load("tilesheet/tilesheet.png"),
-        Vec2::new(8.0, 8.0),
-        16,
-        16,
+        assets.load("tilesheet/bandit_hideout.png"),
+        Vec2::new(SPRITE_SIZE as f32, SPRITE_SIZE as f32),
+        TILESHEET_WIDTH,
+        TILESHEET_HEIGHT,
     ));
     cmd.insert_resource(SpriteSheet(tilesheet_handle));
 
