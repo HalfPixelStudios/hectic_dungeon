@@ -28,6 +28,8 @@ fn debug(
             .into(),
         material: material_assets
             .add(OutlineMaterial {
+                color: Color::RED,
+                offset: 0.01,
                 image: assets.load("mascot.png"),
             })
             .into(),
