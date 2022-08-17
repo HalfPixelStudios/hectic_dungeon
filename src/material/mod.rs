@@ -11,8 +11,8 @@ pub struct MaterialPlugin;
 
 impl Plugin for MaterialPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(Material2dPlugin::<OutlineMaterial>::default())
-            .add_startup_system(debug);
+        app.add_plugin(Material2dPlugin::<OutlineMaterial>::default());
+        // .add_startup_system(debug);
     }
 }
 
