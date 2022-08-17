@@ -31,7 +31,7 @@ fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
         transform: Transform {
             translation: Vec3::new((-TILE_SIZE / 2) as f32, (-TILE_SIZE / 2) as f32, -1.),
         },
-        ldtk_handle: asset_server.load("maps/testing.ldtk"),
+        ldtk_handle: asset_server.load("maps/bandit_camp.ldtk"),
     });
 }
 
@@ -40,7 +40,10 @@ fn register_collision_int_cell(
     query: Query<(&Transform, &IntGridCell), Added<IntGridCell>>,
 ) {
     for (transform, int_cell) in &query {
-        collision_map.push(snap_to_grid(&transform.translation.truncate()));
+        // TODO magic number
+        if int_cell.value == 2 {
+            collision_map.push(snap_to_grid(&transform.translation.truncate()));
+        }
     }
 }
 
