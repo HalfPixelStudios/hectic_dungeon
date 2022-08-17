@@ -17,7 +17,7 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
-    spritesheet_constants::SpriteIndex,
+    spritesheet_constants::{SpriteFrames, SpriteIndex},
     ui::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
         floating_text::FloatingText, move_indicator::MoveIndicator,
@@ -277,7 +277,7 @@ fn attack_controller(
         // spawn attack animation
         for pos in grid_positions.iter() {
             anim_writer.send(SpawnAttackAnimEvent {
-                frames: vec![144, 145, 146, 147],
+                frames: SpriteFrames::PlayerAttack.frames(),
                 animation_speed: 0.1,
                 spawn_pos: *pos,
             });

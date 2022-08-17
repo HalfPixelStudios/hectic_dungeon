@@ -1,4 +1,5 @@
 pub mod pathfinding;
+pub mod prefab;
 
 use std::{
     cmp::Reverse,
@@ -10,11 +11,13 @@ use bevy::prelude::*;
 use bevy_bobs::{
     component::health::Health,
     health_bar::{spawn_health_bar, HealthBar},
+    prefab::{PrefabId, PrefabLib},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use big_brain::{prelude::FirstToScore, thinker::Thinker, BigBrainPlugin};
 use iyes_loopless::prelude::*;
 
+use self::prefab::{EnemyPrefab, PrefabPlugin, AI};
 use crate::{
     ai::simple_ai::{AttackAction, AttackRangeScorer, MoveAction},
     animation::Animation,
@@ -28,7 +31,7 @@ use crate::{
     player::Player,
     spritesheet_constants::SpriteIndex,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::Dir,
+    utils::{some_or_continue, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -36,6 +39,7 @@ use crate::{
 pub struct Enemy;
 
 pub struct SpawnEnemyEvent {
+    pub prefab_id: PrefabId,
     pub spawn_pos: IVec2,
 }
 
@@ -47,7 +51,8 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<SpawnEnemyEvent>()
+        app.add_plugin(PrefabPlugin)
+            .add_event::<SpawnEnemyEvent>()
             .add_event::<DamageEnemyEvent>()
             .add_system(spawn)
             .add_system(take_damage)
@@ -60,17 +65,21 @@ fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnEnemyEvent>,
     asset_sheet: Res<SpriteSheet>,
-    prefab_data: Res<PrefabData>,
-    beings: Res<Assets<BeingPrefab>>,
+    prefab_lib: Res<PrefabLib<EnemyPrefab>>,
 ) {
-    for SpawnEnemyEvent { spawn_pos } in events.iter() {
-        // let enemy = beings.get(prefab_data.get("archer").unwrap()).unwrap();
+    for SpawnEnemyEvent {
+        spawn_pos,
+        prefab_id,
+    } in events.iter()
+    {
+        let prefab = some_or_continue!(prefab_lib.get(prefab_id));
+
         let id = cmd.spawn().id();
 
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: SpriteIndex::OrcSwordsman as usize,
+                    index: prefab.sprite_index as usize,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
@@ -84,15 +93,25 @@ fn spawn(
             .insert(GridEntity::new(*spawn_pos, CellType::Enemy(id)))
             .insert(Movement::new())
             .insert(AttackIndicator::default())
-            .insert(CurrentWeapon("dagger".into()))
+            .insert(CurrentWeapon(prefab.weapon_id.to_owned()))
             .insert(Enemy)
-            .insert(Health::new(3))
-            .insert(
-                Thinker::build()
-                    .picker(FirstToScore { threshold: 0.8 })
-                    .when(AttackRangeScorer { range: 3. }, AttackAction)
-                    .otherwise(MoveAction),
-            );
+            .insert(Health::new(prefab.health));
+
+        match prefab.ai {
+            AI::Simple { attack_range } => {
+                cmd.entity(id).insert(
+                    Thinker::build()
+                        .picker(FirstToScore { threshold: 0.8 })
+                        .when(
+                            AttackRangeScorer {
+                                range: attack_range,
+                            },
+                            AttackAction,
+                        )
+                        .otherwise(MoveAction),
+                );
+            },
+        }
 
         let hp_bar = spawn_health_bar(
             &mut cmd,
@@ -146,6 +165,7 @@ fn spawn_from_ldtk(
             if let FieldValue::String(Some(v)) = &field.value {
                 writer.send(SpawnEnemyEvent {
                     spawn_pos: ldtk_to_bevy(&entity_instance.grid),
+                    prefab_id: v.to_owned(),
                 });
             }
         }
