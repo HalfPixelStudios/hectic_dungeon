@@ -32,8 +32,8 @@ pub fn load_assets(
     let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
         assets.load("tilesheet/bandit_hideout.png"),
         Vec2::new(SPRITE_SIZE as f32, SPRITE_SIZE as f32),
-        TILESHEET_WIDTH,
-        TILESHEET_HEIGHT,
+        TILESHEET_WIDTH as usize,
+        TILESHEET_HEIGHT as usize,
     ));
     cmd.insert_resource(SpriteSheet(tilesheet_handle));
 

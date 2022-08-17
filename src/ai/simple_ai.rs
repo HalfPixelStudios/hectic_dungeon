@@ -9,6 +9,7 @@ use crate::{
     grid::{CellType, Grid, GridEntity},
     movement::Movement,
     player::Player,
+    spritesheet_constants::SpriteFrames,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::{ok_or_continue, ok_or_return, Dir},
 };
@@ -83,7 +84,8 @@ fn attack_action(
 
                 for pos in grid_positions.iter() {
                     anim_writer.send(SpawnAttackAnimEvent {
-                        frames: vec![128, 129, 130],
+                        // TODO need constants for this
+                        frames: SpriteFrames::EnemyAttack.frames(),
                         animation_speed: 0.1,
                         spawn_pos: *pos,
                     });
