@@ -4,10 +4,13 @@ use bevy::{prelude::*, reflect::TypeUuid};
 use serde::*;
 
 use super::animation::*;
-use crate::prefab::*;
+use crate::{
+    prefab::*,
+    spritesheet_constants::{SPRITE_SIZE, TILESHEET_HEIGHT, TILESHEET_WIDTH},
+};
 
 #[derive(Deref)]
-pub struct SpriteSheets(pub HashMap<String, Handle<TextureAtlas>>);
+pub struct SpriteSheet(Handle<TextureAtlas>);
 
 #[derive(Debug, Deref)]
 pub struct PrefabData(pub HashMap<String, HandleUntyped>);
@@ -25,30 +28,19 @@ pub fn load_assets(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     let mut data: HashMap<String, HandleUntyped> = HashMap::new();
-    let mut sheets = HashMap::new();
 
-    let archer_handle = texture_atlases.add(TextureAtlas::from_grid(
-        assets.load("tilesheet/player.png"),
-        Vec2::new(8.0, 8.0),
-        1,
-        1,
+    let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
+        assets.load("tilesheet/bandit_hideout.png"),
+        Vec2::new(SPRITE_SIZE as f32, SPRITE_SIZE as f32),
+        TILESHEET_WIDTH as usize,
+        TILESHEET_HEIGHT as usize,
     ));
-    sheets.insert("player".into(), archer_handle);
-
-    let orc_handle = texture_atlases.add(TextureAtlas::from_grid(
-        assets.load("tilesheet/orc.png"),
-        Vec2::new(8.0, 8.0),
-        1,
-        1,
-    ));
-    sheets.insert("orc".into(), orc_handle);
+    cmd.insert_resource(SpriteSheet(tilesheet_handle));
 
     // data.insert(
     //     "archer".to_string(),
     //     assets.load_untyped("beings/archer.being"),
     // );
-
-    cmd.insert_resource(SpriteSheets(sheets));
 
     cmd.insert_resource(PrefabData(data));
 }

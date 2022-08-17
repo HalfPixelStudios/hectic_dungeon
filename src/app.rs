@@ -1,5 +1,7 @@
-use bevy::{animation::*, asset::AssetLoader, log::LogSettings, prelude::*};
-use bevy_prototype_debug_lines::*;
+use bevy::{
+    animation::*, asset::AssetLoader, log::LogSettings, prelude::*, render::texture::ImageSettings,
+};
+use bevy_bobs::health_bar::HealthBarPlugin;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
 use super::{
@@ -14,7 +16,10 @@ use super::{
     player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
     ui::UIPlugin,
 };
-use crate::map::MapPlugin;
+use crate::{
+    ability::AbilityPlugin, ai::AIPlugin, attack::AttackPlugin, enviro::EnviroPlugin,
+    item::ItemPlugin, map::MapPlugin, room::RoomPlugin, weapon::WeaponPlugin,
+};
 
 pub fn app() {
     let window_descriptor = WindowDescriptor {
@@ -27,56 +32,34 @@ pub fn app() {
 
     let mut app = App::new();
 
-    app.insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.5)))
+    app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(ImageSettings::default_nearest())
         .insert_resource(window_descriptor);
     // .insert_resource(LogSettings {
     //     level: bevy::log::Level::DEBUG,
     //     ..default()
     // });
 
-    app.add_loopless_state(GameState::EnemyPhase)
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DebugLinesPlugin::default())
+    app.add_plugins(DefaultPlugins)
         .add_plugin(GamePlugin)
+        .add_plugin(AIPlugin)
+        .add_plugin(AbilityPlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(RoomPlugin)
         // .add_plugin(AnimatePlugin)
+        .add_plugin(AttackPlugin)
+        .add_plugin(ItemPlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
         .add_plugin(MaterialPlugin)
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(MapPlugin)
+        .add_plugin(HealthBarPlugin)
+        .add_plugin(EnviroPlugin)
+        .add_plugin(WeaponPlugin)
         .add_plugin(GridPlugin);
 
-    app.add_startup_system(setup).add_system(debug);
-
     app.run();
-}
-
-fn setup(
-    mut spawn_player: EventWriter<SpawnPlayerEvent>,
-    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
-) {
-    spawn_player.send(SpawnPlayerEvent {
-        spawn_pos: Vec2::new(8., 8.),
-    });
-    spawn_enemy.send(SpawnEnemyEvent {
-        spawn_pos: Vec2::new(64., 64.),
-    });
-}
-
-fn debug(
-    keys: Res<Input<KeyCode>>,
-    mut spawn_enemy: EventWriter<SpawnEnemyEvent>,
-    mut player_move: EventWriter<PlayerMovedEvent>,
-) {
-    if keys.just_pressed(KeyCode::Q) {
-        spawn_enemy.send(SpawnEnemyEvent {
-            spawn_pos: Vec2::new(96., 96.),
-        });
-    }
-    if keys.just_pressed(KeyCode::Y) {
-        player_move.send(PlayerMovedEvent);
-    }
 }
