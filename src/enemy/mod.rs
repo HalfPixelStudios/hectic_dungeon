@@ -129,7 +129,7 @@ fn spawn(
 fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<DamageEnemyEvent>,
-    mut query: Query<&mut Health, With<Enemy>>,
+    mut query: Query<&mut Health>,
 ) {
     for DamageEnemyEvent { entity } in events.iter() {
         let mut health = query.get_mut(*entity).unwrap();

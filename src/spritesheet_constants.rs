@@ -11,6 +11,8 @@ pub enum SpriteIndex {
     OrcSwordsman = sprite!(2, 4),
     OrcTwinblade = sprite!(3, 4),
 
+    Barrel = sprite!(0, 7),
+
     AttackIndicator = sprite!(0, 8),
     // MoveIndicatorW = sprite!(4, 10),
     // MoveIndicatorN = sprite!(5, 10),
