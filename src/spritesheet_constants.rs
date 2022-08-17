@@ -1,7 +1,10 @@
+use serde::Deserialize;
+
 pub const TILESHEET_WIDTH: u32 = 16;
 pub const TILESHEET_HEIGHT: u32 = 16;
 
 // beings
+#[derive(Deserialize, Clone, Copy)]
 pub enum SpriteIndex {
     Player = sprite!(5, 1),
     OrcSwordsman = sprite!(5, 2),

@@ -637,9 +637,9 @@
 							"height": 8,
 							"defUid": 41,
 							"px": [104,152],
-							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 42, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc_swordsman", "__type": "String", "__tile": null, "defUid": 42, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["orc"]
+								"params": ["orc_swordsman"]
 							}] }]
 						}
 					]
