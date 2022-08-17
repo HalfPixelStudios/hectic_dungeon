@@ -26,13 +26,11 @@ fn debug(
         mesh: mesh_assets
             .add(Mesh::from(shape::Quad::new(Vec2::new(80., 80.))))
             .into(),
-        material: material_assets
-            .add(OutlineMaterial {
-                color: Color::RED,
-                offset: 0.01,
-                image: assets.load("mascot.png"),
-            })
-            .into(),
+        material: material_assets.add(OutlineMaterial {
+            color: Color::RED,
+            offset: 0.01,
+            image: assets.load("mascot.png"),
+        }),
         transform: Transform::from_translation(Vec2::ZERO.extend(5.)),
         ..default()
     });

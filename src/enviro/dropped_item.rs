@@ -41,7 +41,7 @@ fn spawn(
         prefab_id,
     } in events.iter()
     {
-        let prefab = some_or_return!(prefab_lib.get(&prefab_id));
+        let prefab = some_or_return!(prefab_lib.get(prefab_id));
         let id = cmd.spawn().id();
 
         cmd.entity(id)

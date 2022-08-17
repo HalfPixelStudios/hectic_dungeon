@@ -45,7 +45,7 @@ fn ai(
     mut projectile_writer: EventWriter<SpawnProjectileEvent>,
 ) {
     for (entity, grid_entity, mut arrow_trap, mut attack_indicator) in &mut query {
-        if attack_indicator.hidden == false {
+        if !attack_indicator.hidden {
             let grid_positions = attack_indicator
                 .get_pattern()
                 .iter()
