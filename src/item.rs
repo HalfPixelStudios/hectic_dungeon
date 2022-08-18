@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::PrefabLib;
 use serde::Deserialize;
 
+use crate::spritesheet_constants::SpriteIndex;
+
 #[derive(Deserialize)]
 pub enum ItemType {
     Weapon,
@@ -24,7 +26,7 @@ pub enum Rarity {
 pub struct ItemPrefab {
     pub item_type: ItemType,
     pub rarity: Rarity,
-    pub sprite_index: usize,
+    pub sprite_index: SpriteIndex,
 }
 
 const RON_STRING: &str = r#"
@@ -32,7 +34,7 @@ const RON_STRING: &str = r#"
     "steel_sword": (
         item_type: Weapon,
         rarity: Common,
-        sprite_index: 160,
+        sprite_index: SteelSword,
     )
 }
 "#;

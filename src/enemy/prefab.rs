@@ -10,6 +10,7 @@ pub struct EnemyPrefab {
     pub ai: AI,
     pub weapon_id: String,
     pub sprite_index: SpriteIndex,
+    pub drops: Vec<(String, f32)>,
 }
 
 #[derive(Deserialize)]
@@ -31,13 +32,15 @@ const RON_STRING: &str = r#"
         health: 3,
         ai: Simple ( attack_range: 3. ),
         weapon_id: "steel_sword",
-        sprite_index: OrcSwordsman
+        sprite_index: OrcSwordsman,
+        drops: [("steel_sword", 0.5)]
     ),
     "orc_twinblade": (
         health: 3,
         ai: Simple ( attack_range: 3. ),
         weapon_id: "twin_blade",
-        sprite_index: OrcTwinblade
+        sprite_index: OrcTwinblade,
+        drops: []
     ),
 }
 "#;
