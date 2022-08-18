@@ -24,6 +24,7 @@ use crate::{
     assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     constants::{BEING_LAYER, INGAME_UI_LAYER},
+    enviro::dropped_item::SpawnDroppedItemEvent,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
@@ -37,6 +38,8 @@ use crate::{
 
 #[derive(Component)]
 pub struct Enemy;
+
+pub type DropTable = bevy_bobs::component::droptable::DropTable<String>;
 
 pub struct SpawnEnemyEvent {
     pub prefab_id: PrefabId,
@@ -95,7 +98,8 @@ fn spawn(
             .insert(AttackIndicator::default())
             .insert(CurrentWeapon(prefab.weapon_id.to_owned()))
             .insert(Enemy)
-            .insert(Health::new(prefab.health));
+            .insert(Health::new(prefab.health))
+            .insert(DropTable::new(prefab.drops.clone()));
 
         match prefab.ai {
             AI::Simple { attack_range } => {
@@ -129,14 +133,25 @@ fn spawn(
 fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<DamageEnemyEvent>,
-    mut query: Query<&mut Health>,
+    mut query: Query<(&mut Health, Option<&DropTable>, &GridEntity)>,
+    mut writer: EventWriter<SpawnDroppedItemEvent>,
 ) {
     for DamageEnemyEvent { entity } in events.iter() {
-        let mut health = query.get_mut(*entity).unwrap();
+        let (mut health, droptable, grid_entity) = query.get_mut(*entity).unwrap();
 
         health.take(1);
         if health.is_zero() {
             cmd.entity(*entity).despawn_recursive();
+
+            // select item to drop
+            if let Some(droptable) = droptable {
+                if let Some(drop) = droptable.select_single_drop() {
+                    writer.send(SpawnDroppedItemEvent {
+                        spawn_pos: grid_entity.pos,
+                        prefab_id: drop.into(),
+                    });
+                }
+            }
         }
     }
 }

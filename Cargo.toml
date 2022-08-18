@@ -15,7 +15,8 @@ bevy_ui = ["bevy/bevy_ui", "bevy/bevy_text", "bevy/bevy_render"]
 [dependencies]
 bevy = { version = "0.8", default-features = false, features = [ "render", "animation", "bevy_winit", "bevy_gilrs", "png", "hdr", "filesystem_watcher", "x11", "trace" ] }
 bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk", features = [ "atlas" ] }
-bevy_bobs = { git = "https://github.com/HalfPixelStudios/bevy_bobs", features = ["health_bar", "prefab", "physics_2d", "grid"] }
+bevy_bobs = { path = "../bevy_bobs", features = ["health_bar", "prefab", "physics_2d", "grid"] }
+# bevy_bobs = { git = "https://github.com/HalfPixelStudios/bevy_bobs", features = ["health_bar", "prefab", "physics_2d", "grid"] }
 leafwing-input-manager = { version = "0.5" }
 iyes_loopless = { version = "0.7" }
 big-brain = { version = "0.12" }

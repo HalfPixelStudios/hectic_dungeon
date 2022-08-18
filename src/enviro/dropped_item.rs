@@ -47,7 +47,7 @@ fn spawn(
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: prefab.sprite_index,
+                    index: prefab.sprite_index as usize,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),

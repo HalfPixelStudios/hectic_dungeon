@@ -287,7 +287,6 @@ dependencies = [
 [[package]]
 name = "bevy_bobs"
 version = "0.1.0"
-source = "git+https://github.com/HalfPixelStudios/bevy_bobs#ba942ca53435cbe2fe8df9360bc696d2e98a71c6"
 dependencies = [
  "anyhow",
  "bevy",
