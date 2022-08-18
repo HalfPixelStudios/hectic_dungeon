@@ -33,7 +33,7 @@ const RON_STRING: &str = r#"
         ai: Simple ( attack_range: 3. ),
         weapon_id: "steel_sword",
         sprite_index: OrcSwordsman,
-        drops: [("steel_sword", 5.)]
+        drops: [("steel_sword", 0.5)]
     ),
     "orc_twinblade": (
         health: 3,

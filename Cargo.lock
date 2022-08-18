@@ -287,6 +287,7 @@ dependencies = [
 [[package]]
 name = "bevy_bobs"
 version = "0.1.0"
+source = "git+https://github.com/HalfPixelStudios/bevy_bobs#262c74a3e85e90b671e467cdf08553b49389caa0"
 dependencies = [
  "anyhow",
  "bevy",
@@ -375,8 +376,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_ecs_ldtk"
-version = "0.3.0"
-source = "git+https://github.com/Trouv/bevy_ecs_ldtk#1d9f0a47d1e23f4e7a5d6f67708b83c1524bb001"
+version = "0.4.0"
+source = "git+https://github.com/Trouv/bevy_ecs_ldtk#eb27c37e8caf7df42139b07e77bca3ba50f51201"
 dependencies = [
  "anyhow",
  "bevy",
@@ -391,8 +392,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_ecs_ldtk_macros"
-version = "0.3.0"
-source = "git+https://github.com/Trouv/bevy_ecs_ldtk#1d9f0a47d1e23f4e7a5d6f67708b83c1524bb001"
+version = "0.4.0"
+source = "git+https://github.com/Trouv/bevy_ecs_ldtk#eb27c37e8caf7df42139b07e77bca3ba50f51201"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -957,24 +958,24 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 
 [[package]]
 name = "bumpalo"
-version = "3.10.0"
+version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37ccbd214614c6783386c1af30caf03192f17891059cecc394b4fb119e363de3"
+checksum = "c1ad822118d20d2c234f427000d5acc36eabe1e29a348c89b63dd60b13f28e5d"
 
 [[package]]
 name = "bytemuck"
-version = "1.12.0"
+version = "1.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44f8cb64b4147a528e1e9e77583739e683541973295b35f3bd7e78d42c5971fd"
+checksum = "2f5715e491b5a1598fc2bef5a606847b5dc1d48ea625bd3c02c00de8285591da"
 dependencies = [
  "bytemuck_derive",
 ]
 
 [[package]]
 name = "bytemuck_derive"
-version = "1.2.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "339cdf1eb047d1c96cb8be64f4bc28975821222ec1736edfa06e140cf18d0064"
+checksum = "1b9e1f5fa78f69496407a27ae9ed989e3c3b072310286f5ef385525e4cbc24a9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1382,9 +1383,9 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
 name = "either"
-version = "1.7.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f107b87b6afc2a64fd13cac55fe06d6c8859f12d4b14cbcdd2c67d0976781be"
+checksum = "90e5c1c8368803113bf0c9584fc495a58b86dc8a29edbf8fe877d21d9507e797"
 
 [[package]]
 name = "encase"
