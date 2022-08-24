@@ -2,7 +2,10 @@ use autodefault::*;
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 
-use crate::{player::Player, screens::utils::FONT_PATH, utils::ok_or_return};
+use crate::{
+    assets::SpriteSheet, player::Player, screens::utils::FONT_PATH,
+    spritesheet_constants::SpriteIndex, utils::ok_or_return,
+};
 
 #[derive(Component)]
 struct HealthNode;
@@ -16,7 +19,12 @@ impl Plugin for HealthPlugin {
 }
 
 #[autodefault]
-pub fn HealthBar(cmd: &mut ChildBuilder, assets: &Res<AssetServer>) -> Entity {
+pub fn HealthBar(
+    cmd: &mut ChildBuilder,
+    assets: &Res<AssetServer>,
+    asset_sheet: Res<SpriteSheet>,
+) -> Entity {
+    /*
     cmd.spawn()
         .insert(HealthNode)
         .insert_bundle(TextBundle {
@@ -30,6 +38,27 @@ pub fn HealthBar(cmd: &mut ChildBuilder, assets: &Res<AssetServer>) -> Entity {
             ),
         })
         .id()
+    */
+
+    cmd.spawn_bundle(NodeBundle {
+        color: UiColor(Color::NONE),
+    })
+    .with_children(|parent| {
+        parent
+            .spawn_bundle(SpriteSheetBundle {
+                sprite: TextureAtlasSprite {
+                    index: SpriteIndex::Player as usize,
+                    ..default()
+                },
+                texture_atlas: asset_sheet.clone(),
+            })
+            .insert(Style::default())
+            .insert(Node::default())
+            .insert(CalculatedSize {
+                size: Size::new(30., 30.),
+            });
+    })
+    .id()
 }
 
 fn update(

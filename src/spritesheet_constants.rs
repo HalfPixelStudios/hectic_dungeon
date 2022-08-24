@@ -24,6 +24,9 @@ pub enum SpriteIndex {
     WeaponSlot = sprite!(1, 11),
     ArmorSlot = sprite!(2, 11),
     AbilitySlot = sprite!(3, 11),
+
+    HeartFull = sprite!(0, 12),
+    HeartEmpty = sprite!(0, 13),
 }
 
 // ui

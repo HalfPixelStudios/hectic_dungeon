@@ -23,31 +23,13 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>, asset_sheet: Res<Sprit
     cmd.spawn()
         .insert(UIRoot)
         .insert_bundle(NodeBundle {
+            color: UiColor(Color::NONE),
             style: Style {
                 align_self: AlignSelf::Center,
                 justify_content: JustifyContent::Center,
             },
         })
         .with_children(|mut parent| {
-            HealthBar(&mut parent, &assets);
-            /*
-            parent
-                .spawn_bundle(SpriteSheetBundle {
-                    sprite: TextureAtlasSprite {
-                        index: SpriteIndex::ItemSlotBg as usize,
-                        ..default()
-                    },
-                    texture_atlas: asset_sheet.clone(),
-                })
-                .insert(Style {
-                    position_type: PositionType::Absolute,
-                    position: UiRect {
-                        top: Val::Px(5.),
-                        right: Val::Px(300.)
-                    }
-                })
-                .insert(Node::default())
-                .insert(CalculatedSize::default());
-            */
+            HealthBar(&mut parent, &assets, asset_sheet);
         });
 }
