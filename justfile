@@ -17,4 +17,4 @@ chk:
     cargo check
 
 lint:
-    cargo clippy
+    cargo clippy -- -W clippy::unwrap_used -W clippy::cargo
