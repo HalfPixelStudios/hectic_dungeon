@@ -9,8 +9,8 @@
 		"url": "https://ldtk.io"
 	},
 	"jsonVersion": "1.1.3",
-	"appBuildId": 460557,
-	"nextUid": 56,
+	"appBuildId": 458364,
+	"nextUid": 58,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -484,7 +484,37 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": []
+			"fieldDefs": [
+				{
+					"identifier": "id",
+					"__type": "String",
+					"uid": 57,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayPos": "Above",
+					"editorAlwaysShow": false,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		},
 		{
 			"identifier": "CollapsableFloor",
@@ -712,7 +742,10 @@
 							"height": 8,
 							"defUid": 43,
 							"px": [88,208],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "id", "__value": "samurai", "__type": "String", "__tile": null, "defUid": 57, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["samurai"]
+							}] }]
 						},
 						{
 							"__identifier": "EnemySpawn",

@@ -1,11 +1,18 @@
+pub mod inventory;
+pub mod prefab;
+
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_bobs::component::health::*;
-use bevy_ecs_ldtk::EntityInstance;
+use bevy_bobs::{
+    component::health::*,
+    prefab::{PrefabId, PrefabLib},
+};
+use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::{prelude::*, state::NextState};
 use leafwing_input_manager::prelude::*;
 
+use self::prefab::{PlayerPrefab, PrefabPlugin};
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
@@ -22,7 +29,7 @@ use crate::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
         floating_text::FloatingText, move_indicator::MoveIndicator,
     },
-    utils::{cardinal_dirs, ok_or_return, Dir},
+    utils::{cardinal_dirs, ok_or_return, some_or_continue, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -51,6 +58,7 @@ pub struct PlayerMovedEvent;
 
 pub struct SpawnPlayerEvent {
     pub spawn_pos: IVec2,
+    pub prefab_id: PrefabId,
 }
 
 pub struct PlayerPlugin;
@@ -58,6 +66,7 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+            .add_plugin(PrefabPlugin)
             .add_loopless_state(PlayerState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
@@ -87,10 +96,13 @@ fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnPlayerEvent>,
     asset_sheet: Res<SpriteSheet>,
-    prefab_data: Res<PrefabData>,
-    beings: Res<Assets<BeingPrefab>>,
+    prefab_lib: Res<PrefabLib<PlayerPrefab>>,
 ) {
-    for SpawnPlayerEvent { spawn_pos } in events.iter() {
+    for SpawnPlayerEvent {
+        spawn_pos,
+        prefab_id,
+    } in events.iter()
+    {
         let input_map = InputMap::new([
             // (KeyCode::Left, PlayerAction::Left),
             (KeyCode::A, PlayerAction::Left),
@@ -105,15 +117,14 @@ fn spawn(
             (KeyCode::E, PlayerAction::Interact),
         ]);
 
-        // let handle = prefab_data.get("player").unwrap();
-        // let player = beings.get(handle).unwrap();
+        let prefab = some_or_continue!(prefab_lib.get(prefab_id));
 
         let id = cmd.spawn().id();
 
         cmd.entity(id)
             .insert_bundle(SpriteSheetBundle {
                 sprite: TextureAtlasSprite {
-                    index: SpriteIndex::Player as usize,
+                    index: prefab.sprite_index as usize,
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
@@ -125,13 +136,13 @@ fn spawn(
             })
             .insert(Player)
             .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
-            .insert(Health::new(10))
+            .insert(Health::new(prefab.health))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,
             })
             .insert(CameraFollow)
-            .insert(CurrentWeapon("hammer".into()))
+            .insert(CurrentWeapon(prefab.default_weapon.to_owned()))
             .insert(Movement::new());
 
         // ui related
@@ -324,8 +335,17 @@ fn spawn_from_ldtk(
     mut writer: EventWriter<SpawnPlayerEvent>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "PlayerSpawn") {
-        writer.send(SpawnPlayerEvent {
-            spawn_pos: ldtk_to_bevy(&entity_instance.grid),
-        });
+        if let Some(field) = entity_instance
+            .field_instances
+            .iter()
+            .find(|field| field.identifier == "id")
+        {
+            if let FieldValue::String(Some(v)) = &field.value {
+                writer.send(SpawnPlayerEvent {
+                    spawn_pos: ldtk_to_bevy(&entity_instance.grid),
+                    prefab_id: v.to_owned(),
+                });
+            }
+        }
     }
 }
