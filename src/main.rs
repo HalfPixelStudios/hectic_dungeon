@@ -20,6 +20,7 @@ mod movement;
 mod player;
 mod prefab;
 mod room;
+mod screens;
 mod spritesheet_constants;
 mod ui;
 mod utils;

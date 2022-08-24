@@ -18,7 +18,8 @@ use super::{
 };
 use crate::{
     ability::AbilityPlugin, ai::AIPlugin, attack::AttackPlugin, enviro::EnviroPlugin,
-    item::ItemPlugin, map::MapPlugin, room::RoomPlugin, weapon::WeaponPlugin,
+    item::ItemPlugin, map::MapPlugin, room::RoomPlugin, screens::ScreensPlugin,
+    weapon::WeaponPlugin,
 };
 
 pub fn app() {
@@ -34,6 +35,7 @@ pub fn app() {
 
     app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(ImageSettings::default_nearest())
+        .insert_resource(Msaa { samples: 1 })
         .insert_resource(window_descriptor);
     // .insert_resource(LogSettings {
     //     level: bevy::log::Level::DEBUG,
@@ -59,7 +61,8 @@ pub fn app() {
         .add_plugin(HealthBarPlugin)
         .add_plugin(EnviroPlugin)
         .add_plugin(WeaponPlugin)
-        .add_plugin(GridPlugin);
+        .add_plugin(GridPlugin)
+        .add_plugin(ScreensPlugin);
 
     app.run();
 }
