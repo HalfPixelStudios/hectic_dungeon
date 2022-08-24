@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+pub const FONT_PATH: &str = "fonts/arcadeclassic.ttf";
+
 /// Marker component for the root node of each screen
 #[derive(Component)]
 pub struct UIRoot;
