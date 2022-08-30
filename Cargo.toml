@@ -29,6 +29,7 @@ serde = { version = "1", features = ["derive"] }
 rand = { version = "0.8.5" }
 enum-map = { version = "2.4.0", features = ["serde"] }
 priority-queue = { version = "1.2.3" }
+pino_argparse = { git = "https://github.com/MrPicklePinosaur/pino_argparse" }
 
 [profile.dev]
 opt-level = 1
