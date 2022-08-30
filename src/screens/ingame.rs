@@ -25,8 +25,8 @@ fn render_ui(mut cmd: Commands) {
         .insert_bundle(NodeBundle {
             color: UiColor(Color::NONE),
             style: Style {
-                align_self: AlignSelf::Center,
-                justify_content: JustifyContent::Center,
+                align_self: AlignSelf::FlexEnd,
+                // justify_content: JustifyContent::Center,
             },
         })
         .with_children(|mut parent| {

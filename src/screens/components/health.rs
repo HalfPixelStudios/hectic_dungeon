@@ -42,6 +42,7 @@ fn update(
 ) {
     let health = ok_or_return!(player_query.get_single());
 
+    // TODO kinda inefficnet to despawn all health nodes and respawn every frame
     for (entity, mut health_node) in ui_query.iter_mut() {
         cmd.entity(entity).despawn_descendants();
 
