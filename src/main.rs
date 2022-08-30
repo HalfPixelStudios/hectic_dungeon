@@ -24,6 +24,7 @@ mod spritesheet_constants;
 mod ui;
 mod utils;
 mod weapon;
+mod buffs;
 
 fn main() {
     app::app();
