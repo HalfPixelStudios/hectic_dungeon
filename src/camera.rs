@@ -17,7 +17,7 @@ impl Plugin for CameraPlugin {
 fn setup(mut cmd: Commands) {
     cmd.spawn_bundle(Camera2dBundle {
         projection: OrthographicProjection {
-            scale: 0.4,
+            scale: 0.2,
             ..default()
         },
         ..default()
