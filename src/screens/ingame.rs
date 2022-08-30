@@ -19,7 +19,7 @@ impl Plugin for IngamePlugin {
 }
 
 #[autodefault]
-fn render_ui(mut cmd: Commands, assets: Res<AssetServer>, asset_sheet: Res<SpriteSheet>) {
+fn render_ui(mut cmd: Commands) {
     cmd.spawn()
         .insert(UIRoot)
         .insert_bundle(NodeBundle {
@@ -30,6 +30,6 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>, asset_sheet: Res<Sprit
             },
         })
         .with_children(|mut parent| {
-            HealthBar(&mut parent, &assets, asset_sheet);
+            HealthBar(&mut parent);
         });
 }

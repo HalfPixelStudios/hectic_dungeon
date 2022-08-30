@@ -1,3 +1,5 @@
+use std::thread::current;
+
 use autodefault::*;
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
@@ -19,55 +21,37 @@ impl Plugin for HealthPlugin {
 }
 
 #[autodefault]
-pub fn HealthBar(
-    cmd: &mut ChildBuilder,
-    assets: &Res<AssetServer>,
-    asset_sheet: Res<SpriteSheet>,
-) -> Entity {
-    /*
+#[allow(non_snake_case)]
+pub fn HealthBar(cmd: &mut ChildBuilder) -> Entity {
     cmd.spawn()
         .insert(HealthNode)
-        .insert_bundle(TextBundle {
-            text: Text::from_section(
-                "",
-                TextStyle {
-                    font: assets.load(FONT_PATH),
-                    font_size: 20.,
-                    color: Color::CRIMSON,
-                },
-            ),
+        .insert_bundle(NodeBundle {
+            style: Style {
+                display: Display::Flex,
+            },
         })
         .id()
-    */
-
-    cmd.spawn_bundle(NodeBundle {
-        color: UiColor(Color::NONE),
-    })
-    .with_children(|parent| {
-        parent
-            .spawn_bundle(SpriteSheetBundle {
-                sprite: TextureAtlasSprite {
-                    index: SpriteIndex::Player as usize,
-                    ..default()
-                },
-                texture_atlas: asset_sheet.clone(),
-            })
-            .insert(Style::default())
-            .insert(Node::default())
-            .insert(CalculatedSize {
-                size: Size::new(30., 30.),
-            });
-    })
-    .id()
 }
 
+#[autodefault]
 fn update(
+    mut cmd: Commands,
     mut player_query: Query<&Health, With<Player>>,
-    mut ui_query: Query<&mut Text, With<HealthNode>>,
+    mut ui_query: Query<(Entity, &mut HealthNode), Without<Player>>,
+    asset_server: Res<AssetServer>,
 ) {
     let health = ok_or_return!(player_query.get_single());
 
-    for mut text in ui_query.iter_mut() {
-        text.sections[0].value = format!("health {}", health.current());
+    for (entity, mut health_node) in ui_query.iter_mut() {
+        cmd.entity(entity).despawn_descendants();
+
+        for i in 0..health.current() {
+            cmd.entity(entity).with_children(|parent| {
+                parent.spawn().insert_bundle(ImageBundle {
+                    image: UiImage(asset_server.load("tilesheet/heart.png")),
+                    style: Style {},
+                });
+            });
+        }
     }
 }
