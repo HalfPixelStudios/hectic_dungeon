@@ -10,7 +10,7 @@ use crate::{
 };
 
 #[derive(Deref)]
-pub struct SpriteSheet(Handle<TextureAtlas>);
+pub struct SpriteSheet(pub Handle<TextureAtlas>);
 
 #[derive(Debug, Deref)]
 pub struct PrefabData(pub HashMap<String, HandleUntyped>);

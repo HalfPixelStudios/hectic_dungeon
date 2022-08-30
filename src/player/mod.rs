@@ -61,6 +61,10 @@ pub struct SpawnPlayerEvent {
     pub prefab_id: PrefabId,
 }
 
+pub struct DamagePlayerEvent {
+    pub entity: Entity,
+}
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -70,6 +74,7 @@ impl Plugin for PlayerPlugin {
             .add_loopless_state(PlayerState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
+            .add_event::<DamagePlayerEvent>()
             .add_system(controller.run_in_state(GameState::PlayerInput))
             .add_system(
                 move_controller
@@ -87,6 +92,7 @@ impl Plugin for PlayerPlugin {
             .add_enter_system(GameState::PlayerInput, on_turn_start)
             .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
             .add_system(spawn)
+            .add_system(take_damage)
             .add_system(update_move_indicator.run_in_state(GameState::PlayerInput))
             .add_system(spawn_from_ldtk);
     }
@@ -128,10 +134,6 @@ fn spawn(
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
-                transform: Transform {
-                    translation: to_world_coords(spawn_pos).extend(BEING_LAYER),
-                    ..default()
-                },
                 ..default()
             })
             .insert(Player)
@@ -347,5 +349,18 @@ fn spawn_from_ldtk(
                 });
             }
         }
+    }
+}
+
+fn take_damage(
+    mut cmd: Commands,
+    mut events: EventReader<DamagePlayerEvent>,
+    mut query: Query<(&mut Health, &GridEntity)>,
+) {
+    for DamagePlayerEvent { entity } in events.iter() {
+        let (mut health, grid_entity) = query.get_mut(*entity).unwrap();
+
+        health.take(1);
+        if health.is_zero() {}
     }
 }

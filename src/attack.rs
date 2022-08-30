@@ -4,6 +4,7 @@ use serde::Deserialize;
 use crate::{
     enemy::DamageEnemyEvent,
     grid::{CellType, Grid},
+    player::DamagePlayerEvent,
     utils::{ok_or_continue, variant_eq, Dir},
 };
 
@@ -69,7 +70,8 @@ impl Plugin for AttackPlugin {
 
 fn process_attack(
     mut events: EventReader<AttackEvent>,
-    mut writer: EventWriter<DamageEnemyEvent>,
+    mut enemy_writer: EventWriter<DamageEnemyEvent>,
+    mut player_writer: EventWriter<DamagePlayerEvent>,
     grid: Res<Grid>,
 ) {
     for AttackEvent {
@@ -86,10 +88,11 @@ fn process_attack(
 
                 match cell_entity {
                     CellType::Enemy(entity) => {
-                        writer.send(DamageEnemyEvent { entity: *entity });
+                        enemy_writer.send(DamageEnemyEvent { entity: *entity });
                     },
                     CellType::Player(entity) => {
                         info!("player hit!");
+                        player_writer.send(DamagePlayerEvent { entity: *entity });
                     },
                     _ => {},
                 }

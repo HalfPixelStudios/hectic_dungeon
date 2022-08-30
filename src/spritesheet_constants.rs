@@ -20,6 +20,13 @@ pub enum SpriteIndex {
     // MoveIndicatorN = sprite!(5, 10),
     // MoveIndicatorS = sprite!(6, 10),
     // MoveIndicatorE = sprite!(7, 10),
+    ItemSlotBg = sprite!(0, 11),
+    WeaponSlot = sprite!(1, 11),
+    ArmorSlot = sprite!(2, 11),
+    AbilitySlot = sprite!(3, 11),
+
+    HeartFull = sprite!(0, 12),
+    HeartEmpty = sprite!(0, 13),
 }
 
 // ui
