@@ -1,7 +1,7 @@
 use std::thread::current;
 
 use autodefault::*;
-use bevy::prelude::*;
+use bevy::{prelude::*, ui::FocusPolicy};
 use bevy_bobs::component::health::Health;
 
 use crate::{
@@ -29,6 +29,7 @@ pub fn HealthBar(cmd: &mut ChildBuilder) -> Entity {
             style: Style {
                 display: Display::Flex,
             },
+            color: UiColor(Color::NONE),
         })
         .id()
 }
@@ -39,12 +40,34 @@ fn update(
     mut player_query: Query<&Health, With<Player>>,
     mut ui_query: Query<(Entity, &mut HealthNode), Without<Player>>,
     assets: Res<AssetServer>,
+    asset_sheet: Res<SpriteSheet>,
 ) {
     let health = ok_or_return!(player_query.get_single());
 
     // TODO kinda inefficnet to despawn all health nodes and respawn every frame
     for (entity, mut health_node) in ui_query.iter_mut() {
         cmd.entity(entity).despawn_descendants();
+
+        // TODO this does not work
+        cmd.entity(entity).with_children(|parent| {
+            parent
+                .spawn_bundle(SpriteSheetBundle {
+                    sprite: TextureAtlasSprite {
+                        index: SpriteIndex::Player as usize,
+                    },
+                    texture_atlas: asset_sheet.clone(),
+                })
+                .insert(Node::default())
+                .insert(Style::default())
+                .insert(CalculatedSize {
+                    size: Size::new(8., 8.),
+                })
+                .insert(FocusPolicy::default())
+                .insert(UiImage::default())
+                .insert(UiColor::default())
+                .insert_bundle(TransformBundle::default())
+                .insert_bundle(VisibilityBundle::default());
+        });
 
         for i in 0..health.current() {
             cmd.entity(entity).with_children(|parent| {
