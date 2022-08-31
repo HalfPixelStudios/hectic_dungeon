@@ -38,7 +38,7 @@ fn update(
     mut cmd: Commands,
     mut player_query: Query<&Health, With<Player>>,
     mut ui_query: Query<(Entity, &mut HealthNode), Without<Player>>,
-    asset_server: Res<AssetServer>,
+    assets: Res<AssetServer>,
 ) {
     let health = ok_or_return!(player_query.get_single());
 
@@ -49,7 +49,7 @@ fn update(
         for i in 0..health.current() {
             cmd.entity(entity).with_children(|parent| {
                 parent.spawn().insert_bundle(ImageBundle {
-                    image: UiImage(asset_server.load("tilesheet/heart.png")),
+                    image: UiImage(assets.load("tilesheet/heart.png")),
                     style: Style {},
                 });
             });
