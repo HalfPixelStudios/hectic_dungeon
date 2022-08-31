@@ -51,7 +51,7 @@ pub fn InventoryDisplay(cmd: &mut ChildBuilder, assets: Res<AssetServer>) -> Ent
 #[autodefault]
 fn update(
     mut cmd: Commands,
-    player_query: Query<&Inventory, (With<Player>, Changed<Inventory>)>,
+    player_query: Query<&Inventory, (With<Player>, Added<Inventory>, Changed<Inventory>)>,
     slot_query: Query<(Entity, &SlotType), Without<Player>>,
     assets: Res<AssetServer>,
 ) {
@@ -75,7 +75,7 @@ fn update(
             },
             SlotType::Armor => match &inventory.armor {
                 Some(id) => "",
-                None => "tilesheet/inventory_slot.png",
+                None => "tilesheet/armor_slot.png",
             },
         };
 
