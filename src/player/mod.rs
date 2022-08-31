@@ -12,7 +12,10 @@ use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::{prelude::*, state::NextState};
 use leafwing_input_manager::prelude::*;
 
-use self::prefab::{PlayerPrefab, PrefabPlugin};
+use self::{
+    inventory::Inventory,
+    prefab::{PlayerPrefab, PrefabPlugin},
+};
 use crate::{
     animation::Animation,
     assets::{BeingPrefab, PrefabData, SpriteSheet},
@@ -150,8 +153,14 @@ fn spawn(
                 input_map,
             })
             .insert(CameraFollow)
-            .insert(CurrentWeapon(prefab.default_weapon.to_owned()))
-            .insert(Movement::new());
+            .insert(CurrentWeapon(prefab.default_primary.to_owned().unwrap()))
+            .insert(Movement::new())
+            .insert(Inventory {
+                weapon_primary: prefab.default_primary.to_owned(),
+                weapon_secondary: prefab.default_secondary.to_owned(),
+                armor: prefab.default_armor.to_owned(),
+                ability: prefab.default_ability.to_owned(),
+            });
 
         // ui related
         cmd.entity(id)
