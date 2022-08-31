@@ -62,6 +62,7 @@ pub fn app(config: AppConfig) {
 
     app.add_plugin(GamePlugin)
         .add_plugin(ScreensPlugin)
+        .add_plugin(CameraPlugin)
         .add_plugin(AIPlugin)
         .add_plugin(AbilityPlugin)
         .add_plugin(AssetLoadPlugin)
@@ -70,7 +71,6 @@ pub fn app(config: AppConfig) {
         // .add_plugin(AnimatePlugin)
         .add_plugin(AttackPlugin)
         .add_plugin(ItemPlugin)
-        .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
         .add_plugin(MaterialPlugin)
         .add_plugin(MovementPlugin)

@@ -21,15 +21,16 @@ leafwing-input-manager = { version = "0.5" }
 iyes_loopless = { version = "0.7" }
 big-brain = { version = "0.12" }
 bevy-inspector-egui = { version = "0.12" }
+bevy_hanabi = { version = "0.3", default-features = false, features = ["2d"] }
 
 ron = "0.7"
 anyhow = "1"
 thiserror = "1"
 autodefault = { version = "2" }
 serde = { version = "1", features = ["derive"] }
-rand = { version = "0.8.5" }
-enum-map = { version = "2.4.0", features = ["serde"] }
-priority-queue = { version = "1.2.3" }
+rand = { version = "0.8" }
+enum-map = { version = "2.4", features = ["serde"] }
+priority-queue = { version = "1.2" }
 pino_argparse = { git = "https://github.com/MrPicklePinosaur/pino_argparse" }
 
 [profile.dev]
