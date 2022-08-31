@@ -2,6 +2,7 @@ use bevy::{
     animation::*, asset::AssetLoader, log::LogSettings, prelude::*, render::texture::ImageSettings,
 };
 use bevy_bobs::health_bar::HealthBarPlugin;
+use bevy_inspector_egui::WorldInspectorPlugin;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
 use super::{
@@ -22,14 +23,22 @@ use crate::{
     weapon::WeaponPlugin,
 };
 
-pub fn app() {
-    let window_descriptor = WindowDescriptor {
+pub struct AppConfig {
+    pub fullscreen: bool,
+    pub egui_enabled: bool,
+}
+
+pub fn app(config: AppConfig) {
+    let mut window_descriptor = WindowDescriptor {
         present_mode: bevy::window::PresentMode::Fifo,
         title: "hectic_dungeon".into(),
-        width: 800.,
-        height: 600.,
         ..default()
     };
+
+    if !config.fullscreen {
+        window_descriptor.width = 800.;
+        window_descriptor.height = 600.;
+    }
 
     let mut app = App::new();
 
@@ -63,6 +72,10 @@ pub fn app() {
         .add_plugin(WeaponPlugin)
         .add_plugin(GridPlugin)
         .add_plugin(ScreensPlugin);
+
+    if config.egui_enabled {
+        app.add_plugin(WorldInspectorPlugin::new());
+    }
 
     app.run();
 }
