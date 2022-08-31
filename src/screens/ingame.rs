@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
 use super::{
-    components::health::HealthBar,
+    components::{health::HealthBar, inventory::InventoryDisplay},
     state::ScreenState,
     utils::{destroy_ui, UIRoot},
 };
@@ -19,7 +19,7 @@ impl Plugin for IngamePlugin {
 }
 
 #[autodefault]
-fn render_ui(mut cmd: Commands) {
+fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
     cmd.spawn()
         .insert(UIRoot)
         .insert_bundle(NodeBundle {
@@ -31,5 +31,6 @@ fn render_ui(mut cmd: Commands) {
         })
         .with_children(|mut parent| {
             HealthBar(&mut parent);
+            InventoryDisplay(&mut parent, assets);
         });
 }
