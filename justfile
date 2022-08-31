@@ -2,7 +2,7 @@
 default: debug
 
 debug:
-    cargo run
+    cargo run -- -e
 
 web:
     cargo watch -cx "run --release --target wasm32-unknown-unknown"

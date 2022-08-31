@@ -6,7 +6,9 @@ mod animation;
 mod app;
 mod assets;
 mod attack;
+mod buffs;
 mod camera;
+mod cli;
 mod constants;
 mod enemy;
 mod enviro;
@@ -25,8 +27,7 @@ mod spritesheet_constants;
 mod ui;
 mod utils;
 mod weapon;
-mod buffs;
 
 fn main() {
-    app::app();
+    cli::run_cli().unwrap();
 }
