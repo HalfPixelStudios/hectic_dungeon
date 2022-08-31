@@ -58,8 +58,10 @@ pub fn app(config: AppConfig) {
     //     ..default()
     // });
 
-    app.add_plugins(DefaultPlugins)
-        .add_plugin(GamePlugin)
+    app.add_plugins(DefaultPlugins).add_plugin(HealthBarPlugin);
+
+    app.add_plugin(GamePlugin)
+        .add_plugin(ScreensPlugin)
         .add_plugin(AIPlugin)
         .add_plugin(AbilityPlugin)
         .add_plugin(AssetLoadPlugin)
@@ -74,11 +76,9 @@ pub fn app(config: AppConfig) {
         .add_plugin(MovementPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(MapPlugin)
-        .add_plugin(HealthBarPlugin)
         .add_plugin(EnviroPlugin)
         .add_plugin(WeaponPlugin)
-        .add_plugin(GridPlugin)
-        .add_plugin(ScreensPlugin);
+        .add_plugin(GridPlugin);
 
     if config.egui_enabled {
         app.add_plugin(WorldInspectorPlugin::new());

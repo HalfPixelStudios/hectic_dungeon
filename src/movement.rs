@@ -1,9 +1,11 @@
 use bevy::prelude::*;
+use iyes_loopless::prelude::ConditionSet;
 
 use crate::{
     animation::AniState,
     enemy::Enemy,
     grid::{to_world_coords, GridEntity},
+    screens::state::ScreenState,
 };
 
 const THRESHOLD: f32 = 0.001;
@@ -55,6 +57,11 @@ pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(movement);
+        app.add_system_set(
+            ConditionSet::new()
+                .run_in_state(ScreenState::Ingame)
+                .with_system(movement)
+                .into(),
+        );
     }
 }

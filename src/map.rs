@@ -1,11 +1,13 @@
 use autodefault::autodefault;
 use bevy::{ecs::query, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
+use iyes_loopless::prelude::{AppLooplessStateExt, ConditionSet};
 
 use crate::{
     constants::{MAP_HEIGHT, TILE_SIZE},
     enemy::SpawnEnemyEvent,
     grid::snap_to_grid,
+    screens::state::ScreenState,
 };
 
 pub struct MapPlugin;
@@ -19,9 +21,14 @@ impl Plugin for MapPlugin {
         app.add_plugin(LdtkPlugin)
             .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
-            .add_startup_system(setup)
-            .add_system(register_collision_int_cell)
-            .add_system(switch_level);
+            .add_system_set(
+                ConditionSet::new()
+                    .run_in_state(ScreenState::Ingame)
+                    .with_system(register_collision_int_cell)
+                    .with_system(switch_level)
+                    .into(),
+            )
+            .add_enter_system(ScreenState::Ingame, setup);
     }
 }
 
