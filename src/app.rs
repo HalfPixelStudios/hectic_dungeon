@@ -3,7 +3,7 @@ use bevy::{
 };
 use bevy_bobs::health_bar::HealthBarPlugin;
 use bevy_inspector_egui::WorldInspectorPlugin;
-use iyes_loopless::prelude::AppLooplessStateExt;
+use iyes_loopless::{prelude::AppLooplessStateExt, state::NextState};
 
 use super::{
     animation::AnimatePlugin,
@@ -18,14 +18,21 @@ use super::{
     ui::UIPlugin,
 };
 use crate::{
-    ability::AbilityPlugin, ai::AIPlugin, attack::AttackPlugin, enviro::EnviroPlugin,
-    item::ItemPlugin, map::MapPlugin, room::RoomPlugin, screens::ScreensPlugin,
+    ability::AbilityPlugin,
+    ai::AIPlugin,
+    attack::AttackPlugin,
+    enviro::EnviroPlugin,
+    item::ItemPlugin,
+    map::MapPlugin,
+    room::RoomPlugin,
+    screens::{state::ScreenState, ScreensPlugin},
     weapon::WeaponPlugin,
 };
 
 pub struct AppConfig {
     pub fullscreen: bool,
     pub egui_enabled: bool,
+    pub start_state: ScreenState,
 }
 
 pub fn app(config: AppConfig) {
@@ -76,6 +83,8 @@ pub fn app(config: AppConfig) {
     if config.egui_enabled {
         app.add_plugin(WorldInspectorPlugin::new());
     }
+
+    app.insert_resource(NextState(config.start_state));
 
     app.run();
 }
