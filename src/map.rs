@@ -38,7 +38,7 @@ fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
         transform: Transform {
             translation: Vec3::new((-TILE_SIZE / 2) as f32, (-TILE_SIZE / 2) as f32, -1.),
         },
-        ldtk_handle: asset_server.load("maps/bandit_camp.ldtk"),
+        ldtk_handle: asset_server.load("maps/dungeon.ldtk"),
     });
 }
 
