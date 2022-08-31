@@ -30,7 +30,9 @@ use crate::{
         floating_text::FloatingText, move_indicator::MoveIndicator,
     },
     utils::{cardinal_dirs, ok_or_return, some_or_continue, Dir},
-    weapon::CurrentWeapon,
+    weapon::{CurrentWeapon, WeaponPrefab, Damage},
+    buffs::Stats
+    
 };
 
 #[derive(Component)]
@@ -96,7 +98,8 @@ fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnPlayerEvent>,
     asset_sheet: Res<SpriteSheet>,
-    prefab_lib: Res<PrefabLib<PlayerPrefab>>,
+    player_lib: Res<PrefabLib<PlayerPrefab>>,
+    weapon_lib: Res<PrefabLib<WeaponPrefab>>
 ) {
     for SpawnPlayerEvent {
         spawn_pos,
@@ -117,7 +120,8 @@ fn spawn(
             (KeyCode::E, PlayerAction::Interact),
         ]);
 
-        let prefab = some_or_continue!(prefab_lib.get(prefab_id));
+        let prefab = some_or_continue!(player_lib.get(prefab_id));
+        let weapon_prefab = weapon_lib.get(&prefab.default_weapon.to_owned());
 
         let id = cmd.spawn().id();
 
@@ -136,13 +140,13 @@ fn spawn(
             })
             .insert(Player)
             .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
-            .insert(Health::new(prefab.health))
+            .insert(Stats::new(prefab.base_stats))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
                 action_state: ActionState::default(),
                 input_map,
             })
             .insert(CameraFollow)
-            .insert(CurrentWeapon(prefab.default_weapon.to_owned()))
+            .insert(CurrentWeapon(weapon_lib.get(&prefab.default_weapon.to_owned()).unwrap().clone()))
             .insert(Movement::new());
 
         // ui related
@@ -154,6 +158,7 @@ fn spawn(
         //     offset: Vec2::new(0., 8.),
         //     ..default()
         // });
+        
     }
 }
 
@@ -250,6 +255,8 @@ fn attack_controller(
             &mut AttackIndicator,
             &GridEntity,
             &ActionState<PlayerAction>,
+            &Stats,
+            &CurrentWeapon
         ),
         With<Player>,
     >,
@@ -257,7 +264,7 @@ fn attack_controller(
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     mut player_moved: EventWriter<PlayerMovedEvent>,
 ) {
-    let (entity, mut attack_indicator, grid_entity, action_state) =
+    let (entity, mut attack_indicator, grid_entity, action_state, stats, weapon) =
         ok_or_return!(query.get_single_mut());
 
     if action_state.just_pressed(PlayerAction::Up) {
@@ -293,10 +300,17 @@ fn attack_controller(
                 spawn_pos: *pos,
             });
         }
+        
+        //calculate damage
+
+
+        
 
         writer.send(AttackEvent {
             grid_positions,
             cell_type: CellType::Enemy(entity),
+            damage: stats.apply_modifiers().damage+weapon.damage.value()
+
         });
 
         player_moved.send(PlayerMovedEvent);

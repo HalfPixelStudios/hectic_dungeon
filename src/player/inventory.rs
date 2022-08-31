@@ -7,7 +7,7 @@ pub struct Inventory {
     pub armor: PrefabId,
     pub ability: PrefabId,
     pub slots: Vec<PrefabId>,
-    capactiy: u32,
+    capacity: u32,
 }
 
 impl Inventory {}

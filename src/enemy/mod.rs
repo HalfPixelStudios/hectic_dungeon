@@ -33,7 +33,7 @@ use crate::{
     spritesheet_constants::SpriteIndex,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::{some_or_continue, Dir},
-    weapon::CurrentWeapon,
+    weapon::{CurrentWeapon, WeaponPrefab},
 };
 
 #[derive(Component)]
@@ -48,6 +48,7 @@ pub struct SpawnEnemyEvent {
 
 pub struct DamageEnemyEvent {
     pub entity: Entity,
+    pub damage: u32
 }
 
 pub struct EnemyPlugin;
@@ -69,6 +70,7 @@ fn spawn(
     mut events: EventReader<SpawnEnemyEvent>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<EnemyPrefab>>,
+    weapon_lib: Res<PrefabLib<WeaponPrefab>>
 ) {
     for SpawnEnemyEvent {
         spawn_pos,
@@ -96,7 +98,8 @@ fn spawn(
             .insert(GridEntity::new(*spawn_pos, CellType::Enemy(id)))
             .insert(Movement::new())
             .insert(AttackIndicator::default())
-            .insert(CurrentWeapon(prefab.weapon_id.to_owned()))
+            .insert(CurrentWeapon(weapon_lib.get(&prefab.weapon_id.to_owned()).unwrap().clone()))
+
             .insert(Enemy)
             .insert(Health::new(prefab.health))
             .insert(DropTable::new(prefab.drops.clone()));
@@ -136,10 +139,10 @@ fn take_damage(
     mut query: Query<(&mut Health, Option<&DropTable>, &GridEntity)>,
     mut writer: EventWriter<SpawnDroppedItemEvent>,
 ) {
-    for DamageEnemyEvent { entity } in events.iter() {
+    for DamageEnemyEvent { entity, damage } in events.iter() {
         let (mut health, droptable, grid_entity) = query.get_mut(*entity).unwrap();
 
-        health.take(1);
+        health.take(*damage);
         if health.is_zero() {
             cmd.entity(*entity).despawn_recursive();
 

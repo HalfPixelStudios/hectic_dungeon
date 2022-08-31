@@ -57,6 +57,7 @@ pub struct AttackEvent {
     pub grid_positions: Vec<IVec2>,
     /// target cell type to hit
     pub cell_type: CellType,
+    pub damage: u32
 }
 
 pub struct AttackPlugin;
@@ -75,6 +76,7 @@ fn process_attack(
     for AttackEvent {
         grid_positions,
         cell_type,
+        damage
     } in events.iter()
     {
         for grid_position in grid_positions.iter() {
@@ -86,7 +88,7 @@ fn process_attack(
 
                 match cell_entity {
                     CellType::Enemy(entity) => {
-                        writer.send(DamageEnemyEvent { entity: *entity });
+                        writer.send(DamageEnemyEvent { entity: *entity, damage: *damage});
                     },
                     CellType::Player(entity) => {
                         info!("player hit!");

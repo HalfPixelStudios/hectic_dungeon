@@ -4,21 +4,31 @@ use serde::Deserialize;
 
 use crate::attack::AttackPattern;
 
-#[derive(Deserialize)]
+#[derive(Deserialize,Clone)]
 pub enum Damage {
     Fixed(u32),
     Range(u32, u32),
 }
+impl Damage{
+    pub fn value(&self)->u32{
+        match &self{
+            Damage::Fixed(x) => *x,
+            Damage::Range(x,y) => (x+y)/2
 
-#[derive(Deserialize)]
+
+        }
+    }
+}
+
+#[derive(Deserialize,Clone)]
 pub struct WeaponPrefab {
     pub display_name: Option<String>,
     pub attack_pattern: AttackPattern,
     pub damage: Damage,
 }
 
-#[derive(Component, Deref, DerefMut)]
-pub struct CurrentWeapon(pub PrefabId);
+#[derive(Component,Deref,DerefMut)]
+pub struct CurrentWeapon(pub WeaponPrefab);
 
 const RON_STRING: &str = r#"
 {

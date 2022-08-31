@@ -96,6 +96,7 @@ fn attack_action(
                 attack_writer.send(AttackEvent {
                     grid_positions,
                     cell_type: CellType::Player(*actor),
+                    damage: 69
                 });
 
                 attack_indicator.hidden = true;

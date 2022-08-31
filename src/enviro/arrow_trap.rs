@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_bobs::prefab::PrefabLib;
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::prelude::*;
 
@@ -11,7 +12,7 @@ use crate::{
     map::ldtk_to_bevy,
     ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
     utils::{to_rotation, Dir},
-    weapon::CurrentWeapon,
+    weapon::{CurrentWeapon, WeaponPrefab},
 };
 
 // how many turns between each attack
@@ -56,6 +57,7 @@ fn ai(
             writer.send(AttackEvent {
                 grid_positions,
                 cell_type: CellType::Player(entity),
+                damage: 69
             });
 
             projectile_writer.send(SpawnProjectileEvent {
@@ -80,6 +82,7 @@ fn spawn_from_ldtk(
     mut cmd: Commands,
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
+    weapon_lib: Res<PrefabLib<WeaponPrefab>>
 ) {
     for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
         // TODO this code is sorta cringe
@@ -117,7 +120,7 @@ fn spawn_from_ldtk(
         })
         .insert(ArrowTrap::new(dir))
         .insert(AttackIndicator { dir, ..default() })
-        .insert(CurrentWeapon("arrow_trap".into()))
+        .insert(CurrentWeapon(weapon_lib.get("arrow_trap").unwrap().clone()))
         .insert(GridEntity {
             pos: grid_coords,
             value: CellType::Wall,

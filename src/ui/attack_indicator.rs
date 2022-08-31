@@ -45,20 +45,10 @@ pub struct AttackIndicatorPlugin;
 impl Plugin for AttackIndicatorPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(spawn)
-            .add_system(sync_attack_pattern)
-            .add_system(render);
+            .add_system(sync_attack_pattern);
     }
 }
 
-fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
-    for (attack_indicator, grid_position) in &query {
-        let pos: Vec<IVec2> = attack_indicator
-            .get_pattern()
-            .iter()
-            .map(|v| *v + grid_position.pos)
-            .collect();
-    }
-}
 
 fn spawn(
     mut cmd: Commands,
@@ -69,7 +59,7 @@ fn spawn(
     >,
     child_query: Query<&AttackIndicatorRoot>,
 ) {
-    for (entity, attack_indictor, children) in &query {
+    for (entity, attack_indicator, children) in &query {
         // despawn existing
         if let Some(children) = children {
             for child in children.iter() {
@@ -82,7 +72,7 @@ fn spawn(
             }
         }
 
-        if attack_indictor.hidden {
+        if attack_indicator.hidden {
             continue;
         }
 
@@ -97,7 +87,7 @@ fn spawn(
         cmd.entity(entity).push_children(&[root]);
 
         // spawn children
-        for offset in attack_indictor
+        for offset in attack_indicator
             .get_pattern()
             .iter()
             .map(|v| v.as_vec2().extend(0.) * (TILE_SIZE as f32))
@@ -126,7 +116,6 @@ fn sync_attack_pattern(
     prefabs: Res<PrefabLib<WeaponPrefab>>,
 ) {
     for (cur_weapon, mut attack_indicator) in &mut query {
-        let prefab = prefabs.get(&cur_weapon).unwrap();
-        attack_indicator.pattern = prefab.attack_pattern;
+        attack_indicator.pattern = cur_weapon.attack_pattern;
     }
 }
