@@ -30,6 +30,7 @@ use crate::{
     map::ldtk_to_bevy,
     movement::Movement,
     player::Player,
+    screens::state::ScreenState,
     spritesheet_constants::SpriteIndex,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::{some_or_continue, Dir},
@@ -57,10 +58,15 @@ impl Plugin for EnemyPlugin {
         app.add_plugin(PrefabPlugin)
             .add_event::<SpawnEnemyEvent>()
             .add_event::<DamageEnemyEvent>()
-            .add_system(spawn)
-            .add_system(take_damage)
-            .add_system(sync_health_bars)
-            .add_system(spawn_from_ldtk);
+            .add_system_set(
+                ConditionSet::new()
+                    .run_in_state(ScreenState::Ingame)
+                    .with_system(spawn)
+                    .with_system(take_damage)
+                    .with_system(sync_health_bars)
+                    .with_system(spawn_from_ldtk)
+                    .into(),
+            );
     }
 }
 

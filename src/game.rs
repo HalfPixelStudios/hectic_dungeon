@@ -4,7 +4,7 @@ use iyes_loopless::{
     state::{CurrentState, NextState},
 };
 
-use crate::player::PlayerMovedEvent;
+use crate::{player::PlayerMovedEvent, screens::state::ScreenState};
 
 const PLAYER_INPUT_TIME_LIMIT: f32 = 1.2;
 const PLAYER_ANIM_TIME_LIMIT: f32 = 0.1;
@@ -83,11 +83,16 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_loopless_state(GameState::PlayerInput)
             .insert_resource(StateTimer::default())
-            .add_system(game_loop)
-            .add_system(
-                end_player_input
-                    .run_in_state(GameState::PlayerInput)
-                    .run_on_event::<PlayerMovedEvent>(),
+            .add_system_set(
+                ConditionSet::new()
+                    .run_in_state(ScreenState::Ingame)
+                    .with_system(game_loop)
+                    .with_system(
+                        end_player_input
+                            .run_in_state(GameState::PlayerInput)
+                            .run_on_event::<PlayerMovedEvent>(),
+                    )
+                    .into(),
             );
     }
 }

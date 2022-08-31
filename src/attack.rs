@@ -1,10 +1,12 @@
 use bevy::prelude::*;
+use iyes_loopless::prelude::ConditionSet;
 use serde::Deserialize;
 
 use crate::{
     enemy::DamageEnemyEvent,
     grid::{CellType, Grid},
     player::DamagePlayerEvent,
+    screens::state::ScreenState,
     utils::{ok_or_continue, variant_eq, Dir},
 };
 
@@ -64,7 +66,12 @@ pub struct AttackPlugin;
 
 impl Plugin for AttackPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<AttackEvent>().add_system(process_attack);
+        app.add_event::<AttackEvent>().add_system_set(
+            ConditionSet::new()
+                .run_in_state(ScreenState::Ingame)
+                .with_system(process_attack)
+                .into(),
+        );
     }
 }
 

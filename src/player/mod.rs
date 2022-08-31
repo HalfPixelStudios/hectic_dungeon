@@ -24,6 +24,7 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
+    screens::state::ScreenState,
     spritesheet_constants::{SpriteFrames, SpriteIndex},
     ui::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
@@ -75,26 +76,31 @@ impl Plugin for PlayerPlugin {
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
             .add_event::<DamagePlayerEvent>()
-            .add_system(controller.run_in_state(GameState::PlayerInput))
-            .add_system(
-                move_controller
-                    .run_in_state(GameState::PlayerInput)
-                    .run_in_state(PlayerState::Move),
-            )
-            .add_system(
-                attack_controller
-                    .run_in_state(GameState::PlayerInput)
-                    .run_in_state(PlayerState::Attack),
+            .add_system_set(
+                ConditionSet::new()
+                    .run_in_state(ScreenState::Ingame)
+                    .with_system(controller.run_in_state(GameState::PlayerInput))
+                    .with_system(
+                        move_controller
+                            .run_in_state(GameState::PlayerInput)
+                            .run_in_state(PlayerState::Move),
+                    )
+                    .with_system(
+                        attack_controller
+                            .run_in_state(GameState::PlayerInput)
+                            .run_in_state(PlayerState::Attack),
+                    )
+                    .with_system(spawn)
+                    .with_system(take_damage)
+                    .with_system(update_move_indicator.run_in_state(GameState::PlayerInput))
+                    .with_system(spawn_from_ldtk)
+                    .into(),
             )
             .add_enter_system(PlayerState::Attack, transition_to_attack)
             .add_enter_system(PlayerState::Move, transition_to_move)
             .add_enter_system(PlayerState::None, transition_to_none)
             .add_enter_system(GameState::PlayerInput, on_turn_start)
-            .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
-            .add_system(spawn)
-            .add_system(take_damage)
-            .add_system(update_move_indicator.run_in_state(GameState::PlayerInput))
-            .add_system(spawn_from_ldtk);
+            .add_exit_system(GameState::PlayerInput, reset_on_turn_end);
     }
 }
 

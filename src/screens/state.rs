@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
@@ -7,6 +8,20 @@ pub enum ScreenState {
     Settings,
     LevelSelect,
     Ingame,
+}
+
+impl TryFrom<String> for ScreenState {
+    type Error = anyhow::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.as_str() {
+            "mainmenu" => Ok(Self::MainMenu),
+            "settings" => Ok(Self::Settings),
+            "levelselect" => Ok(Self::LevelSelect),
+            "ingame" => Ok(Self::Ingame),
+            _ => Err(anyhow!("could not convert '{}' to ScreenState", value)),
+        }
+    }
 }
 
 pub struct StatePlugin;
