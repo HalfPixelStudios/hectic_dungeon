@@ -8,7 +8,9 @@ use crate::{
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::{ldtk_to_bevy, CollisionMap},
+    screens::state::ScreenState,
     spritesheet::SpriteSheet,
+    utils::cleanup,
 };
 
 const FLOOR_HEALTH: u32 = 2;
@@ -33,7 +35,8 @@ impl Plugin for CollapsableFloorPlugin {
         app.add_system(update)
             .add_system(spawn_from_ldtk)
             .add_exit_system(GameState::PlayerInput, detect_step_on)
-            .add_system(despawn);
+            .add_system(despawn)
+            .add_exit_system(ScreenState::Ingame, cleanup::<CollapsableFloor>);
     }
 }
 

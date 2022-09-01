@@ -80,3 +80,10 @@ pub fn to_rotation(dir: Dir) -> f32 {
 pub fn cardinal_dirs() -> Vec<Dir> {
     vec![Dir::North, Dir::South, Dir::East, Dir::West]
 }
+
+/// Despawn all entities with a given tag component
+pub fn cleanup<C: Component>(mut cmd: Commands, query: Query<Entity, With<C>>) {
+    for entity in &query {
+        cmd.entity(entity).despawn_recursive();
+    }
+}

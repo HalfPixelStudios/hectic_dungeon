@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["nithinmuthukumar", "MrPicklePinosaur"]
-description = "Turn based"
+description = "RTS dungeon crawler"
 repository = "https://github.com/HalfPixelStudios/hectic_dungeon.git"
 
 [features]
@@ -27,9 +27,9 @@ anyhow = "1"
 thiserror = "1"
 autodefault = { version = "2" }
 serde = { version = "1", features = ["derive"] }
-rand = { version = "0.8.5" }
-enum-map = { version = "2.4.0", features = ["serde"] }
-priority-queue = { version = "1.2.3" }
+rand = { version = "0.8" }
+enum-map = { version = "2.4", features = ["serde"] }
+priority-queue = { version = "1.2" }
 pino_argparse = { git = "https://github.com/MrPicklePinosaur/pino_argparse" }
 pino_utils = { git = "https://github.com/MrPicklePinosaur/pino_utils" }
 

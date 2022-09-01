@@ -1,7 +1,10 @@
 use autodefault::autodefault;
 use bevy::{ecs::query, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
-use iyes_loopless::prelude::{AppLooplessStateExt, ConditionSet};
+use iyes_loopless::{
+    prelude::{AppLooplessStateExt, ConditionSet},
+    state::NextState,
+};
 
 use crate::{
     constants::{GROUND_LAYER, MAP_HEIGHT, TILE_SIZE},
@@ -9,6 +12,10 @@ use crate::{
     grid::snap_to_grid,
     screens::state::ScreenState,
 };
+
+pub struct SwitchLevelEvent {
+    level_index: usize,
+}
 
 pub struct MapPlugin;
 
@@ -19,12 +26,14 @@ pub struct CollisionMap(pub Vec<IVec2>);
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(LdtkPlugin)
+            .add_event::<SwitchLevelEvent>()
             .insert_resource(LevelSelection::Index(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_system_set(
                 ConditionSet::new()
                     .run_in_state(ScreenState::Ingame)
                     .with_system(register_collision_int_cell)
+                    .with_system(debug)
                     .with_system(switch_level)
                     .into(),
             )
@@ -65,11 +74,23 @@ pub fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
     IVec2::new(v.x, (MAP_HEIGHT as i32) - v.y - 1)
 }
 
-fn switch_level(mut cmd: Commands, keys: Res<Input<KeyCode>>) {
+fn switch_level(
+    mut cmd: Commands,
+    mut events: EventReader<SwitchLevelEvent>,
+    mut collision_map: ResMut<CollisionMap>,
+) {
+    for SwitchLevelEvent { level_index } in events.iter() {
+        cmd.insert_resource(NextState(ScreenState::Ingame));
+        cmd.insert_resource(LevelSelection::Index(*level_index));
+        collision_map.clear();
+    }
+}
+
+fn debug(keys: Res<Input<KeyCode>>, mut writer: EventWriter<SwitchLevelEvent>) {
     if keys.just_pressed(KeyCode::Key1) {
-        cmd.insert_resource(LevelSelection::Index(0));
+        writer.send(SwitchLevelEvent { level_index: 0 });
     }
     if keys.just_pressed(KeyCode::Key2) {
-        cmd.insert_resource(LevelSelection::Index(1));
+        writer.send(SwitchLevelEvent { level_index: 1 });
     }
 }

@@ -1,12 +1,15 @@
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 use bevy_ecs_ldtk::EntityInstance;
+use iyes_loopless::prelude::*;
 
 use crate::{
     constants::BEING_LAYER,
     grid::{to_world_coords, CellType, GridEntity},
     map::ldtk_to_bevy,
+    screens::state::ScreenState,
     spritesheet::{SpriteIndex, SpriteSheet},
+    utils::cleanup,
 };
 
 #[derive(Component)]
@@ -16,7 +19,8 @@ pub struct DestructiblePlugin;
 
 impl Plugin for DestructiblePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_from_ldtk);
+        app.add_system(spawn_from_ldtk)
+            .add_exit_system(ScreenState::Ingame, cleanup::<Destructible>);
     }
 }
 
