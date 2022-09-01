@@ -137,7 +137,7 @@ fn spawn(
         );
         cmd.entity(id).push_children(&[hp_bar]);
 
-        room_state.register_enemy();
+        room_state.register_enemy(id);
     }
 }
 
@@ -154,7 +154,7 @@ fn take_damage(
         health.take(1);
         if health.is_zero() {
             cmd.entity(*entity).despawn_recursive();
-            room_state.deregister_enemy();
+            room_state.deregister_enemy(*entity);
 
             // select item to drop
             if let Some(droptable) = droptable {

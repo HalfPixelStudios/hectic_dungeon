@@ -1,5 +1,7 @@
 //! Holds game state logic related to the current level
 
+use std::collections::HashSet;
+
 use bevy::prelude::*;
 use iyes_loopless::prelude::{AppLooplessStateExt, IntoConditionalSystem};
 
@@ -9,8 +11,8 @@ pub struct LevelCleared;
 pub struct LevelFailed;
 
 pub struct Level {
-    remaining_players: u32,
-    remaining_enemies: u32,
+    players: HashSet<Entity>,
+    enemies: HashSet<Entity>,
     /// Lock to prevent instantly winning or losing the level while entites are still being loaded
     game_end_lock: bool,
 }
@@ -18,35 +20,41 @@ pub struct Level {
 impl Level {
     pub fn new() -> Self {
         Level {
-            remaining_players: 0,
-            remaining_enemies: 0,
+            players: HashSet::new(),
+            enemies: HashSet::new(),
             game_end_lock: true,
         }
     }
     pub fn reset(&mut self) {
-        println!("level reset");
-        self.remaining_players = 0;
-        self.remaining_enemies = 0;
+        self.players.clear();
+        self.enemies.clear();
         self.game_end_lock = true;
     }
-    pub fn remaining_players(&self) -> u32 {
-        self.remaining_players
+
+    pub fn register_player(&mut self, e: Entity) {
+        self.players.insert(e);
     }
-    pub fn remaining_enemies(&self) -> u32 {
-        self.remaining_enemies
+    pub fn register_enemy(&mut self, e: Entity) {
+        self.enemies.insert(e);
     }
-    pub fn register_player(&mut self) {
-        self.remaining_players += 1;
+    pub fn deregister_player(&mut self, e: Entity) {
+        self.players.remove(&e);
     }
-    pub fn register_enemy(&mut self) {
-        self.remaining_enemies += 1;
+    pub fn deregister_enemy(&mut self, e: Entity) {
+        self.enemies.remove(&e);
     }
-    pub fn deregister_player(&mut self) {
-        // careful of underflow
-        self.remaining_players -= 1;
+
+    pub fn players(&self) -> &HashSet<Entity> {
+        &self.players
     }
-    pub fn deregister_enemy(&mut self) {
-        self.remaining_enemies -= 1;
+    pub fn enemies(&self) -> &HashSet<Entity> {
+        &self.enemies
+    }
+    pub fn remaining_players(&self) -> usize {
+        self.players.len()
+    }
+    pub fn remaining_enemies(&self) -> usize {
+        self.enemies.len()
     }
 }
 

@@ -13,6 +13,8 @@ bevy_sprite = ["bevy/bevy_sprite", "bevy/bevy_render"]
 bevy_ui = ["bevy/bevy_ui", "bevy/bevy_text", "bevy/bevy_render"]
 
 [dependencies]
+
+## bevy related
 bevy = { version = "0.8", default-features = false, features = [ "render", "animation", "bevy_winit", "bevy_gilrs", "png", "hdr", "filesystem_watcher", "x11", "trace" ] }
 bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk", features = [ "atlas" ] }
 # bevy_bobs = { path = "../bevy_bobs", features = ["health_bar", "prefab", "physics_2d", "grid"] }
@@ -22,14 +24,17 @@ iyes_loopless = { version = "0.7" }
 big-brain = { version = "0.12" }
 bevy-inspector-egui = { version = "0.12" }
 
-ron = "0.7"
+## utilities
 anyhow = "1"
 thiserror = "1"
 autodefault = { version = "2" }
-serde = { version = "1", features = ["derive"] }
-rand = { version = "0.8" }
+
+## other
 enum-map = { version = "2.4", features = ["serde"] }
 priority-queue = { version = "1.2" }
+rand = { version = "0.8" }
+ron = "0.7"
+serde = { version = "1", features = ["derive"] }
 pino_argparse = { git = "https://github.com/MrPicklePinosaur/pino_argparse" }
 pino_utils = { git = "https://github.com/MrPicklePinosaur/pino_utils" }
 
