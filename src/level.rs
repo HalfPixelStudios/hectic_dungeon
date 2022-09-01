@@ -1,7 +1,7 @@
 //! Holds game state logic related to the current level
 
 use bevy::prelude::*;
-use iyes_loopless::prelude::IntoConditionalSystem;
+use iyes_loopless::prelude::{AppLooplessStateExt, IntoConditionalSystem};
 
 use crate::screens::state::ScreenState;
 
@@ -22,6 +22,12 @@ impl Level {
             remaining_enemies: 0,
             game_end_lock: true,
         }
+    }
+    pub fn reset(&mut self) {
+        println!("level reset");
+        self.remaining_players = 0;
+        self.remaining_enemies = 0;
+        self.game_end_lock = true;
     }
     pub fn remaining_players(&self) -> u32 {
         self.remaining_players
@@ -51,7 +57,8 @@ impl Plugin for LevelPlugin {
         app.insert_resource(Level::new())
             .add_event::<LevelCleared>()
             .add_event::<LevelFailed>()
-            .add_system(update.run_in_state(ScreenState::Ingame));
+            .add_system(update.run_in_state(ScreenState::Ingame))
+            .add_enter_system(ScreenState::Ingame, reset);
     }
 }
 
@@ -84,4 +91,8 @@ fn update(
             }
         }
     }
+}
+
+fn reset(mut room_state: ResMut<Level>) {
+    room_state.reset();
 }
