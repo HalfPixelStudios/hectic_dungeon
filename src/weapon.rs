@@ -26,7 +26,7 @@ const RON_STRING: &str = r#"
         attack_pattern: Hammer,
         damage: Fixed(1),
     ),
-    "dagger": (
+    "steel_dagger": (
         attack_pattern: StraightOne,
         damage: Fixed(1),
     ),

@@ -1,8 +1,9 @@
 
-# characters
+# player and enemy troops
 
-playable characters each have their own special ability and types of gear they
-can equip.
-- magician: hold special spell tome (flame burst, teleport), maybe have a mana bar, generally an offsensive class
-- samurai: carry secondary sheath/sword (dash, slash etc)
-- summoner: spawns summons to fight for you
+## player melee
+- warrior: the basic troop (decent health/defence with straight forward attack)
+
+## player ranged
+- archer: shoots over obstacles (attack is only one tile however)
+

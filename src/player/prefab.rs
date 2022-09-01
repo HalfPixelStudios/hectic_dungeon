@@ -6,6 +6,7 @@ use crate::spritesheet_constants::SpriteIndex;
 
 #[derive(Deserialize, Component)]
 pub enum Class {
+    Warrior,
     Samurai,
     Magician,
     Summoner,
@@ -32,11 +33,11 @@ impl Plugin for PrefabPlugin {
 
 const RON_STRING: &str = r#"
 {
-    "samurai": (
+    "warrior": (
         health: 10,
-        class: Samurai,
+        class: Warrior,
         sprite_index: Player,
-        default_primary: Some("hammer"),
+        default_primary: Some("steel_sword"),
         default_secondary: None,
         default_ability: None,
         default_armor: None,
