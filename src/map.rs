@@ -26,7 +26,6 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(LdtkPlugin)
             .add_event::<SwitchLevelEvent>()
-            .insert_resource(LevelSelection::Index(1))
             .insert_resource(CollisionMap(Vec::new()))
             .add_system_set(
                 ConditionSet::new()

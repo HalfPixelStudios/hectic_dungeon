@@ -79,7 +79,7 @@ fn button_listener(
         match interaction {
             Interaction::Clicked => match button_tag {
                 ButtonTag::Play => {
-                    cmd.insert_resource(NextState(ScreenState::Ingame));
+                    cmd.insert_resource(NextState(ScreenState::LevelSelect));
                 },
                 ButtonTag::Settings => {},
                 ButtonTag::Quit => exit_writer.send(AppExit),

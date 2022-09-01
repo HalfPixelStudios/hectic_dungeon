@@ -1,5 +1,6 @@
 mod components;
 mod ingame;
+mod level_select;
 mod main_menu;
 pub mod state;
 mod utils;
@@ -7,8 +8,8 @@ mod utils;
 use bevy::prelude::*;
 
 use self::{
-    components::ComponentPlugin, ingame::IngamePlugin, main_menu::MainMenuPlugin,
-    state::StatePlugin,
+    components::ComponentPlugin, ingame::IngamePlugin, level_select::LevelSelectPlugin,
+    main_menu::MainMenuPlugin, state::StatePlugin,
 };
 
 pub struct ScreensPlugin;
@@ -18,6 +19,7 @@ impl Plugin for ScreensPlugin {
         app.add_plugin(StatePlugin)
             .add_plugin(IngamePlugin)
             .add_plugin(MainMenuPlugin)
+            .add_plugin(LevelSelectPlugin)
             .add_plugin(ComponentPlugin)
             .add_startup_system(debug);
     }
