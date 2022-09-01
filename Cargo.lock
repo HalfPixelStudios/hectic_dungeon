@@ -1939,6 +1939,7 @@ dependencies = [
  "iyes_loopless",
  "leafwing-input-manager",
  "pino_argparse",
+ "pino_utils",
  "priority-queue",
  "rand",
  "ron",
@@ -2864,6 +2865,11 @@ checksum = "e0a7ae3ac2f1173085d398531c705756c94a4c56843785df85a60c1a0afac116"
 name = "pino_argparse"
 version = "0.1.0"
 source = "git+https://github.com/MrPicklePinosaur/pino_argparse#880f45527f63094a2cbbbaaf056f9aa377b01243"
+
+[[package]]
+name = "pino_utils"
+version = "0.1.0"
+source = "git+https://github.com/MrPicklePinosaur/pino_utils#1497349480bcff8d95ed5d663431e1feadab1172"
 
 [[package]]
 name = "pkg-config"

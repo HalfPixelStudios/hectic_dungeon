@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-
-use crate::utils::ok_or_return;
+use pino_utils::ok_or_return;
 
 pub const FONT_PATH: &str = "fonts/arcadeclassic.ttf";
 

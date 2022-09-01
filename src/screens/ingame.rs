@@ -8,9 +8,8 @@ use super::{
     utils::{destroy_ui, destroy_ui_tag, UIRoot},
 };
 use crate::{
-    assets::SpriteSheet,
     level::{LevelCleared, LevelFailed},
-    spritesheet_constants::SpriteIndex,
+    spritesheet::{SpriteIndex, SpriteSheet},
 };
 
 #[derive(Component)]
