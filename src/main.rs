@@ -13,7 +13,6 @@ mod enviro;
 mod game;
 mod grid;
 mod item;
-mod layers;
 mod level;
 mod map;
 mod material;

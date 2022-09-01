@@ -1,10 +1,8 @@
 use autodefault::autodefault;
 use bevy::prelude::*;
+use pino_utils::ok_or_return;
 
-use crate::{
-    player::{inventory::Inventory, Player},
-    utils::ok_or_return,
-};
+use crate::player::{inventory::Inventory, Player};
 
 #[derive(Component)]
 enum SlotType {
