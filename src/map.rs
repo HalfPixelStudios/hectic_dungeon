@@ -1,7 +1,10 @@
 use autodefault::autodefault;
 use bevy::{ecs::query, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
-use iyes_loopless::prelude::{AppLooplessStateExt, ConditionSet};
+use iyes_loopless::{
+    prelude::{AppLooplessStateExt, ConditionSet},
+    state::NextState,
+};
 
 use crate::{
     constants::{GROUND_LAYER, MAP_HEIGHT, TILE_SIZE},
@@ -67,9 +70,11 @@ pub fn ldtk_to_bevy(v: &IVec2) -> IVec2 {
 
 fn switch_level(mut cmd: Commands, keys: Res<Input<KeyCode>>) {
     if keys.just_pressed(KeyCode::Key1) {
+        cmd.insert_resource(NextState(ScreenState::Ingame));
         cmd.insert_resource(LevelSelection::Index(0));
     }
     if keys.just_pressed(KeyCode::Key2) {
+        cmd.insert_resource(NextState(ScreenState::Ingame));
         cmd.insert_resource(LevelSelection::Index(1));
     }
 }

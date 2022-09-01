@@ -33,7 +33,7 @@ use crate::{
     screens::state::ScreenState,
     spritesheet::{SpriteIndex, SpriteSheet},
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::Dir,
+    utils::{cleanup, Dir},
     weapon::CurrentWeapon,
 };
 
@@ -57,16 +57,18 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(PrefabPlugin)
             .add_event::<SpawnEnemyEvent>()
-            .add_event::<DamageEnemyEvent>()
-            .add_system_set(
-                ConditionSet::new()
-                    .run_in_state(ScreenState::Ingame)
-                    .with_system(spawn)
-                    .with_system(take_damage)
-                    .with_system(sync_health_bars)
-                    .with_system(spawn_from_ldtk)
-                    .into(),
-            );
+            .add_event::<DamageEnemyEvent>();
+
+        app.add_system_set(
+            ConditionSet::new()
+                .run_in_state(ScreenState::Ingame)
+                .with_system(spawn)
+                .with_system(take_damage)
+                .with_system(sync_health_bars)
+                .with_system(spawn_from_ldtk)
+                .into(),
+        )
+        .add_exit_system(ScreenState::Ingame, cleanup::<Enemy>);
     }
 }
 

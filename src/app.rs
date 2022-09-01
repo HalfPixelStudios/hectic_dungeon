@@ -59,8 +59,8 @@ pub fn app(config: AppConfig) {
 
     app.add_plugins(DefaultPlugins).add_plugin(HealthBarPlugin);
 
-    app.add_plugin(GamePlugin)
-        .add_plugin(ScreensPlugin)
+    app.add_plugin(ScreensPlugin)
+        .add_plugin(GamePlugin)
         .add_plugin(AIPlugin)
         .add_plugin(AbilityPlugin)
         .add_plugin(SpritesheetPlugin)

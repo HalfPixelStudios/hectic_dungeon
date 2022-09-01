@@ -11,6 +11,8 @@ const PLAYER_ANIM_TIME_LIMIT: f32 = 0.1;
 const ENEMY_INPUT_TIME_LIMIT: f32 = 0.3;
 const ENEMY_ANIM_TIME_LIMIT: f32 = 0.1;
 
+const START_STATE: GameState = GameState::PlayerInput;
+
 /// Four phases of the game loop
 ///
 /// - `PlayerInput` is awaiting player input on their turn (either attack or move)
@@ -48,10 +50,10 @@ impl GameState {
 }
 
 #[derive(Deref, DerefMut, Default)]
-pub struct StateTimer(pub Stopwatch);
+struct StateTimer(pub Stopwatch);
 
 /// Advance the game state based on defined time limits
-pub fn game_loop(
+fn game_loop(
     mut cmd: Commands,
     time: Res<Time>,
     mut state_timer: ResMut<StateTimer>,
@@ -68,7 +70,7 @@ pub fn game_loop(
 }
 
 /// End player input stage early if player sends input
-pub fn end_player_input(
+fn end_player_input(
     mut cmd: Commands,
     mut state_timer: ResMut<StateTimer>,
     state: Res<CurrentState<GameState>>,
@@ -77,12 +79,19 @@ pub fn end_player_input(
     state_timer.reset();
 }
 
+// TODO need to reset game state back to start state
+fn reset(mut cmd: Commands, mut state_timer: ResMut<StateTimer>) {
+    state_timer.reset();
+    cmd.insert_resource(NextState(START_STATE));
+}
+
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_loopless_state(GameState::PlayerInput)
+        app.add_loopless_state(START_STATE)
             .insert_resource(StateTimer::default())
+            .add_enter_system(ScreenState::Ingame, reset)
             .add_system_set(
                 ConditionSet::new()
                     .run_in_state(ScreenState::Ingame)
