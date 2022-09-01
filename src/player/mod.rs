@@ -15,7 +15,7 @@ use pino_utils::{ok_or_return, some_or_continue};
 
 use self::{
     inventory::Inventory,
-    prefab::{PlayerPrefab, PrefabPlugin},
+    prefab::{Class, PlayerPrefab, PrefabPlugin},
 };
 use crate::{
     attack::{AttackEvent, AttackPattern},
@@ -160,7 +160,6 @@ fn spawn(
                 ..default()
             })
             .insert(Player)
-            .insert(SelectedPlayer)
             .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
             .insert(Health::new(prefab.health))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
@@ -186,7 +185,13 @@ fn spawn(
         //     offset: Vec2::new(0., 8.),
         //     ..default()
         // });
-        room_state.register_player();
+
+        // TODO temp for debug
+        if prefab.class == Class::Warrior {
+            cmd.entity(id).insert(SelectedPlayer);
+        }
+
+        room_state.register_player(id);
     }
 }
 
@@ -391,15 +396,15 @@ fn spawn_from_ldtk(
 fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<DamagePlayerEvent>,
-    mut query: Query<(&mut Health, &GridEntity)>,
+    mut query: Query<(Entity, &mut Health, &GridEntity)>,
     mut room_state: ResMut<Level>,
 ) {
     for DamagePlayerEvent { entity } in events.iter() {
-        let (mut health, grid_entity) = query.get_mut(*entity).unwrap();
+        let (entity, mut health, grid_entity) = query.get_mut(*entity).unwrap();
 
         health.take(1);
         if health.is_zero() {
-            room_state.deregister_player();
+            room_state.deregister_player(entity);
         }
     }
 }

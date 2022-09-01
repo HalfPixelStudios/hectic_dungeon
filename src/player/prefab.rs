@@ -4,12 +4,13 @@ use serde::Deserialize;
 
 use crate::spritesheet::SpriteIndex;
 
-#[derive(Deserialize, Component)]
+#[derive(Deserialize, Component, PartialEq, Eq)]
 pub enum Class {
     Warrior,
     Samurai,
     Magician,
     Summoner,
+    Archer,
 }
 
 #[derive(Deserialize)]
@@ -36,7 +37,16 @@ const RON_STRING: &str = r#"
     "warrior": (
         health: 10,
         class: Warrior,
-        sprite_index: Player,
+        sprite_index: PlayerWarrior,
+        default_primary: Some("steel_sword"),
+        default_secondary: None,
+        default_ability: None,
+        default_armor: None,
+    ),
+    "archer": (
+        health: 10,
+        class: Archer,
+        sprite_index: PlayerArcher,
         default_primary: Some("steel_sword"),
         default_secondary: None,
         default_ability: None,

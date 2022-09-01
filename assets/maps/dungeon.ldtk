@@ -802,9 +802,9 @@
 							"height": 8,
 							"defUid": 21,
 							"px": [32,48],
-							"fieldInstances": [{ "__identifier": "id", "__value": "warrior", "__type": "String", "__tile": null, "defUid": 22, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "id", "__value": "archer", "__type": "String", "__tile": null, "defUid": 22, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["warrior"]
+								"params": ["archer"]
 							}] }]
 						}
 					]

@@ -55,7 +55,7 @@ fn update(
             parent
                 .spawn_bundle(SpriteSheetBundle {
                     sprite: TextureAtlasSprite {
-                        index: SpriteIndex::Player as usize,
+                        index: SpriteIndex::PlayerWarrior as usize,
                     },
                     texture_atlas: asset_sheet.clone(),
                 })
