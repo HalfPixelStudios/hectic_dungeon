@@ -8,6 +8,7 @@ pub const SPRITE_SIZE: u32 = 8;
 #[derive(Deserialize, Clone, Copy)]
 pub enum SpriteIndex {
     Player = sprite!(0, 3),
+    OrcDagger = sprite!(1, 4),
     OrcSwordsman = sprite!(2, 4),
     OrcTwinblade = sprite!(3, 4),
 

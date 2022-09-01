@@ -464,7 +464,7 @@
 			"uid": 0,
 			"worldX": 0,
 			"worldY": 0,
-			"worldDepth": 0,
+			"worldDepth": -1,
 			"pxWid": 128,
 			"pxHei": 128,
 			"__bgColor": "#696A79",
@@ -532,9 +532,9 @@
 							"height": 8,
 							"defUid": 5,
 							"px": [72,48],
-							"fieldInstances": [{ "__identifier": "id", "__value": "orc", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "id", "__value": "orc_dagger", "__type": "String", "__tile": null, "defUid": 6, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["orc"]
+								"params": ["orc_dagger"]
 							}] }]
 						}
 					]

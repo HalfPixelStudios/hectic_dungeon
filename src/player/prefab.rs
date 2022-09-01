@@ -37,7 +37,7 @@ const RON_STRING: &str = r#"
         health: 10,
         class: Warrior,
         sprite_index: Player,
-        default_primary: Some("hammer"),
+        default_primary: Some("steel_sword"),
         default_secondary: None,
         default_ability: None,
         default_armor: None,

@@ -4,7 +4,7 @@ use bevy_ecs_ldtk::prelude::*;
 use iyes_loopless::prelude::{AppLooplessStateExt, ConditionSet};
 
 use crate::{
-    constants::{MAP_HEIGHT, TILE_SIZE},
+    constants::{GROUND_LAYER, MAP_HEIGHT, TILE_SIZE},
     enemy::SpawnEnemyEvent,
     grid::snap_to_grid,
     screens::state::ScreenState,
@@ -36,7 +36,11 @@ impl Plugin for MapPlugin {
 fn setup(mut cmd: Commands, asset_server: Res<AssetServer>) {
     cmd.spawn_bundle(LdtkWorldBundle {
         transform: Transform {
-            translation: Vec3::new((-TILE_SIZE / 2) as f32, (-TILE_SIZE / 2) as f32, -1.),
+            translation: Vec3::new(
+                (-TILE_SIZE / 2) as f32,
+                (-TILE_SIZE / 2) as f32,
+                GROUND_LAYER as f32,
+            ),
         },
         ldtk_handle: asset_server.load("maps/dungeon.ldtk"),
     });
@@ -48,7 +52,7 @@ fn register_collision_int_cell(
 ) {
     for (transform, int_cell) in &query {
         // TODO magic number
-        if int_cell.value == 2 {
+        if int_cell.value == 1 {
             collision_map.push(snap_to_grid(&transform.translation.truncate()));
         }
     }

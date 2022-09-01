@@ -143,6 +143,10 @@ fn spawn(
                     ..default()
                 },
                 texture_atlas: asset_sheet.clone(),
+                transform: Transform {
+                    translation: to_world_coords(spawn_pos).extend(BEING_LAYER),
+                    ..default()
+                },
                 ..default()
             })
             .insert(Player)
