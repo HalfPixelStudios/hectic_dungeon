@@ -1,7 +1,3 @@
-/// Custom iyes pickers
-use bevy::prelude::*;
-use big_brain::{choices::Choice, prelude::Picker, scorers::Score};
-
 // NOTE nm, found that theres a .otherwise method for thinkers
 /*
 /// Takes only two choices, picks first if past threshold, otherwise picks second

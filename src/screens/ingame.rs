@@ -3,14 +3,11 @@ use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
 use super::{
-    components::{health::HealthBar, inventory::InventoryDisplay},
+    components::health::HealthBar,
     state::ScreenState,
     utils::{destroy_ui, destroy_ui_tag, UIRoot},
 };
-use crate::{
-    level::{LevelCleared, LevelFailed},
-    spritesheet::{SpriteIndex, SpriteSheet},
-};
+use crate::level::{LevelCleared, LevelFailed};
 
 #[derive(Component)]
 struct WinMenuRoot;
@@ -51,7 +48,7 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
             },
         })
         .with_children(|mut parent| {
-            HealthBar(&mut parent);
+            HealthBar(parent);
             // InventoryDisplay(&mut parent, assets);
         });
 }

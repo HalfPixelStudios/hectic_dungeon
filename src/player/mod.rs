@@ -1,8 +1,6 @@
 pub mod inventory;
 pub mod prefab;
 
-use std::time::Duration;
-
 use bevy::prelude::*;
 use bevy_bobs::{
     component::health::*,
@@ -18,7 +16,7 @@ use self::{
     prefab::{Class, PlayerPrefab, PrefabPlugin},
 };
 use crate::{
-    attack::{AttackEvent, AttackPattern},
+    attack::AttackEvent,
     camera::CameraFollow,
     constants::BEING_LAYER,
     enviro::dropped_item::DroppedItem,
@@ -28,10 +26,10 @@ use crate::{
     map::ldtk_to_bevy,
     movement::Movement,
     screens::state::ScreenState,
-    spritesheet::{SpriteFrames, SpriteIndex, SpriteSheet},
+    spritesheet::{SpriteFrames, SpriteSheet},
     ui::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
-        floating_text::FloatingText, move_indicator::MoveIndicator,
+        move_indicator::MoveIndicator,
     },
     utils::{cardinal_dirs, cleanup, Dir},
     weapon::CurrentWeapon,
@@ -471,7 +469,7 @@ fn troop_selector(
     };
 
     let players = level_state.players();
-    if players.len() == 0 {
+    if players.is_empty() {
         return;
     }
 

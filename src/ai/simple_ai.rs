@@ -10,7 +10,6 @@ use crate::{
     grid::{CellType, Grid, GridEntity},
     movement::Movement,
     player::Player,
-    screens::state::ScreenState,
     spritesheet::SpriteFrames,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::Dir,

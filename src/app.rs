@@ -1,19 +1,11 @@
-use bevy::{
-    animation::*, asset::AssetLoader, log::LogSettings, prelude::*, render::texture::ImageSettings,
-};
+use bevy::{prelude::*, render::texture::ImageSettings};
 use bevy_bobs::health_bar::HealthBarPlugin;
 use bevy_inspector_egui::WorldInspectorPlugin;
-use iyes_loopless::{prelude::AppLooplessStateExt, state::NextState};
+use iyes_loopless::state::NextState;
 
 use super::{
-    camera::CameraPlugin,
-    enemy::{EnemyPlugin, SpawnEnemyEvent},
-    game::{GamePlugin, GameState},
-    grid::GridPlugin,
-    material::MaterialPlugin,
-    movement::MovementPlugin,
-    player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
-    spritesheet::*,
+    camera::CameraPlugin, enemy::EnemyPlugin, game::GamePlugin, grid::GridPlugin,
+    material::MaterialPlugin, movement::MovementPlugin, player::PlayerPlugin, spritesheet::*,
     ui::UIPlugin,
 };
 use crate::{

@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use iyes_loopless::prelude::ConditionSet;
 
 use crate::{
-    enemy::Enemy,
     grid::{to_world_coords, GridEntity},
     screens::state::ScreenState,
 };

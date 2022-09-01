@@ -1,7 +1,6 @@
-use std::{fmt::Debug, ops::Deref};
+use std::ops::Deref;
 
 use bevy::prelude::*;
-use bevy_bobs::prefab::PrefabId;
 
 use crate::{
     constants::{MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},

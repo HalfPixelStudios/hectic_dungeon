@@ -11,7 +11,7 @@ use crate::{
     screens::state::ScreenState,
     spritesheet::SpriteSheet,
     ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
-    utils::{cleanup, to_rotation, Dir},
+    utils::{cleanup, Dir},
     weapon::CurrentWeapon,
 };
 

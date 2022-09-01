@@ -1,5 +1,5 @@
 use autodefault::autodefault;
-use bevy::{ecs::query, prelude::*};
+use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use iyes_loopless::{
     prelude::{AppLooplessStateExt, ConditionSet},
@@ -8,7 +8,6 @@ use iyes_loopless::{
 
 use crate::{
     constants::{GROUND_LAYER, MAP_HEIGHT, TILE_SIZE},
-    enemy::SpawnEnemyEvent,
     grid::snap_to_grid,
     screens::state::ScreenState,
 };

@@ -5,7 +5,6 @@ use crate::{
     attack::{rotate_offsets, AttackPattern},
     constants::{INGAME_UI_LAYER, TILE_SIZE},
     grid::GridEntity,
-    player::Player,
     spritesheet::{SpriteIndex, SpriteSheet},
     utils::Dir,
     weapon::{CurrentWeapon, WeaponPrefab},

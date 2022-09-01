@@ -5,13 +5,10 @@ pub mod state;
 mod utils;
 
 use bevy::prelude::*;
-use iyes_loopless::state::NextState;
 
 use self::{
-    components::ComponentPlugin,
-    ingame::IngamePlugin,
-    main_menu::MainMenuPlugin,
-    state::{ScreenState, StatePlugin},
+    components::ComponentPlugin, ingame::IngamePlugin, main_menu::MainMenuPlugin,
+    state::StatePlugin,
 };
 
 pub struct ScreensPlugin;

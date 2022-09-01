@@ -1,12 +1,6 @@
 pub mod pathfinding;
 pub mod prefab;
 
-use std::{
-    cmp::Reverse,
-    collections::{HashMap, HashSet},
-    sync,
-};
-
 use bevy::prelude::*;
 use bevy_bobs::{
     component::health::Health,
@@ -14,26 +8,23 @@ use bevy_bobs::{
     prefab::{PrefabId, PrefabLib},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
-use big_brain::{prelude::FirstToScore, thinker::Thinker, BigBrainPlugin};
+use big_brain::{prelude::FirstToScore, thinker::Thinker};
 use iyes_loopless::prelude::*;
 use pino_utils::some_or_continue;
 
 use self::prefab::{EnemyPrefab, PrefabPlugin, AI};
 use crate::{
     ai::simple_ai::{AttackAction, AttackRangeScorer, MoveAction},
-    attack::{AttackEvent, AttackPattern},
     constants::{BEING_LAYER, INGAME_UI_LAYER},
     enviro::dropped_item::SpawnDroppedItemEvent,
-    game::GameState,
-    grid::{to_world_coords, CellType, Grid, GridEntity},
+    grid::{to_world_coords, CellType, GridEntity},
     level::Level,
     map::ldtk_to_bevy,
     movement::Movement,
-    player::Player,
     screens::state::ScreenState,
-    spritesheet::{SpriteIndex, SpriteSheet},
-    ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::{cleanup, Dir},
+    spritesheet::SpriteSheet,
+    ui::attack_indicator::AttackIndicator,
+    utils::cleanup,
     weapon::CurrentWeapon,
 };
 

@@ -18,3 +18,6 @@ chk:
 
 lint:
     cargo clippy -- -W clippy::unwrap_used -W clippy::cargo
+
+lint-fix:
+    cargo clippy --fix -- -W clippy::unwrap_used -W clippy::cargo

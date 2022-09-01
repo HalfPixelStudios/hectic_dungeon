@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
-use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
+use bevy_ecs_ldtk::EntityInstance;
 use iyes_loopless::prelude::*;
 
 use crate::{

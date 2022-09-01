@@ -3,11 +3,9 @@ use bevy::{app::AppExit, prelude::*};
 use iyes_loopless::prelude::*;
 
 use super::{
-    components::health::HealthBar,
     state::ScreenState,
     utils::{destroy_ui, UIRoot},
 };
-use crate::spritesheet::{SpriteIndex, SpriteSheet};
 
 pub struct MainMenuPlugin;
 
