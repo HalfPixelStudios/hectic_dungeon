@@ -5,8 +5,10 @@ use bevy::{prelude::*, ui::FocusPolicy};
 use bevy_bobs::component::health::Health;
 
 use crate::{
-    assets::SpriteSheet, player::Player, screens::utils::FONT_PATH,
-    spritesheet_constants::SpriteIndex, utils::ok_or_return,
+    player::Player,
+    screens::utils::FONT_PATH,
+    spritesheet::{SpriteIndex, SpriteSheet},
+    utils::ok_or_return,
 };
 
 #[derive(Component)]

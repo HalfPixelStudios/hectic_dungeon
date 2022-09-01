@@ -2,12 +2,11 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::PrefabLib;
 
 use crate::{
-    assets::{PrefabData, SpriteSheet},
     attack::{rotate_offsets, AttackPattern},
     constants::{INGAME_UI_LAYER, TILE_SIZE},
     grid::GridEntity,
     player::Player,
-    spritesheet_constants::SpriteIndex,
+    spritesheet::{SpriteIndex, SpriteSheet},
     utils::Dir,
     weapon::{CurrentWeapon, WeaponPrefab},
 };

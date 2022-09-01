@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bevy::{prelude::*, time::Stopwatch};
 
-use crate::{assets::SpriteSheet, grid::to_world_coords};
+use crate::{grid::to_world_coords, spritesheet::SpriteSheet};
 
 // TODO this is simply a short lived sprite animation, should be replaced by general animation
 // system in future

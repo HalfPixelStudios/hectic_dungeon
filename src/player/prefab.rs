@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::{PrefabId, PrefabLib};
 use serde::Deserialize;
 
-use crate::spritesheet_constants::SpriteIndex;
+use crate::spritesheet::SpriteIndex;
 
 #[derive(Deserialize, Component)]
 pub enum Class {

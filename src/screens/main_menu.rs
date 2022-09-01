@@ -7,7 +7,7 @@ use super::{
     state::ScreenState,
     utils::{destroy_ui, UIRoot},
 };
-use crate::{assets::SpriteSheet, spritesheet_constants::SpriteIndex};
+use crate::spritesheet::{SpriteIndex, SpriteSheet};
 
 pub struct MainMenuPlugin;
 

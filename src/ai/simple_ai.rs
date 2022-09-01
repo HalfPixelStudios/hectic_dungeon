@@ -10,7 +10,7 @@ use crate::{
     movement::Movement,
     player::Player,
     screens::state::ScreenState,
-    spritesheet_constants::SpriteFrames,
+    spritesheet::SpriteFrames,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::{ok_or_continue, ok_or_return, Dir},
 };

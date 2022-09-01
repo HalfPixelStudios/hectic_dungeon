@@ -3,12 +3,12 @@ use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::prelude::*;
 
 use crate::{
-    assets::SpriteSheet,
     attack::AttackEvent,
     constants::BEING_LAYER,
     game::GameState,
     grid::{to_world_coords, CellType, GridEntity},
     map::ldtk_to_bevy,
+    spritesheet::SpriteSheet,
     ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
     utils::{to_rotation, Dir},
     weapon::CurrentWeapon,

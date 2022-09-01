@@ -20,8 +20,6 @@ use iyes_loopless::prelude::*;
 use self::prefab::{EnemyPrefab, PrefabPlugin, AI};
 use crate::{
     ai::simple_ai::{AttackAction, AttackRangeScorer, MoveAction},
-    animation::Animation,
-    assets::{BeingPrefab, PrefabData, SpriteSheet},
     attack::{AttackEvent, AttackPattern},
     constants::{BEING_LAYER, INGAME_UI_LAYER},
     enviro::dropped_item::SpawnDroppedItemEvent,
@@ -32,7 +30,7 @@ use crate::{
     movement::Movement,
     player::Player,
     screens::state::ScreenState,
-    spritesheet_constants::SpriteIndex,
+    spritesheet::{SpriteIndex, SpriteSheet},
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
     utils::{some_or_continue, Dir},
     weapon::CurrentWeapon,

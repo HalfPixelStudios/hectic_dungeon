@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{assets::SpriteSheet, constants::TILE_SIZE, utils::Dir};
+use crate::{constants::TILE_SIZE, spritesheet::SpriteSheet, utils::Dir};
 
 pub struct MoveIndicatorPlugin;
 

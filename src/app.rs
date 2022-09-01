@@ -6,8 +6,6 @@ use bevy_inspector_egui::WorldInspectorPlugin;
 use iyes_loopless::{prelude::AppLooplessStateExt, state::NextState};
 
 use super::{
-    animation::AnimatePlugin,
-    assets::*,
     camera::CameraPlugin,
     enemy::{EnemyPlugin, SpawnEnemyEvent},
     game::{GamePlugin, GameState},
@@ -15,6 +13,7 @@ use super::{
     material::MaterialPlugin,
     movement::MovementPlugin,
     player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
+    spritesheet::*,
     ui::UIPlugin,
 };
 use crate::{
@@ -64,10 +63,9 @@ pub fn app(config: AppConfig) {
         .add_plugin(ScreensPlugin)
         .add_plugin(AIPlugin)
         .add_plugin(AbilityPlugin)
-        .add_plugin(AssetLoadPlugin)
+        .add_plugin(SpritesheetPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(LevelPlugin)
-        // .add_plugin(AnimatePlugin)
         .add_plugin(AttackPlugin)
         .add_plugin(ItemPlugin)
         .add_plugin(CameraPlugin)

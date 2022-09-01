@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use bevy::prelude::*;
 use serde::Deserialize;
 
 pub const TILESHEET_WIDTH: u32 = 16;
@@ -61,3 +64,30 @@ macro_rules! sprite {
     };
 }
 pub(crate) use sprite;
+
+#[derive(Deref)]
+pub struct SpriteSheet(pub Handle<TextureAtlas>);
+
+pub fn load_assets(
+    mut cmd: Commands,
+    assets: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    let mut data: HashMap<String, HandleUntyped> = HashMap::new();
+
+    let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
+        assets.load("tilesheet/bandit_hideout.png"),
+        Vec2::new(SPRITE_SIZE as f32, SPRITE_SIZE as f32),
+        TILESHEET_WIDTH as usize,
+        TILESHEET_HEIGHT as usize,
+    ));
+    cmd.insert_resource(SpriteSheet(tilesheet_handle));
+}
+
+pub struct SpritesheetPlugin;
+
+impl Plugin for SpritesheetPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_startup_system(load_assets);
+    }
+}

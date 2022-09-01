@@ -2,10 +2,10 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::{PrefabId, PrefabLib};
 
 use crate::{
-    assets::SpriteSheet,
     constants::BEING_LAYER,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     item::ItemPrefab,
+    spritesheet::SpriteSheet,
     utils::some_or_return,
 };
 

@@ -3,11 +3,10 @@ use bevy_bobs::component::health::Health;
 use bevy_ecs_ldtk::EntityInstance;
 
 use crate::{
-    assets::SpriteSheet,
     constants::BEING_LAYER,
     grid::{to_world_coords, CellType, GridEntity},
     map::ldtk_to_bevy,
-    spritesheet_constants::SpriteIndex,
+    spritesheet::{SpriteIndex, SpriteSheet},
 };
 
 #[derive(Component)]

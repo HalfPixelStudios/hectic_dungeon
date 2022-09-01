@@ -4,11 +4,11 @@ use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
 use iyes_loopless::prelude::*;
 
 use crate::{
-    assets::SpriteSheet,
     constants::BEING_LAYER,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::{ldtk_to_bevy, CollisionMap},
+    spritesheet::SpriteSheet,
 };
 
 const FLOOR_HEALTH: u32 = 2;
