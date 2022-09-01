@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+pub struct LevelCleared;
+pub struct LevelFailed;
+
 pub struct Room {
     remaining_players: u32,
     remaining_enemies: u32,
@@ -42,22 +45,31 @@ pub struct RoomPlugin;
 
 impl Plugin for RoomPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Room::new()).add_system(update);
+        app.insert_resource(Room::new())
+            .add_event::<LevelCleared>()
+            .add_event::<LevelFailed>()
+            .add_system(update);
     }
 }
 
-fn update(room_state: Res<Room>) {
+fn update(
+    room_state: Res<Room>,
+    mut win_writer: EventWriter<LevelCleared>,
+    mut lose_writer: EventWriter<LevelFailed>,
+) {
     if room_state.is_changed() {
         println!(
             "players: {}, enemies: {}",
             room_state.remaining_players(),
             room_state.remaining_enemies()
         );
-        if room_state.did_lose() {
-            println!("player lost");
-        }
         if room_state.did_win() {
             println!("player win");
+            win_writer.send(LevelCleared);
+        }
+        if room_state.did_lose() {
+            println!("player lost");
+            lose_writer.send(LevelFailed);
         }
     }
 }
