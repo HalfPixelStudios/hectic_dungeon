@@ -38,6 +38,10 @@ const RON_STRING: &str = r#"
         attack_pattern: StraightTwo,
         damage: Fixed(1),
     ),
+    "wooden_bow": (
+        attack_pattern: PointThree,
+        damage: Fixed(1),
+    ),
     "arrow_trap": (
         attack_pattern: StraightSix,
         damage: Fixed(1),
