@@ -8,6 +8,9 @@ use super::{
     utils::{destroy_ui, UIRoot},
 };
 
+#[derive(Component)]
+pub struct LevelBox(pub usize);
+
 pub enum DungeonName {
     Doceo,
 }
@@ -35,7 +38,7 @@ impl Plugin for LevelSelectPlugin {
 
 const DUNGEON_INFO: DungeonInfo = DungeonInfo {
     dungeon_name: DungeonName::Doceo,
-    level_count: 2,
+    level_count: 10,
 };
 #[autodefault]
 fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
@@ -55,28 +58,35 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
 
     cmd.entity(root).with_children(|parent| {
         for level_index in 0..DUNGEON_INFO.level_count {
-            parent.spawn_bundle(TextBundle {
-                node: Node {
-                    size: Vec2::new(16., 16.),
-                },
-                text: Text::from_section(
-                    format!("{}", level_index),
-                    TextStyle {
-                        font: font.clone(),
-                        font_size: 20.,
-                        color: Color::WHITE,
+            parent
+                .spawn_bundle(TextBundle {
+                    node: Node {
+                        size: Vec2::new(16., 16.),
                     },
-                ),
-                style: Style {
-                    margin: UiRect::all(Val::Px(4.)),
-                },
-            });
+                    text: Text::from_section(
+                        format!("{}", level_index),
+                        TextStyle {
+                            font: font.clone(),
+                            font_size: 20.,
+                            color: Color::GRAY,
+                        },
+                    ),
+                    style: Style {
+                        margin: UiRect::all(Val::Px(4.)),
+                    },
+                })
+                .insert(LevelBox(level_index));
         }
     });
 }
 
 // TODO maybe use leafwing input manager
-fn input(mut cmd: Commands, keys: Res<Input<KeyCode>>, mut state: ResMut<LevelSelectState>) {
+fn input(
+    mut cmd: Commands,
+    keys: Res<Input<KeyCode>>,
+    mut state: ResMut<LevelSelectState>,
+    mut query: Query<(&mut Text, &LevelBox)>,
+) {
     if keys.just_pressed(KeyCode::A) {
         state.index = std::cmp::max(state.index as i32 - 1, 0) as usize;
     }
@@ -86,5 +96,17 @@ fn input(mut cmd: Commands, keys: Res<Input<KeyCode>>, mut state: ResMut<LevelSe
     if keys.just_pressed(KeyCode::Space) {
         cmd.insert_resource(NextState(ScreenState::Ingame));
         cmd.insert_resource(LevelSelection::Index(state.index));
+    }
+    if keys.just_pressed(KeyCode::Escape) {
+        cmd.insert_resource(NextState(ScreenState::MainMenu));
+    }
+
+    // updated selected level color
+    for (mut text, level_box) in query.iter_mut() {
+        text.sections.get_mut(0).unwrap().style.color = if level_box.0 == state.index {
+            Color::WHITE
+        } else {
+            Color::GRAY
+        };
     }
 }
