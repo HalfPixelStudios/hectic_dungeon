@@ -7,7 +7,7 @@ use super::{
     state::ScreenState,
     utils::{destroy_ui, destroy_ui_tag, UIRoot},
 };
-use crate::{assets::SpriteSheet, room::LevelCleared, spritesheet_constants::SpriteIndex};
+use crate::{assets::SpriteSheet, level::LevelCleared, spritesheet_constants::SpriteIndex};
 
 #[derive(Component)]
 struct WinMenuRoot;
@@ -27,7 +27,7 @@ pub struct IngamePlugin;
 impl Plugin for IngamePlugin {
     fn build(&self, app: &mut App) {
         app.add_enter_system(ScreenState::Ingame, render_ui)
-            .add_system(render_win_ui)
+            .add_system(render_win_ui.run_on_event::<LevelCleared>())
             .add_system(button_listener)
             .add_exit_system(ScreenState::Ingame, destroy_ui)
             .add_exit_system(ScreenState::Ingame, destroy_ui_tag::<WinMenuRoot>)
@@ -53,62 +53,56 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
 }
 
 #[autodefault]
-fn render_win_ui(
-    mut cmd: Commands,
-    assets: Res<AssetServer>,
-    mut events: EventReader<LevelCleared>,
-) {
-    for event in events.iter() {
-        let font = assets.load("fonts/arcadeclassic.ttf");
+fn render_win_ui(mut cmd: Commands, assets: Res<AssetServer>) {
+    let font = assets.load("fonts/arcadeclassic.ttf");
 
-        cmd.spawn()
-            .insert(WinMenuRoot)
-            .insert_bundle(NodeBundle {
-                color: UiColor(Color::NONE),
-                style: Style {
-                    align_self: AlignSelf::Center,
-                    justify_content: JustifyContent::Center,
-                },
-            })
-            .with_children(|mut parent| {
-                parent.spawn_bundle(TextBundle {
-                    text: Text::from_section(
-                        "Level cleared",
-                        TextStyle {
-                            font: font.clone(),
-                            font_size: 20.,
-                            color: Color::WHITE,
-                        },
-                    ),
-                });
-
-                for (tag, text) in vec![
-                    (ButtonTag::NextLevel, "Next Level"),
-                    (ButtonTag::MainMenu, "Main Menu"),
-                ] {
-                    parent
-                        .spawn_bundle(ButtonBundle {
-                            color: UiColor(Color::GRAY),
-                            style: Style {
-                                margin: UiRect::all(Val::Px(5.)),
-                            },
-                        })
-                        .insert(tag)
-                        .with_children(|mut parent| {
-                            parent.spawn_bundle(TextBundle {
-                                text: Text::from_section(
-                                    text,
-                                    TextStyle {
-                                        font: font.clone(),
-                                        font_size: 20.,
-                                        color: Color::WHITE,
-                                    },
-                                ),
-                            });
-                        });
-                }
+    cmd.spawn()
+        .insert(WinMenuRoot)
+        .insert_bundle(NodeBundle {
+            color: UiColor(Color::NONE),
+            style: Style {
+                align_self: AlignSelf::Center,
+                justify_content: JustifyContent::Center,
+            },
+        })
+        .with_children(|mut parent| {
+            parent.spawn_bundle(TextBundle {
+                text: Text::from_section(
+                    "Level cleared",
+                    TextStyle {
+                        font: font.clone(),
+                        font_size: 20.,
+                        color: Color::WHITE,
+                    },
+                ),
             });
-    }
+
+            for (tag, text) in vec![
+                (ButtonTag::NextLevel, "Next Level"),
+                (ButtonTag::MainMenu, "Main Menu"),
+            ] {
+                parent
+                    .spawn_bundle(ButtonBundle {
+                        color: UiColor(Color::GRAY),
+                        style: Style {
+                            margin: UiRect::all(Val::Px(5.)),
+                        },
+                    })
+                    .insert(tag)
+                    .with_children(|mut parent| {
+                        parent.spawn_bundle(TextBundle {
+                            text: Text::from_section(
+                                text,
+                                TextStyle {
+                                    font: font.clone(),
+                                    font_size: 20.,
+                                    color: Color::WHITE,
+                                },
+                            ),
+                        });
+                    });
+            }
+        });
 }
 
 fn button_listener(

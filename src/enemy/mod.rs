@@ -27,10 +27,10 @@ use crate::{
     enviro::dropped_item::SpawnDroppedItemEvent,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
+    level::Level,
     map::ldtk_to_bevy,
     movement::Movement,
     player::Player,
-    room::Room,
     screens::state::ScreenState,
     spritesheet_constants::SpriteIndex,
     ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
@@ -76,7 +76,7 @@ fn spawn(
     mut events: EventReader<SpawnEnemyEvent>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<EnemyPrefab>>,
-    mut room_state: ResMut<Room>,
+    mut room_state: ResMut<Level>,
 ) {
     for SpawnEnemyEvent {
         spawn_pos,
@@ -145,7 +145,7 @@ fn take_damage(
     mut events: EventReader<DamageEnemyEvent>,
     mut query: Query<(&mut Health, Option<&DropTable>, &GridEntity)>,
     mut writer: EventWriter<SpawnDroppedItemEvent>,
-    mut room_state: ResMut<Room>,
+    mut room_state: ResMut<Level>,
 ) {
     for DamageEnemyEvent { entity } in events.iter() {
         let (mut health, droptable, grid_entity) = query.get_mut(*entity).unwrap();
@@ -181,7 +181,7 @@ fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<
 fn spawn_from_ldtk(
     query: Query<&EntityInstance, Added<EntityInstance>>,
     mut writer: EventWriter<SpawnEnemyEvent>,
-    mut room: ResMut<Room>,
+    mut room: ResMut<Level>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "EnemySpawn") {
         // TODO handle not found
