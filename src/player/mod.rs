@@ -27,6 +27,7 @@ use crate::{
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
     movement::Movement,
+    room::Room,
     screens::state::ScreenState,
     spritesheet_constants::{SpriteFrames, SpriteIndex},
     ui::{
@@ -112,6 +113,7 @@ fn spawn(
     mut events: EventReader<SpawnPlayerEvent>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<PlayerPrefab>>,
+    mut room_state: ResMut<Room>,
 ) {
     for SpawnPlayerEvent {
         spawn_pos,
@@ -175,6 +177,7 @@ fn spawn(
         //     offset: Vec2::new(0., 8.),
         //     ..default()
         // });
+        room_state.register_player();
     }
 }
 
