@@ -11,8 +11,8 @@ pub struct LevelFailed;
 pub struct Level {
     remaining_players: u32,
     remaining_enemies: u32,
-    win_lock: bool,
-    lose_lock: bool,
+    /// Lock to prevent instantly winning or losing the level while entites are still being loaded
+    game_end_lock: bool,
 }
 
 impl Level {
@@ -20,8 +20,7 @@ impl Level {
         Level {
             remaining_players: 0,
             remaining_enemies: 0,
-            win_lock: true,
-            lose_lock: false,
+            game_end_lock: true,
         }
     }
     pub fn remaining_players(&self) -> u32 {
@@ -37,6 +36,7 @@ impl Level {
         self.remaining_enemies += 1;
     }
     pub fn deregister_player(&mut self) {
+        // careful of underflow
         self.remaining_players -= 1;
     }
     pub fn deregister_enemy(&mut self) {
@@ -63,18 +63,22 @@ fn update(
     // TODO right now using stupid hack to prevent instantly winning/losing when no
     // players/enemies are loaded from the map yet.
     if room_state.is_changed() {
-        if room_state.remaining_enemies() == 0 {
-            if room_state.win_lock {
-                room_state.win_lock = false;
-            } else {
+        println!(
+            "players: {}, enemies: {}",
+            room_state.remaining_players(),
+            room_state.remaining_enemies()
+        );
+
+        if room_state.remaining_players() != 0 && room_state.remaining_enemies() != 0 {
+            room_state.game_end_lock = false;
+        }
+
+        if !room_state.game_end_lock {
+            if room_state.remaining_enemies() == 0 {
                 println!("player win");
                 win_writer.send(LevelCleared);
             }
-        }
-        if room_state.remaining_players() == 0 {
-            if room_state.lose_lock {
-                room_state.lose_lock = false;
-            } else {
+            if room_state.remaining_players() == 0 {
                 println!("player lost");
                 lose_writer.send(LevelFailed);
             }
