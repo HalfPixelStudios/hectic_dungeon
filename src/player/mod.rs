@@ -25,9 +25,9 @@ use crate::{
     enviro::dropped_item::DroppedItem,
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
+    level::Level,
     map::ldtk_to_bevy,
     movement::Movement,
-    room::Room,
     screens::state::ScreenState,
     spritesheet_constants::{SpriteFrames, SpriteIndex},
     ui::{
@@ -113,7 +113,7 @@ fn spawn(
     mut events: EventReader<SpawnPlayerEvent>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<PlayerPrefab>>,
-    mut room_state: ResMut<Room>,
+    mut room_state: ResMut<Level>,
 ) {
     for SpawnPlayerEvent {
         spawn_pos,
@@ -378,11 +378,14 @@ fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<DamagePlayerEvent>,
     mut query: Query<(&mut Health, &GridEntity)>,
+    mut room_state: ResMut<Level>,
 ) {
     for DamagePlayerEvent { entity } in events.iter() {
         let (mut health, grid_entity) = query.get_mut(*entity).unwrap();
 
         health.take(1);
-        if health.is_zero() {}
+        if health.is_zero() {
+            room_state.deregister_player();
+        }
     }
 }

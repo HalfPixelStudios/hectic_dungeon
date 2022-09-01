@@ -23,8 +23,8 @@ use crate::{
     attack::AttackPlugin,
     enviro::EnviroPlugin,
     item::ItemPlugin,
+    level::LevelPlugin,
     map::MapPlugin,
-    room::RoomPlugin,
     screens::{state::ScreenState, ScreensPlugin},
     weapon::WeaponPlugin,
 };
@@ -66,7 +66,7 @@ pub fn app(config: AppConfig) {
         .add_plugin(AbilityPlugin)
         .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
-        .add_plugin(RoomPlugin)
+        .add_plugin(LevelPlugin)
         // .add_plugin(AnimatePlugin)
         .add_plugin(AttackPlugin)
         .add_plugin(ItemPlugin)
