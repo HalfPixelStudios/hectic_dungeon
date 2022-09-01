@@ -38,6 +38,9 @@ use crate::{
 };
 
 #[derive(Component)]
+pub struct SelectedPlayer;
+
+#[derive(Component)]
 pub struct Player;
 
 #[derive(Component, Clone, Copy, PartialEq, Eq, Debug, Hash)]
@@ -57,6 +60,8 @@ pub enum PlayerAction {
     Attack,
     Cancel,
     Interact,
+    PrevTroop,
+    NextTroop,
 }
 pub struct PlayerMovedEvent;
 
@@ -133,6 +138,8 @@ fn spawn(
             (KeyCode::Space, PlayerAction::Attack),
             (KeyCode::Escape, PlayerAction::Cancel),
             (KeyCode::E, PlayerAction::Interact),
+            (KeyCode::Left, PlayerAction::PrevTroop),
+            (KeyCode::Right, PlayerAction::NextTroop),
         ]);
 
         let prefab = some_or_continue!(prefab_lib.get(prefab_id));
@@ -153,6 +160,7 @@ fn spawn(
                 ..default()
             })
             .insert(Player)
+            .insert(SelectedPlayer)
             .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
             .insert(Health::new(prefab.health))
             .insert_bundle(InputManagerBundle::<PlayerAction> {
@@ -184,8 +192,8 @@ fn spawn(
 
 fn controller(
     mut cmd: Commands,
-    mut query: Query<(&GridEntity, &ActionState<PlayerAction>), With<Player>>,
-    item_query: Query<&DroppedItem, Without<Player>>,
+    mut query: Query<(&GridEntity, &ActionState<PlayerAction>), With<SelectedPlayer>>,
+    item_query: Query<&DroppedItem, Without<SelectedPlayer>>,
     grid: Res<Grid>,
 ) {
     let (grid_entity, action_state) = ok_or_return!(query.get_single_mut());
@@ -214,7 +222,7 @@ fn move_controller(
             &mut AttackIndicator,
             &ActionState<PlayerAction>,
         ),
-        With<Player>,
+        With<SelectedPlayer>,
     >,
     mut player_moved: EventWriter<PlayerMovedEvent>,
     grid: Res<Grid>,
@@ -256,13 +264,15 @@ fn update_move_indicator(
     mut query: Query<(&GridEntity, &mut MoveIndicator), With<Player>>,
     grid: Res<Grid>,
 ) {
-    let (grid_entity, mut move_indicator) = ok_or_return!(query.get_single_mut());
-    // TODO duplicated valid move checking logic from move_controller function
-    move_indicator.dirs.clear();
-    for dir in cardinal_dirs().iter() {
-        let next_pos = IVec2::from(*dir) + grid_entity.pos;
-        if grid.bounds_check(&next_pos) && !grid.contains_at(&next_pos, CellType::Wall).unwrap() {
-            move_indicator.dirs.push(*dir);
+    for (grid_entity, mut move_indicator) in query.iter_mut() {
+        // TODO duplicated valid move checking logic from move_controller function
+        move_indicator.dirs.clear();
+        for dir in cardinal_dirs().iter() {
+            let next_pos = IVec2::from(*dir) + grid_entity.pos;
+            if grid.bounds_check(&next_pos) && !grid.contains_at(&next_pos, CellType::Wall).unwrap()
+            {
+                move_indicator.dirs.push(*dir);
+            }
         }
     }
 }
@@ -276,7 +286,7 @@ fn attack_controller(
             &GridEntity,
             &ActionState<PlayerAction>,
         ),
-        With<Player>,
+        With<SelectedPlayer>,
     >,
     mut writer: EventWriter<AttackEvent>,
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
@@ -338,21 +348,24 @@ fn on_turn_start(mut cmd: Commands) {
 }
 
 fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
-    attack_indicator.hidden = true;
-    move_indicator.hidden = false;
+    for (mut attack_indicator, mut move_indicator) in query.iter_mut() {
+        attack_indicator.hidden = true;
+        move_indicator.hidden = false;
+    }
 }
 fn transition_to_attack(
     mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>,
 ) {
-    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
-    attack_indicator.hidden = false;
-    move_indicator.hidden = true;
+    for (mut attack_indicator, mut move_indicator) in query.iter_mut() {
+        attack_indicator.hidden = false;
+        move_indicator.hidden = true;
+    }
 }
 fn transition_to_none(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    let (mut attack_indicator, mut move_indicator) = ok_or_return!(query.get_single_mut());
-    attack_indicator.hidden = true;
-    move_indicator.hidden = true;
+    for (mut attack_indicator, mut move_indicator) in query.iter_mut() {
+        attack_indicator.hidden = true;
+        move_indicator.hidden = true;
+    }
 }
 
 fn spawn_from_ldtk(

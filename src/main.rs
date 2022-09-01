@@ -1,4 +1,5 @@
 #![allow(unused)]
+#![warn(unused_imports)]
 #![allow(dead_code)]
 mod ability;
 mod ai;

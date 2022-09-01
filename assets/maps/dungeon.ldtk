@@ -789,6 +789,23 @@
 								"id": "V_String",
 								"params": ["orc_dagger"]
 							}] }]
+						},
+						{
+							"__identifier": "PlayerSpawn",
+							"__grid": [4,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#1A11F4",
+							"iid": "c1b8e840-02f0-11ed-a43f-4152dcf3d539",
+							"width": 8,
+							"height": 8,
+							"defUid": 21,
+							"px": [32,48],
+							"fieldInstances": [{ "__identifier": "id", "__value": "warrior", "__type": "String", "__tile": null, "defUid": 22, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["warrior"]
+							}] }]
 						}
 					]
 				},
