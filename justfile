@@ -2,7 +2,7 @@
 default: debug
 
 debug:
-    cargo run -- -e -s ingame
+    cargo run -- -e -f -s ingame
 
 web:
     cargo watch -cx "run --release --target wasm32-unknown-unknown"

@@ -378,11 +378,14 @@ fn take_damage(
     mut cmd: Commands,
     mut events: EventReader<DamagePlayerEvent>,
     mut query: Query<(&mut Health, &GridEntity)>,
+    mut room_state: ResMut<Level>,
 ) {
     for DamagePlayerEvent { entity } in events.iter() {
         let (mut health, grid_entity) = query.get_mut(*entity).unwrap();
 
         health.take(1);
-        if health.is_zero() {}
+        if health.is_zero() {
+            room_state.deregister_player();
+        }
     }
 }
