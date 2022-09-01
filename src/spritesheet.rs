@@ -21,10 +21,12 @@ pub enum SpriteIndex {
     Barrel = sprite!(0, 7),
 
     AttackIndicator = sprite!(0, 8),
-    // MoveIndicatorW = sprite!(4, 10),
-    // MoveIndicatorN = sprite!(5, 10),
-    // MoveIndicatorS = sprite!(6, 10),
-    // MoveIndicatorE = sprite!(7, 10),
+
+    MoveIndicatorW = sprite!(4, 10),
+    MoveIndicatorN = sprite!(5, 10),
+    MoveIndicatorS = sprite!(6, 10),
+    MoveIndicatorE = sprite!(7, 10),
+
     ItemSlotBg = sprite!(0, 11),
     WeaponSlot = sprite!(1, 11),
     ArmorSlot = sprite!(2, 11),

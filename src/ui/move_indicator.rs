@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 
-use crate::{constants::TILE_SIZE, spritesheet::SpriteSheet, utils::Dir};
+use crate::{
+    constants::{INGAME_UI_LAYER, TILE_SIZE},
+    spritesheet::{SpriteIndex, SpriteSheet},
+    utils::Dir,
+};
 
 pub struct MoveIndicatorPlugin;
 
@@ -57,7 +61,7 @@ fn spawn(
         let root = cmd.spawn().id();
         cmd.entity(root)
             .insert_bundle(SpatialBundle::from_transform(Transform::from_translation(
-                Vec2::ZERO.extend(2.),
+                Vec2::ZERO.extend(INGAME_UI_LAYER),
             )))
             .insert(MoveIndicatorRoot);
 
@@ -66,10 +70,10 @@ fn spawn(
         // spawn children
         for dir in move_indicator.dirs.iter() {
             let sprite_index = match dir {
-                Dir::West => 132,
-                Dir::North => 133,
-                Dir::South => 134,
-                Dir::East => 135,
+                Dir::West => SpriteIndex::MoveIndicatorW as usize,
+                Dir::North => SpriteIndex::MoveIndicatorN as usize,
+                Dir::South => SpriteIndex::MoveIndicatorS as usize,
+                Dir::East => SpriteIndex::MoveIndicatorE as usize,
                 _ => unreachable!(), // TODO not safe
             };
 

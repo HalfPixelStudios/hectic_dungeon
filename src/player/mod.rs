@@ -126,11 +126,9 @@ impl Plugin for PlayerPlugin {
                 .with_system(update_move_indicator.run_in_state(GameState::PlayerInput))
                 .with_system(spawn_from_ldtk)
                 .with_system(troop_selector)
+                .with_system(ui_enabler)
                 .into(),
         )
-        .add_enter_system(TroopState::Attack, transition_to_attack)
-        .add_enter_system(TroopState::Move, transition_to_move)
-        .add_enter_system(TroopState::None, transition_to_none)
         .add_enter_system(GameState::PlayerInput, on_turn_start)
         .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
         .add_exit_system(ScreenState::Ingame, cleanup::<Player>)
@@ -385,24 +383,38 @@ fn on_turn_start(mut cmd: Commands) {
     cmd.insert_resource(NextState(TroopState::Move));
 }
 
-fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    for (mut attack_indicator, mut move_indicator) in query.iter_mut() {
-        attack_indicator.hidden = true;
-        move_indicator.hidden = false;
-    }
-}
-fn transition_to_attack(
-    mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>,
+/// Decides which ingame ui to show or hide depending on state
+fn ui_enabler(
+    mut query: Query<
+        (
+            &mut AttackIndicator,
+            &mut MoveIndicator,
+            Option<&SelectedPlayer>,
+        ),
+        With<Player>,
+    >,
+    current_state: Res<CurrentState<TroopState>>,
 ) {
-    for (mut attack_indicator, mut move_indicator) in query.iter_mut() {
-        attack_indicator.hidden = false;
-        move_indicator.hidden = true;
-    }
-}
-fn transition_to_none(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
-    for (mut attack_indicator, mut move_indicator) in query.iter_mut() {
-        attack_indicator.hidden = true;
-        move_indicator.hidden = true;
+    for (mut attack_indicator, mut move_indicator, selected) in query.iter_mut() {
+        if selected.is_none() {
+            attack_indicator.hidden = true;
+            move_indicator.hidden = true;
+        } else {
+            match current_state.0 {
+                TroopState::None => {
+                    attack_indicator.hidden = true;
+                    move_indicator.hidden = true;
+                },
+                TroopState::Move => {
+                    attack_indicator.hidden = true;
+                    move_indicator.hidden = false;
+                },
+                TroopState::Attack => {
+                    attack_indicator.hidden = false;
+                    move_indicator.hidden = true;
+                },
+            }
+        }
     }
 }
 
