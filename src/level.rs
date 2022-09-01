@@ -30,12 +30,7 @@ impl Level {
         self.enemies.clear();
         self.game_end_lock = true;
     }
-    pub fn remaining_players(&self) -> usize {
-        self.players.len()
-    }
-    pub fn remaining_enemies(&self) -> usize {
-        self.enemies.len()
-    }
+
     pub fn register_player(&mut self, e: Entity) {
         self.players.insert(e);
     }
@@ -47,6 +42,19 @@ impl Level {
     }
     pub fn deregister_enemy(&mut self, e: Entity) {
         self.enemies.remove(&e);
+    }
+
+    pub fn players(&self) -> &HashSet<Entity> {
+        &self.players
+    }
+    pub fn enemies(&self) -> &HashSet<Entity> {
+        &self.enemies
+    }
+    pub fn remaining_players(&self) -> usize {
+        self.players.len()
+    }
+    pub fn remaining_enemies(&self) -> usize {
+        self.enemies.len()
     }
 }
 

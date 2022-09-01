@@ -37,22 +37,43 @@ use crate::{
     weapon::CurrentWeapon,
 };
 
+/// Tag component for the currently selected troop
 #[derive(Component)]
 pub struct SelectedPlayer;
 
+/// Tag component for troops
 #[derive(Component)]
 pub struct Player;
 
+/// Tag component for user input controller
+#[derive(Component)]
+pub struct UserController;
+
+/// Indicator for the current troop action
 #[derive(Component, Clone, Copy, PartialEq, Eq, Debug, Hash)]
-pub enum PlayerState {
+pub enum TroopState {
     None,
     Move,
     Attack,
 }
 
+/// Resource for selecting the current controlled troop
+#[derive(Default)]
+pub struct TroopSelector {
+    index: usize,
+}
+
+/// Actions the user can take
+#[derive(Actionlike, Clone)]
+pub enum UserAction {
+    PrevTroop,
+    NextTroop,
+}
+
+/// Actions the troop can take
 //TODO add direction vectors to PlayerAction definition
 #[derive(Actionlike, Clone)]
-pub enum PlayerAction {
+pub enum TroopAction {
     Left,
     Right,
     Up,
@@ -60,9 +81,8 @@ pub enum PlayerAction {
     Attack,
     Cancel,
     Interact,
-    PrevTroop,
-    NextTroop,
 }
+
 pub struct PlayerMovedEvent;
 
 pub struct SpawnPlayerEvent {
@@ -78,12 +98,14 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+        app.add_plugin(InputManagerPlugin::<TroopAction>::default())
+            .add_plugin(InputManagerPlugin::<UserAction>::default())
             .add_plugin(PrefabPlugin)
-            .add_loopless_state(PlayerState::Move)
+            .add_loopless_state(TroopState::Move)
             .add_event::<SpawnPlayerEvent>()
             .add_event::<PlayerMovedEvent>()
-            .add_event::<DamagePlayerEvent>();
+            .add_event::<DamagePlayerEvent>()
+            .insert_resource(TroopSelector::default());
 
         app.add_system_set(
             ConditionSet::new()
@@ -92,26 +114,39 @@ impl Plugin for PlayerPlugin {
                 .with_system(
                     move_controller
                         .run_in_state(GameState::PlayerInput)
-                        .run_in_state(PlayerState::Move),
+                        .run_in_state(TroopState::Move),
                 )
                 .with_system(
                     attack_controller
                         .run_in_state(GameState::PlayerInput)
-                        .run_in_state(PlayerState::Attack),
+                        .run_in_state(TroopState::Attack),
                 )
                 .with_system(spawn)
                 .with_system(take_damage)
                 .with_system(update_move_indicator.run_in_state(GameState::PlayerInput))
                 .with_system(spawn_from_ldtk)
+                .with_system(troop_selector)
                 .into(),
         )
-        .add_enter_system(PlayerState::Attack, transition_to_attack)
-        .add_enter_system(PlayerState::Move, transition_to_move)
-        .add_enter_system(PlayerState::None, transition_to_none)
+        .add_enter_system(TroopState::Attack, transition_to_attack)
+        .add_enter_system(TroopState::Move, transition_to_move)
+        .add_enter_system(TroopState::None, transition_to_none)
         .add_enter_system(GameState::PlayerInput, on_turn_start)
         .add_exit_system(GameState::PlayerInput, reset_on_turn_end)
-        .add_exit_system(ScreenState::Ingame, cleanup::<Player>);
+        .add_exit_system(ScreenState::Ingame, cleanup::<Player>)
+        .add_startup_system(spawn_user_controller);
     }
+}
+
+fn spawn_user_controller(mut cmd: Commands) {
+    let input_map = InputMap::new([
+        (KeyCode::Left, UserAction::PrevTroop),
+        (KeyCode::Right, UserAction::NextTroop),
+    ]);
+    cmd.spawn_bundle(InputManagerBundle::<UserAction> {
+        action_state: ActionState::default(),
+        input_map,
+    });
 }
 
 fn spawn(
@@ -128,18 +163,16 @@ fn spawn(
     {
         let input_map = InputMap::new([
             // (KeyCode::Left, PlayerAction::Left),
-            (KeyCode::A, PlayerAction::Left),
+            (KeyCode::A, TroopAction::Left),
             // (KeyCode::Right, PlayerAction::Right),
-            (KeyCode::D, PlayerAction::Right),
+            (KeyCode::D, TroopAction::Right),
             // (KeyCode::Up, PlayerAction::Up),
-            (KeyCode::W, PlayerAction::Up),
+            (KeyCode::W, TroopAction::Up),
             // (KeyCode::Down, PlayerAction::Down),
-            (KeyCode::S, PlayerAction::Down),
-            (KeyCode::Space, PlayerAction::Attack),
-            (KeyCode::Escape, PlayerAction::Cancel),
-            (KeyCode::E, PlayerAction::Interact),
-            (KeyCode::Left, PlayerAction::PrevTroop),
-            (KeyCode::Right, PlayerAction::NextTroop),
+            (KeyCode::S, TroopAction::Down),
+            (KeyCode::Space, TroopAction::Attack),
+            (KeyCode::Escape, TroopAction::Cancel),
+            (KeyCode::E, TroopAction::Interact),
         ]);
 
         let prefab = some_or_continue!(prefab_lib.get(prefab_id));
@@ -162,7 +195,7 @@ fn spawn(
             .insert(Player)
             .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
             .insert(Health::new(prefab.health))
-            .insert_bundle(InputManagerBundle::<PlayerAction> {
+            .insert_bundle(InputManagerBundle::<TroopAction> {
                 action_state: ActionState::default(),
                 input_map,
             })
@@ -197,13 +230,13 @@ fn spawn(
 
 fn controller(
     mut cmd: Commands,
-    mut query: Query<(&GridEntity, &ActionState<PlayerAction>), With<SelectedPlayer>>,
+    mut query: Query<(&GridEntity, &ActionState<TroopAction>), With<SelectedPlayer>>,
     item_query: Query<&DroppedItem, Without<SelectedPlayer>>,
     grid: Res<Grid>,
 ) {
     let (grid_entity, action_state) = ok_or_return!(query.get_single_mut());
 
-    if action_state.just_pressed(PlayerAction::Interact) {
+    if action_state.just_pressed(TroopAction::Interact) {
         for cell_entity in grid.get_cell(&grid_entity.pos).unwrap().iter() {
             if let CellType::DroppedItem(entity) = cell_entity {
                 let dropped_item = item_query.get(*entity).unwrap();
@@ -225,7 +258,7 @@ fn move_controller(
             &mut GridEntity,
             &mut Movement,
             &mut AttackIndicator,
-            &ActionState<PlayerAction>,
+            &ActionState<TroopAction>,
         ),
         With<SelectedPlayer>,
     >,
@@ -236,20 +269,20 @@ fn move_controller(
         ok_or_return!(query.get_single_mut());
     let mut dir = IVec2::ZERO;
 
-    if action_state.just_pressed(PlayerAction::Left) {
+    if action_state.just_pressed(TroopAction::Left) {
         dir += IVec2::new(-1, 0);
     }
-    if action_state.just_pressed(PlayerAction::Right) {
+    if action_state.just_pressed(TroopAction::Right) {
         dir += IVec2::new(1, 0);
     }
-    if action_state.just_pressed(PlayerAction::Up) {
+    if action_state.just_pressed(TroopAction::Up) {
         dir += IVec2::new(0, 1);
     }
-    if action_state.just_pressed(PlayerAction::Down) {
+    if action_state.just_pressed(TroopAction::Down) {
         dir += IVec2::new(0, -1);
     }
-    if action_state.just_pressed(PlayerAction::Attack) {
-        cmd.insert_resource(NextState(PlayerState::Attack));
+    if action_state.just_pressed(TroopAction::Attack) {
+        cmd.insert_resource(NextState(TroopState::Attack));
     }
 
     // TODO movement collision logic shouldn't be here?
@@ -289,7 +322,7 @@ fn attack_controller(
             Entity,
             &mut AttackIndicator,
             &GridEntity,
-            &ActionState<PlayerAction>,
+            &ActionState<TroopAction>,
         ),
         With<SelectedPlayer>,
     >,
@@ -300,22 +333,22 @@ fn attack_controller(
     let (entity, mut attack_indicator, grid_entity, action_state) =
         ok_or_return!(query.get_single_mut());
 
-    if action_state.just_pressed(PlayerAction::Up) {
+    if action_state.just_pressed(TroopAction::Up) {
         attack_indicator.dir = Dir::North;
     }
-    if action_state.just_pressed(PlayerAction::Left) {
+    if action_state.just_pressed(TroopAction::Left) {
         attack_indicator.dir = Dir::West;
     }
-    if action_state.just_pressed(PlayerAction::Down) {
+    if action_state.just_pressed(TroopAction::Down) {
         attack_indicator.dir = Dir::South;
     }
-    if action_state.just_pressed(PlayerAction::Right) {
+    if action_state.just_pressed(TroopAction::Right) {
         attack_indicator.dir = Dir::East;
     }
-    if action_state.just_pressed(PlayerAction::Cancel) {
-        cmd.insert_resource(NextState(PlayerState::Move));
+    if action_state.just_pressed(TroopAction::Cancel) {
+        cmd.insert_resource(NextState(TroopState::Move));
     }
-    if action_state.just_pressed(PlayerAction::Attack) {
+    if action_state.just_pressed(TroopAction::Attack) {
         // deal damage
         let grid_positions = attack_indicator
             .get_pattern()
@@ -345,11 +378,11 @@ fn attack_controller(
 
 /// If player turn expires or ends, disable their AttackIndicator and reset them to move state
 fn reset_on_turn_end(mut cmd: Commands) {
-    cmd.insert_resource(NextState(PlayerState::None));
+    cmd.insert_resource(NextState(TroopState::None));
 }
 /// Default to move state on turn start
 fn on_turn_start(mut cmd: Commands) {
-    cmd.insert_resource(NextState(PlayerState::Move));
+    cmd.insert_resource(NextState(TroopState::Move));
 }
 
 fn transition_to_move(mut query: Query<(&mut AttackIndicator, &mut MoveIndicator), With<Player>>) {
@@ -407,4 +440,34 @@ fn take_damage(
             room_state.deregister_player(entity);
         }
     }
+}
+
+fn troop_selector(
+    mut cmd: Commands,
+    query: Query<&ActionState<UserAction>>,
+    mut selector: ResMut<TroopSelector>,
+    level_state: Res<Level>,
+) {
+    let action_state = ok_or_return!(query.get_single());
+
+    let offset: i32 = if action_state.just_pressed(UserAction::PrevTroop) {
+        -1
+    } else if action_state.just_pressed(UserAction::NextTroop) {
+        1
+    } else {
+        return;
+    };
+
+    let players = level_state.players();
+    if players.len() == 0 {
+        return;
+    }
+
+    let old_player = players.iter().nth(selector.index).unwrap();
+    selector.index = (selector.index as i32 + offset).rem_euclid(players.len() as i32) as usize;
+    let new_player = players.iter().nth(selector.index).unwrap();
+
+    // update the SelectedPlayer marker component
+    cmd.entity(*old_player).remove::<SelectedPlayer>();
+    cmd.entity(*new_player).insert(SelectedPlayer);
 }
