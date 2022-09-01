@@ -1,6 +1,6 @@
 use bevy::{prelude::*, time::Stopwatch};
 
-use crate::{grid::to_world_coords, spritesheet::SpriteSheet};
+use crate::{constants::INGAME_UI_LAYER, grid::to_world_coords, spritesheet::SpriteSheet};
 
 // TODO this is simply a short lived sprite animation, should be replaced by general animation
 // system in future
@@ -88,7 +88,7 @@ fn spawn(
             },
             texture_atlas: asset_sheet.clone(),
             transform: Transform {
-                translation: to_world_coords(spawn_pos).extend(2.),
+                translation: to_world_coords(spawn_pos).extend(INGAME_UI_LAYER),
                 ..default()
             },
             ..default()

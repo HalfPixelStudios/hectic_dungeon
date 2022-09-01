@@ -19,6 +19,7 @@ pub enum AttackPattern {
     StraightSix,
     Hammer,
     TwinBlade,
+    PointThree,
 }
 
 impl AttackPattern {
@@ -43,6 +44,7 @@ impl AttackPattern {
                 IVec2::new(1, 1),
                 IVec2::new(2, 2),
             ],
+            AttackPattern::PointThree => vec![IVec2::new(0, 3)],
         }
     }
 }

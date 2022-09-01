@@ -18,10 +18,7 @@ pub struct PlayerPrefab {
     pub health: u32,
     pub class: Class,
     pub sprite_index: SpriteIndex,
-    pub default_primary: Option<PrefabId>,
-    pub default_secondary: Option<PrefabId>,
-    pub default_ability: Option<PrefabId>,
-    pub default_armor: Option<PrefabId>,
+    pub weapon: PrefabId,
 }
 
 pub struct PrefabPlugin;
@@ -38,19 +35,13 @@ const RON_STRING: &str = r#"
         health: 10,
         class: Warrior,
         sprite_index: PlayerWarrior,
-        default_primary: Some("steel_sword"),
-        default_secondary: None,
-        default_ability: None,
-        default_armor: None,
+        weapon: "steel_sword",
     ),
     "archer": (
         health: 10,
         class: Archer,
         sprite_index: PlayerArcher,
-        default_primary: Some("steel_sword"),
-        default_secondary: None,
-        default_ability: None,
-        default_armor: None,
+        weapon: "wooden_bow",
     )
 }
 "#;
