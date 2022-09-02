@@ -43,6 +43,7 @@ pub enum SpriteIndex {
 pub enum SpriteFrames {
     PlayerAttack,
     EnemyAttack,
+    SpikeTrap,
 }
 
 impl SpriteFrames {
@@ -50,6 +51,7 @@ impl SpriteFrames {
         match self {
             Self::PlayerAttack => vec![(0, 9), (1, 9), (2, 9), (3, 9)],
             Self::EnemyAttack => vec![(0, 10), (1, 10), (2, 10)],
+            Self::SpikeTrap => vec![(0, 13), (1, 13), (2, 13), (3, 13)],
         }
     }
 

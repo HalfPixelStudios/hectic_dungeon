@@ -3,12 +3,14 @@ pub mod collapsable_floor;
 pub mod destructible;
 pub mod door;
 pub mod dropped_item;
+pub mod spike_trap;
 
 use bevy::prelude::*;
 
 use self::{
     arrow_trap::ArrowTrapPlugin, collapsable_floor::CollapsableFloorPlugin,
     destructible::DestructiblePlugin, door::DoorPlugin, dropped_item::DroppedItemPlugin,
+    spike_trap::SpikeTrapPlugin,
 };
 
 pub struct EnviroPlugin;
@@ -19,6 +21,7 @@ impl Plugin for EnviroPlugin {
             .add_plugin(ArrowTrapPlugin)
             .add_plugin(DoorPlugin)
             .add_plugin(DroppedItemPlugin)
-            .add_plugin(DestructiblePlugin);
+            .add_plugin(DestructiblePlugin)
+            .add_plugin(SpikeTrapPlugin);
     }
 }
