@@ -9,6 +9,7 @@ use crate::{
 
 #[derive(Clone, PartialEq)]
 pub enum CellType {
+    None,
     Player(Entity),
     Enemy(Entity),
     Wall,
