@@ -34,6 +34,8 @@ pub enum SpriteIndex {
 
     HeartFull = sprite!(0, 12),
     HeartEmpty = sprite!(0, 13),
+
+    WaterTile = sprite!(0, 14),
 }
 
 // ui
