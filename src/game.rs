@@ -10,6 +10,7 @@ const PLAYER_INPUT_TIME_LIMIT: f32 = 30.;
 const PLAYER_ANIM_TIME_LIMIT: f32 = 0.1;
 const ENEMY_INPUT_TIME_LIMIT: f32 = 0.3;
 const ENEMY_ANIM_TIME_LIMIT: f32 = 0.1;
+const WORLD_UPDATE_TIME_LIMIT: f32 = 0.5;
 
 const START_STATE: GameState = GameState::PlayerInput;
 
@@ -19,6 +20,7 @@ const START_STATE: GameState = GameState::PlayerInput;
 /// - `PlayerAnimation` is a short period allocated to playing animations like moving and attacking
 /// - `EnemyInput` is for enemies to compute or carry out their next move and attacks
 /// - `EnemyAnimation` similar to `PlayerAnimation` phase
+/// - `WorldUpdate` is for updates that are not related to either the player or enemy
 ///
 /// Can hook into each of these phases by adding your system to on_enter or on_update
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -27,6 +29,7 @@ pub enum GameState {
     PlayerAnimation,
     EnemyInput,
     EnemyAnimation,
+    WorldUpdate,
 }
 
 impl GameState {
@@ -36,6 +39,7 @@ impl GameState {
             GameState::PlayerAnimation => PLAYER_ANIM_TIME_LIMIT,
             GameState::EnemyInput => ENEMY_INPUT_TIME_LIMIT,
             GameState::EnemyAnimation => ENEMY_ANIM_TIME_LIMIT,
+            GameState::WorldUpdate => WORLD_UPDATE_TIME_LIMIT,
         }
     }
 
@@ -44,7 +48,8 @@ impl GameState {
             GameState::PlayerInput => GameState::PlayerAnimation,
             GameState::PlayerAnimation => GameState::EnemyInput,
             GameState::EnemyInput => GameState::EnemyAnimation,
-            GameState::EnemyAnimation => GameState::PlayerInput,
+            GameState::EnemyAnimation => GameState::WorldUpdate,
+            GameState::WorldUpdate => GameState::PlayerInput,
         }
     }
 }
