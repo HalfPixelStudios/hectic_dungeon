@@ -23,6 +23,7 @@ pub struct AttackRangeScorer {
     pub range: f32,
 }
 
+/// Finds the closest player troop and targets that
 fn attack_range_scorer(
     player_query: Query<&GridEntity, With<Player>>,
     mut score_query: Query<(&Actor, &mut Score, &AttackRangeScorer), Without<Player>>,

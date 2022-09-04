@@ -1,5 +1,6 @@
 use autodefault::*;
 use bevy::prelude::*;
+use bevy_ecs_ldtk::LevelSelection;
 use iyes_loopless::prelude::*;
 
 use super::{
@@ -7,7 +8,10 @@ use super::{
     state::ScreenState,
     utils::{destroy_ui, destroy_ui_tag, UIRoot},
 };
-use crate::level::{LevelCleared, LevelFailed};
+use crate::{
+    level::{LevelCleared, LevelFailed},
+    map::{CurrentLevel, SwitchLevelEvent},
+};
 
 #[derive(Component)]
 struct WinMenuRoot;
@@ -82,6 +86,7 @@ fn render_win_ui(mut cmd: Commands, assets: Res<AssetServer>) {
 
             for (tag, text) in vec![
                 (ButtonTag::NextLevel, "Next Level"),
+                (ButtonTag::RetryLevel, "Retry Level"),
                 (ButtonTag::MainMenu, "Main Menu"),
             ] {
                 parent
@@ -167,15 +172,25 @@ fn render_lose_ui(mut cmd: Commands, assets: Res<AssetServer>) {
 fn button_listener(
     mut cmd: Commands,
     query: Query<(&Interaction, &ButtonTag), Changed<Interaction>>,
+    current_level: Res<CurrentLevel>,
+    mut switch_level_writer: EventWriter<SwitchLevelEvent>,
 ) {
     for (interaction, button_tag) in &query {
         match interaction {
             Interaction::Clicked => match button_tag {
-                ButtonTag::NextLevel => {},
+                ButtonTag::NextLevel => {
+                    switch_level_writer.send(SwitchLevelEvent {
+                        level_index: current_level.0 + 1,
+                    });
+                },
                 ButtonTag::MainMenu => {
                     cmd.insert_resource(NextState(ScreenState::MainMenu));
                 },
-                ButtonTag::RetryLevel => {},
+                ButtonTag::RetryLevel => {
+                    switch_level_writer.send(SwitchLevelEvent {
+                        level_index: current_level.0,
+                    });
+                },
             },
             _ => {},
         }

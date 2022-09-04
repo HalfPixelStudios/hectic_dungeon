@@ -12,8 +12,10 @@ use crate::{
     screens::state::ScreenState,
 };
 
+pub struct CurrentLevel(pub usize);
+
 pub struct SwitchLevelEvent {
-    level_index: usize,
+    pub level_index: usize,
 }
 
 pub struct MapPlugin;
@@ -26,6 +28,7 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(LdtkPlugin)
             .add_event::<SwitchLevelEvent>()
+            .insert_resource(CurrentLevel(0))
             .insert_resource(CollisionMap(Vec::new()))
             .add_system_set(
                 ConditionSet::new()
@@ -80,6 +83,7 @@ fn switch_level(
     for SwitchLevelEvent { level_index } in events.iter() {
         cmd.insert_resource(NextState(ScreenState::Ingame));
         cmd.insert_resource(LevelSelection::Index(*level_index));
+        cmd.insert_resource(CurrentLevel(*level_index));
         collision_map.clear();
     }
 }
