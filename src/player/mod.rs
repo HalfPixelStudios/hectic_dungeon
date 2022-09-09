@@ -16,7 +16,7 @@ use crate::{
     camera::CameraFollow,
     constants::BEING_LAYER,
     enviro::dropped_item::DroppedItem,
-    game::GameState,
+    game::{GameState, PauseGame},
     grid::{to_world_coords, CellType, Grid, GridEntity},
     level::Level,
     map::ldtk_to_bevy,
@@ -62,6 +62,7 @@ pub struct TroopSelector {
 pub enum UserAction {
     PrevTroop,
     NextTroop,
+    PauseGame,
 }
 
 /// Actions the troop can take
@@ -120,6 +121,7 @@ impl Plugin for PlayerPlugin {
                 .with_system(update_move_indicator.run_in_state(GameState::PlayerInput))
                 .with_system(spawn_from_ldtk)
                 .with_system(troop_selector)
+                .with_system(game_pauser)
                 .with_system(ui_enabler)
                 .into(),
         )
@@ -134,6 +136,7 @@ fn spawn_user_controller(mut cmd: Commands) {
     let input_map = InputMap::new([
         (KeyCode::Left, UserAction::PrevTroop),
         (KeyCode::Right, UserAction::NextTroop),
+        (KeyCode::P, UserAction::PauseGame),
     ]);
     cmd.spawn_bundle(InputManagerBundle::<UserAction> {
         action_state: ActionState::default(),
@@ -470,4 +473,17 @@ fn troop_selector(
     // update the SelectedPlayer marker component
     cmd.entity(*old_player).remove::<SelectedPlayer>();
     cmd.entity(*new_player).insert(SelectedPlayer);
+}
+
+fn game_pauser(
+    mut cmd: Commands,
+    query: Query<&ActionState<UserAction>>,
+    mut selector: ResMut<TroopSelector>,
+    paused: Res<PauseGame>,
+) {
+    let action_state = ok_or_return!(query.get_single());
+
+    if action_state.just_pressed(UserAction::PauseGame) {
+        cmd.insert_resource(PauseGame(!paused.0));
+    }
 }
