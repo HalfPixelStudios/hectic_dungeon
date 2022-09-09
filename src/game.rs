@@ -32,6 +32,13 @@ pub enum GameState {
     WorldUpdate,
 }
 
+/// Resource that is used to pause and unpause the game
+pub struct PauseGame(pub bool);
+
+fn is_paused(paused: Res<PauseGame>) -> bool {
+    paused.0
+}
+
 impl GameState {
     pub fn time_limit(&self) -> f32 {
         match self {
@@ -96,11 +103,12 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_loopless_state(START_STATE)
             .insert_resource(StateTimer::default())
+            .insert_resource(PauseGame(false))
             .add_enter_system(ScreenState::Ingame, reset)
             .add_system_set(
                 ConditionSet::new()
                     .run_in_state(ScreenState::Ingame)
-                    .with_system(game_loop)
+                    .with_system(game_loop.run_if_not(is_paused))
                     .with_system(
                         end_player_input
                             .run_in_state(GameState::PlayerInput)

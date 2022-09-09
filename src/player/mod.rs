@@ -16,7 +16,7 @@ use crate::{
     camera::CameraFollow,
     constants::BEING_LAYER,
     enviro::dropped_item::DroppedItem,
-    game::GameState,
+    game::{GameState, PauseGame},
     grid::{to_world_coords, CellType, Grid, GridEntity},
     level::Level,
     map::ldtk_to_bevy,
@@ -62,6 +62,7 @@ pub struct TroopSelector {
 pub enum UserAction {
     PrevTroop,
     NextTroop,
+    PauseGame,
 }
 
 /// Actions the troop can take
@@ -73,7 +74,7 @@ pub enum TroopAction {
     Up,
     Down,
     Attack,
-    Cancel,
+    ToggleState,
     Interact,
 }
 
@@ -120,6 +121,7 @@ impl Plugin for PlayerPlugin {
                 .with_system(update_move_indicator.run_in_state(GameState::PlayerInput))
                 .with_system(spawn_from_ldtk)
                 .with_system(troop_selector)
+                .with_system(game_pauser)
                 .with_system(ui_enabler)
                 .into(),
         )
@@ -134,6 +136,7 @@ fn spawn_user_controller(mut cmd: Commands) {
     let input_map = InputMap::new([
         (KeyCode::Left, UserAction::PrevTroop),
         (KeyCode::Right, UserAction::NextTroop),
+        (KeyCode::Escape, UserAction::PauseGame),
     ]);
     cmd.spawn_bundle(InputManagerBundle::<UserAction> {
         action_state: ActionState::default(),
@@ -163,7 +166,7 @@ fn spawn(
             // (KeyCode::Down, PlayerAction::Down),
             (KeyCode::S, TroopAction::Down),
             (KeyCode::Space, TroopAction::Attack),
-            (KeyCode::Escape, TroopAction::Cancel),
+            (KeyCode::LShift, TroopAction::ToggleState),
             (KeyCode::E, TroopAction::Interact),
         ]);
 
@@ -267,7 +270,7 @@ fn move_controller(
     if action_state.just_pressed(TroopAction::Down) {
         dir += IVec2::new(0, -1);
     }
-    if action_state.just_pressed(TroopAction::Attack) {
+    if action_state.just_pressed(TroopAction::ToggleState) {
         cmd.insert_resource(NextState(TroopState::Attack));
     }
 
@@ -331,7 +334,7 @@ fn attack_controller(
     if action_state.just_pressed(TroopAction::Right) {
         attack_indicator.dir = Dir::East;
     }
-    if action_state.just_pressed(TroopAction::Cancel) {
+    if action_state.just_pressed(TroopAction::ToggleState) {
         cmd.insert_resource(NextState(TroopState::Move));
     }
     if action_state.just_pressed(TroopAction::Attack) {
@@ -470,4 +473,17 @@ fn troop_selector(
     // update the SelectedPlayer marker component
     cmd.entity(*old_player).remove::<SelectedPlayer>();
     cmd.entity(*new_player).insert(SelectedPlayer);
+}
+
+fn game_pauser(
+    mut cmd: Commands,
+    query: Query<&ActionState<UserAction>>,
+    mut selector: ResMut<TroopSelector>,
+    paused: Res<PauseGame>,
+) {
+    let action_state = ok_or_return!(query.get_single());
+
+    if action_state.just_pressed(UserAction::PauseGame) {
+        cmd.insert_resource(PauseGame(!paused.0));
+    }
 }
