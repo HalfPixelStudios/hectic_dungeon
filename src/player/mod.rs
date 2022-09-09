@@ -74,7 +74,7 @@ pub enum TroopAction {
     Up,
     Down,
     Attack,
-    Cancel,
+    ToggleState,
     Interact,
 }
 
@@ -136,7 +136,7 @@ fn spawn_user_controller(mut cmd: Commands) {
     let input_map = InputMap::new([
         (KeyCode::Left, UserAction::PrevTroop),
         (KeyCode::Right, UserAction::NextTroop),
-        (KeyCode::P, UserAction::PauseGame),
+        (KeyCode::Escape, UserAction::PauseGame),
     ]);
     cmd.spawn_bundle(InputManagerBundle::<UserAction> {
         action_state: ActionState::default(),
@@ -166,7 +166,7 @@ fn spawn(
             // (KeyCode::Down, PlayerAction::Down),
             (KeyCode::S, TroopAction::Down),
             (KeyCode::Space, TroopAction::Attack),
-            (KeyCode::Escape, TroopAction::Cancel),
+            (KeyCode::LShift, TroopAction::ToggleState),
             (KeyCode::E, TroopAction::Interact),
         ]);
 
@@ -270,7 +270,7 @@ fn move_controller(
     if action_state.just_pressed(TroopAction::Down) {
         dir += IVec2::new(0, -1);
     }
-    if action_state.just_pressed(TroopAction::Attack) {
+    if action_state.just_pressed(TroopAction::ToggleState) {
         cmd.insert_resource(NextState(TroopState::Attack));
     }
 
@@ -334,7 +334,7 @@ fn attack_controller(
     if action_state.just_pressed(TroopAction::Right) {
         attack_indicator.dir = Dir::East;
     }
-    if action_state.just_pressed(TroopAction::Cancel) {
+    if action_state.just_pressed(TroopAction::ToggleState) {
         cmd.insert_resource(NextState(TroopState::Move));
     }
     if action_state.just_pressed(TroopAction::Attack) {
