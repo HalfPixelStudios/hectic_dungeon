@@ -257,7 +257,9 @@ fn button_listener(
     for (interaction, button_tag) in &query {
         match interaction {
             Interaction::Clicked => match button_tag {
-                ButtonTag::Resume => {},
+                ButtonTag::Resume => {
+                    cmd.insert_resource(PauseGame(false));
+                },
                 ButtonTag::NextLevel => {
                     switch_level_writer.send(SwitchLevelEvent {
                         level_index: current_level.0 + 1,
