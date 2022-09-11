@@ -4,40 +4,69 @@ use bevy_bobs::component::health::Health;
 use pino_utils::ok_or_return;
 
 use crate::{
-    player::Player,
+    player::{Player, SelectedPlayer},
     spritesheet::{SpriteIndex, SpriteSheet},
 };
 
 #[derive(Component)]
 struct HealthNode;
 
+#[derive(Component)]
+struct ClassNameText;
+
 pub struct HealthPlugin;
 
 impl Plugin for HealthPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(update);
+        app.add_system(update_health).add_system(update_class_text);
     }
 }
 
 #[autodefault]
 #[allow(non_snake_case)]
-pub fn HealthBar(cmd: &mut ChildBuilder) -> Entity {
+pub fn HealthBar(cmd: &mut ChildBuilder, assets: Res<AssetServer>) -> Entity {
+    let font = assets.load("fonts/arcadeclassic.ttf");
+
     cmd.spawn()
-        .insert(HealthNode)
         .insert_bundle(NodeBundle {
-            style: Style {
-                display: Display::Flex,
-            },
             color: UiColor(Color::NONE),
+            style: Style {
+                align_self: AlignSelf::Center,
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::ColumnReverse,
+            },
+        })
+        .with_children(|parent| {
+            parent.spawn().insert(HealthNode).insert_bundle(NodeBundle {
+                style: Style {
+                    display: Display::Flex,
+                },
+                color: UiColor(Color::NONE),
+            });
+
+            parent
+                .spawn()
+                .insert(ClassNameText)
+                .insert_bundle(TextBundle {
+                    text: Text::from_section(
+                        String::new(),
+                        TextStyle {
+                            font: font.clone(),
+                            font_size: 20.,
+                            color: Color::WHITE,
+                        },
+                    ),
+                });
         })
         .id()
 }
 
 #[autodefault]
-fn update(
+fn update_health(
     mut cmd: Commands,
-    mut player_query: Query<&Health, With<Player>>,
-    mut ui_query: Query<(Entity, &mut HealthNode), Without<Player>>,
+    mut player_query: Query<&Health, With<SelectedPlayer>>,
+    mut ui_query: Query<(Entity, &mut HealthNode), Without<SelectedPlayer>>,
     assets: Res<AssetServer>,
     asset_sheet: Res<SpriteSheet>,
 ) {
@@ -48,6 +77,7 @@ fn update(
         cmd.entity(entity).despawn_descendants();
 
         // TODO this does not work
+        /*
         cmd.entity(entity).with_children(|parent| {
             parent
                 .spawn_bundle(SpriteSheetBundle {
@@ -67,6 +97,7 @@ fn update(
                 .insert_bundle(TransformBundle::default())
                 .insert_bundle(VisibilityBundle::default());
         });
+        */
 
         for i in 0..health.current() {
             cmd.entity(entity).with_children(|parent| {
@@ -77,4 +108,15 @@ fn update(
             });
         }
     }
+}
+
+fn update_class_text(
+    mut cmd: Commands,
+    mut player_query: Query<&Player, With<SelectedPlayer>>,
+    mut ui_query: Query<(&mut Text), (With<ClassNameText>, Without<SelectedPlayer>)>,
+) {
+    let mut text = ok_or_return!(ui_query.get_single_mut());
+    let player = ok_or_return!(player_query.get_single());
+
+    text.sections[0].value = player.0.to_string();
 }

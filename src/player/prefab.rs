@@ -4,13 +4,19 @@ use serde::Deserialize;
 
 use crate::spritesheet::SpriteIndex;
 
-#[derive(Deserialize, Component, PartialEq, Eq)]
+#[derive(Deserialize, Component, PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Class {
     Warrior,
     Samurai,
     Magician,
     Summoner,
     Archer,
+}
+
+impl std::fmt::Display for Class {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(Deserialize)]
@@ -38,7 +44,7 @@ const RON_STRING: &str = r#"
         weapon: "steel_sword",
     ),
     "archer": (
-        health: 10,
+        health: 5,
         class: Archer,
         sprite_index: PlayerArcher,
         weapon: "wooden_bow",

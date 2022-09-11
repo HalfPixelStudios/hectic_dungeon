@@ -37,7 +37,7 @@ pub struct SelectedPlayer;
 
 /// Tag component for troops
 #[derive(Component)]
-pub struct Player;
+pub struct Player(pub Class);
 
 /// Tag component for user input controller
 #[derive(Component)]
@@ -187,7 +187,7 @@ fn spawn(
                 },
                 ..default()
             })
-            .insert(Player)
+            .insert(Player(prefab.class))
             .insert(GridEntity::new(*spawn_pos, CellType::Player(id)))
             .insert(Health::new(prefab.health))
             .insert_bundle(InputManagerBundle::<TroopAction> {
