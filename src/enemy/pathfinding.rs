@@ -3,7 +3,7 @@ use std::{cmp::Reverse, collections::HashMap};
 use bevy::prelude::*;
 use priority_queue::PriorityQueue;
 
-use crate::grid::{CellType, Grid};
+use crate::prelude::*;
 
 pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2>> {
     // trivial case

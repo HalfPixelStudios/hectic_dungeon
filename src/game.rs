@@ -4,7 +4,7 @@ use iyes_loopless::{
     state::{CurrentState, NextState},
 };
 
-use crate::{player::PlayerMovedEvent, screens::state::ScreenState};
+use crate::prelude::*;
 
 const PLAYER_INPUT_TIME_LIMIT: f32 = 30.;
 const PLAYER_ANIM_TIME_LIMIT: f32 = 0.1;
@@ -97,7 +97,7 @@ fn reset(mut cmd: Commands, mut state_timer: ResMut<StateTimer>) {
     cmd.insert_resource(NextState(START_STATE));
 }
 
-pub struct GamePlugin;
+pub(super) struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut bevy::prelude::App) {

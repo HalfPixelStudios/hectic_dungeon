@@ -6,11 +6,7 @@ use iyes_loopless::{
     state::NextState,
 };
 
-use crate::{
-    constants::{GROUND_LAYER, MAP_HEIGHT, TILE_SIZE},
-    grid::snap_to_grid,
-    screens::state::ScreenState,
-};
+use crate::prelude::*;
 
 pub struct CurrentLevel(pub usize);
 
@@ -18,11 +14,11 @@ pub struct SwitchLevelEvent {
     pub level_index: usize,
 }
 
-pub struct MapPlugin;
-
 /// List of all collisions
 #[derive(Deref, DerefMut)]
 pub struct CollisionMap(pub Vec<IVec2>);
+
+pub(super) struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {

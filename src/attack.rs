@@ -3,13 +3,7 @@ use iyes_loopless::prelude::ConditionSet;
 use pino_utils::{cmp::variant_eq, ok_or_continue};
 use serde::Deserialize;
 
-use crate::{
-    enemy::DamageEnemyEvent,
-    grid::{CellType, Grid},
-    player::DamagePlayerEvent,
-    screens::state::ScreenState,
-    utils::Dir,
-};
+use crate::prelude::*;
 
 #[derive(Deserialize, Clone, Copy)]
 pub enum AttackPattern {
@@ -76,7 +70,7 @@ pub struct AttackEvent {
     pub cell_type: CellType,
 }
 
-pub struct AttackPlugin;
+pub(super) struct AttackPlugin;
 
 impl Plugin for AttackPlugin {
     fn build(&self, app: &mut App) {

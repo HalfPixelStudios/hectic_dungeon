@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::PrefabLib;
 use serde::Deserialize;
 
-use crate::spritesheet::SpriteIndex;
+use crate::prelude::*;
 
 #[derive(Deserialize)]
 pub enum ItemType {

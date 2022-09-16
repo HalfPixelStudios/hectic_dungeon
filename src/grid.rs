@@ -2,10 +2,7 @@ use std::ops::Deref;
 
 use bevy::prelude::*;
 
-use crate::{
-    constants::{MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
-    map::CollisionMap,
-};
+use crate::prelude::*;
 
 #[derive(Clone, PartialEq)]
 pub enum CellType {

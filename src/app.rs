@@ -5,11 +5,10 @@ use iyes_loopless::state::NextState;
 
 use super::{
     camera::CameraPlugin, enemy::EnemyPlugin, game::GamePlugin, grid::GridPlugin,
-    material::MaterialPlugin, movement::MovementPlugin, player::PlayerPlugin, spritesheet::*,
-    ui::UIPlugin,
+    material::MaterialPlugin, movement::MovementPlugin, player::PlayerPlugin,
+    spritesheet::load_assets, ui::UIPlugin,
 };
 use crate::{
-    ability::AbilityPlugin,
     ai::AIPlugin,
     attack::AttackPlugin,
     enviro::EnviroPlugin,
@@ -54,8 +53,6 @@ pub fn app(config: AppConfig) {
     app.add_plugin(ScreensPlugin)
         .add_plugin(GamePlugin)
         .add_plugin(AIPlugin)
-        .add_plugin(AbilityPlugin)
-        .add_plugin(SpritesheetPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(LevelPlugin)
         .add_plugin(AttackPlugin)
@@ -75,6 +72,8 @@ pub fn app(config: AppConfig) {
     }
 
     app.insert_resource(NextState(config.start_state));
+
+    app.add_startup_system(load_assets);
 
     app.run();
 }

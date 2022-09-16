@@ -90,11 +90,3 @@ pub fn load_assets(
     ));
     cmd.insert_resource(SpriteSheet(tilesheet_handle));
 }
-
-pub struct SpritesheetPlugin;
-
-impl Plugin for SpritesheetPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_startup_system(load_assets);
-    }
-}

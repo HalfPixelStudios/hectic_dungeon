@@ -87,3 +87,7 @@ pub fn cleanup<C: Component>(mut cmd: Commands, query: Query<Entity, With<C>>) {
         cmd.entity(entity).despawn_recursive();
     }
 }
+
+pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
+    x * (1. - by) + y * by
+}

@@ -1,5 +1,7 @@
 use bevy::{input::mouse::*, prelude::*};
 
+use crate::utils::lerp;
+
 #[derive(Debug, Component)]
 struct MainCamera;
 
@@ -104,10 +106,6 @@ fn camera_movement(
         }
     }
     *last_pos = Some(current_pos);
-}
-
-pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
-    x * (1. - by) + y * by
 }
 
 #[derive(Component)]

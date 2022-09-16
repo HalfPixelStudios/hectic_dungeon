@@ -4,14 +4,7 @@ use leafwing_input_manager::prelude::*;
 use pino_utils::ok_or_return;
 
 use super::{controller::TroopAction, prefab::Class, Player, PlayerMovedEvent, SelectedPlayer};
-use crate::{
-    attack::{AttackEvent, AttackPattern},
-    game::GameState,
-    grid::{CellType, GridEntity},
-    screens::state::ScreenState,
-    spritesheet::SpriteFrames,
-    ui::attack_animation::SpawnAttackAnimEvent,
-};
+use crate::{prelude::*, ui::attack_animation::SpawnAttackAnimEvent};
 
 pub struct AbilityPlugin;
 

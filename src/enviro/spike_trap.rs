@@ -2,15 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::EntityInstance;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
-use crate::{
-    attack::AttackEvent,
-    constants::BEING_LAYER,
-    game::GameState,
-    grid::{to_world_coords, CellType, GridEntity},
-    map::ldtk_to_bevy,
-    spritesheet::{SpriteFrames, SpriteSheet},
-    ui::attack_animation::SpawnAttackAnimEvent,
-};
+use crate::{prelude::*, ui::attack_animation::SpawnAttackAnimEvent};
 
 #[derive(Component)]
 pub struct SpikeTrap {

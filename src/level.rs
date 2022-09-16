@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use bevy::prelude::*;
 use iyes_loopless::prelude::{AppLooplessStateExt, IntoConditionalSystem};
 
-use crate::screens::state::ScreenState;
+use crate::prelude::*;
 
 pub struct LevelCleared;
 pub struct LevelFailed;

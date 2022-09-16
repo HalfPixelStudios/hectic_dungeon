@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::prelude::*;
+
 #[derive(Component)]
 pub struct Door {
     pub open: bool,

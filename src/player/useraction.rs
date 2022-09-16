@@ -4,8 +4,7 @@ use iyes_loopless::prelude::*;
 use leafwing_input_manager::prelude::*;
 use pino_utils::ok_or_return;
 
-use super::SelectedPlayer;
-use crate::{game::PauseGame, level::Level, screens::state::ScreenState};
+use crate::prelude::*;
 
 /// Tag component for user input controller
 #[derive(Component)]
