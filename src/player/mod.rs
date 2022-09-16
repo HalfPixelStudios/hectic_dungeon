@@ -12,7 +12,7 @@ use pino_utils::{ok_or_return, some_or_continue};
 
 use self::prefab::{Class, PlayerPrefab, PrefabPlugin};
 use crate::{
-    attack::AttackEvent,
+    attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
     constants::BEING_LAYER,
     enviro::dropped_item::DroppedItem,
@@ -76,6 +76,7 @@ pub enum TroopAction {
     Attack,
     ToggleState,
     Interact,
+    Ability,
 }
 
 pub struct PlayerMovedEvent;
@@ -116,6 +117,7 @@ impl Plugin for PlayerPlugin {
                         .run_in_state(GameState::PlayerInput)
                         .run_in_state(TroopState::Attack),
                 )
+                .with_system(ability_controller.run_in_state(GameState::PlayerInput))
                 .with_system(spawn)
                 .with_system(take_damage)
                 .with_system(update_move_indicator.run_in_state(GameState::PlayerInput))
@@ -168,6 +170,7 @@ fn spawn(
             (KeyCode::Space, TroopAction::Attack),
             (KeyCode::LShift, TroopAction::ToggleState),
             (KeyCode::E, TroopAction::Interact),
+            (KeyCode::Q, TroopAction::Ability),
         ]);
 
         let prefab = some_or_continue!(prefab_lib.get(prefab_id));
@@ -348,6 +351,39 @@ fn attack_controller(
         // disgusting
 
         // spawn attack animation
+        for pos in grid_positions.iter() {
+            anim_writer.send(SpawnAttackAnimEvent {
+                frames: SpriteFrames::PlayerAttack.frames(),
+                animation_speed: 0.1,
+                spawn_pos: *pos,
+            });
+        }
+
+        writer.send(AttackEvent {
+            grid_positions,
+            cell_type: CellType::Enemy(entity),
+        });
+
+        player_moved.send(PlayerMovedEvent);
+    }
+}
+
+fn ability_controller(
+    mut cmd: Commands,
+    mut query: Query<(Entity, &GridEntity, &ActionState<TroopAction>), With<SelectedPlayer>>,
+    mut writer: EventWriter<AttackEvent>,
+    mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
+    mut player_moved: EventWriter<PlayerMovedEvent>,
+) {
+    let (entity, grid_entity, action_state) = ok_or_return!(query.get_single_mut());
+
+    if action_state.just_pressed(TroopAction::Ability) {
+        let grid_positions = AttackPattern::Around
+            .to_offsets()
+            .iter()
+            .map(|v| *v + grid_entity.pos)
+            .collect::<Vec<_>>();
+
         for pos in grid_positions.iter() {
             anim_writer.send(SpawnAttackAnimEvent {
                 frames: SpriteFrames::PlayerAttack.frames(),
