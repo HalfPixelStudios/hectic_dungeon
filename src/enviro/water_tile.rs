@@ -8,7 +8,7 @@ use crate::{
     game::GameState,
     grid::{to_world_coords, CellType, Grid, GridEntity},
     map::ldtk_to_bevy,
-    spritesheet::{SpriteFrames, SpriteIndex, SpriteSheet},
+    spritesheet::{SpriteIndex, SpriteSheet},
     utils::Dir,
 };
 

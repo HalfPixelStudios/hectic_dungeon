@@ -5,11 +5,7 @@ use leafwing_input_manager::prelude::*;
 use pino_utils::ok_or_return;
 
 use super::SelectedPlayer;
-use crate::{
-    game::{GameState, PauseGame},
-    level::Level,
-    screens::state::ScreenState,
-};
+use crate::{game::PauseGame, level::Level, screens::state::ScreenState};
 
 /// Tag component for user input controller
 #[derive(Component)]

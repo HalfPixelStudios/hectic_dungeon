@@ -9,33 +9,27 @@ use bevy_bobs::{
     prefab::{PrefabId, PrefabLib},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
-use iyes_loopless::{prelude::*, state::NextState};
+use iyes_loopless::prelude::*;
 use leafwing_input_manager::prelude::*;
-use pino_utils::{ok_or_return, some_or_continue};
+use pino_utils::some_or_continue;
 
 use self::{
-    ability::{ability_controller, AbilityPlugin},
+    ability::AbilityPlugin,
     controller::{ControllerPlugin, TroopAction},
     prefab::{Class, PlayerPrefab, PrefabPlugin},
     useraction::UserActionPlugin,
 };
 use crate::{
-    attack::{AttackEvent, AttackPattern},
     camera::CameraFollow,
     constants::BEING_LAYER,
-    enviro::dropped_item::DroppedItem,
-    game::{GameState, PauseGame},
-    grid::{to_world_coords, CellType, Grid, GridEntity},
+    grid::{to_world_coords, CellType, GridEntity},
     level::Level,
     map::ldtk_to_bevy,
     movement::Movement,
     screens::state::ScreenState,
-    spritesheet::{SpriteFrames, SpriteSheet},
-    ui::{
-        attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
-        move_indicator::MoveIndicator,
-    },
-    utils::{cardinal_dirs, cleanup, Dir},
+    spritesheet::SpriteSheet,
+    ui::{attack_indicator::AttackIndicator, move_indicator::MoveIndicator},
+    utils::cleanup,
     weapon::CurrentWeapon,
 };
 
