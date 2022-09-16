@@ -3,7 +3,7 @@ use iyes_loopless::prelude::*;
 use leafwing_input_manager::prelude::*;
 use pino_utils::ok_or_return;
 
-use super::{controller::TroopAction, PlayerMovedEvent, SelectedPlayer};
+use super::{controller::TroopAction, prefab::Class, Player, PlayerMovedEvent, SelectedPlayer};
 use crate::{
     attack::{AttackEvent, AttackPattern},
     game::GameState,
@@ -20,20 +20,27 @@ impl Plugin for AbilityPlugin {
         app.add_system_set(
             ConditionSet::new()
                 .run_in_state(ScreenState::Ingame)
-                .with_system(ability_controller.run_in_state(GameState::PlayerInput))
+                .with_system(warrior_ability_controller.run_in_state(GameState::PlayerInput))
                 .into(),
         );
     }
 }
 
-pub fn ability_controller(
+fn warrior_ability_controller(
     mut cmd: Commands,
-    mut query: Query<(Entity, &GridEntity, &ActionState<TroopAction>), With<SelectedPlayer>>,
+    mut query: Query<
+        (Entity, &Player, &GridEntity, &ActionState<TroopAction>),
+        With<SelectedPlayer>,
+    >,
     mut writer: EventWriter<AttackEvent>,
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
     mut player_moved: EventWriter<PlayerMovedEvent>,
 ) {
-    let (entity, grid_entity, action_state) = ok_or_return!(query.get_single_mut());
+    let (entity, player, grid_entity, action_state) = ok_or_return!(query.get_single_mut());
+
+    if player.0 != Class::Warrior {
+        return;
+    }
 
     if action_state.just_pressed(TroopAction::Ability) {
         let grid_positions = AttackPattern::Around

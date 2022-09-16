@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::spritesheet::SpriteIndex;
 
-#[derive(Deserialize, Component, PartialEq, Eq, Debug, Clone, Copy)]
+#[derive(Deserialize, PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Class {
     Warrior,
     Samurai,
