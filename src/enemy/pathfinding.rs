@@ -21,7 +21,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2
     costs.insert(*start, 0);
 
     while !search.is_empty() {
-        let (cur_pos, cur_cost) = search.pop().unwrap();
+        let (cur_pos, _cur_cost) = search.pop().unwrap();
         // info!("searching {:?}", cur_pos);
 
         // done

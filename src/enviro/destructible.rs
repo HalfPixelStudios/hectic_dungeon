@@ -23,7 +23,7 @@ fn spawn_from_ldtk(
     asset_sheet: Res<SpriteSheet>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "Destructible") {
-        if let Some(field) = entity_instance
+        if let Some(_field) = entity_instance
             .field_instances
             .iter()
             .find(|field| field.identifier == "id")

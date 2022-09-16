@@ -87,7 +87,7 @@ fn troop_selector(
 fn game_pauser(
     mut cmd: Commands,
     query: Query<&ActionState<UserAction>>,
-    mut selector: ResMut<TroopSelector>,
+    _selector: ResMut<TroopSelector>,
     paused: Res<PauseGame>,
 ) {
     let action_state = ok_or_return!(query.get_single());

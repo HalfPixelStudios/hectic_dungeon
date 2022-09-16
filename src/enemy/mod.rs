@@ -165,7 +165,7 @@ fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<
 fn spawn_from_ldtk(
     query: Query<&EntityInstance, Added<EntityInstance>>,
     mut writer: EventWriter<SpawnEnemyEvent>,
-    mut room: ResMut<Level>,
+    _room: ResMut<Level>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "EnemySpawn") {
         // TODO handle not found

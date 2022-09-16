@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-use crate::prelude::*;
-
 #[derive(Component)]
 pub struct Door {
     pub open: bool,
@@ -10,7 +8,7 @@ pub struct Door {
 pub struct DoorPlugin;
 
 impl Plugin for DoorPlugin {
-    fn build(&self, app: &mut App) {}
+    fn build(&self, _app: &mut App) {}
 }
 
 // fn spawn_from_ldtk(

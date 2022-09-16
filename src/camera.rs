@@ -35,15 +35,15 @@ fn camera_controller(
         (With<MainCamera>, Without<CameraFollow>),
     >,
 ) {
-    let (mut camera, mut cam_transform) = camera_query.single_mut();
+    let (_camera, mut cam_transform) = camera_query.single_mut();
     let mut pos: Vec2 = Vec2::ZERO;
     let mut query_len = 0.;
-    for (transform) in entity_query.iter() {
+    for transform in entity_query.iter() {
         pos.x += transform.translation.x;
         pos.y += transform.translation.y;
         query_len += 1.;
     }
-    if (query_len == 0.) {
+    if query_len == 0. {
         return;
     }
     pos /= query_len;

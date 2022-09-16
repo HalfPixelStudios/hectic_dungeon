@@ -75,7 +75,7 @@ fn spawn_from_ldtk(
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "SpikeTrap") {
+    for (_entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "SpikeTrap") {
         let grid_coords = ldtk_to_bevy(&entity_instance.grid);
 
         cmd.spawn_bundle(SpriteSheetBundle {

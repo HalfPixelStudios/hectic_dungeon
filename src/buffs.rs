@@ -14,7 +14,7 @@ struct Modifier {
     var: String,
 }
 impl Modifier {
-    fn apply(&self, mut stats: ModifiedStats) -> ModifiedStats {
+    fn apply(&self, stats: ModifiedStats) -> ModifiedStats {
         stats
     }
 }
@@ -39,7 +39,7 @@ pub struct Stats {
 }
 impl Stats {
     pub fn apply_modifiers(self) -> ModifiedStats {
-        let mut m_stats = ModifiedStats {
+        let m_stats = ModifiedStats {
             health: self.health,
             armor: self.armor,
             speed: self.speed,

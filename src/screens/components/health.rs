@@ -65,15 +65,15 @@ pub fn HealthBar(cmd: &mut ChildBuilder, assets: Res<AssetServer>) -> Entity {
 #[autodefault]
 fn update_health(
     mut cmd: Commands,
-    mut player_query: Query<&Health, With<SelectedPlayer>>,
+    player_query: Query<&Health, With<SelectedPlayer>>,
     mut ui_query: Query<(Entity, &mut HealthNode), Without<SelectedPlayer>>,
     assets: Res<AssetServer>,
-    asset_sheet: Res<SpriteSheet>,
+    _asset_sheet: Res<SpriteSheet>,
 ) {
     let health = ok_or_return!(player_query.get_single());
 
     // TODO kinda inefficnet to despawn all health nodes and respawn every frame
-    for (entity, mut health_node) in ui_query.iter_mut() {
+    for (entity, _health_node) in ui_query.iter_mut() {
         cmd.entity(entity).despawn_descendants();
 
         // TODO this does not work
@@ -99,7 +99,7 @@ fn update_health(
         });
         */
 
-        for i in 0..health.current() {
+        for _i in 0..health.current() {
             cmd.entity(entity).with_children(|parent| {
                 parent.spawn().insert_bundle(ImageBundle {
                     image: UiImage(assets.load("tilesheet/heart.png")),
@@ -111,9 +111,9 @@ fn update_health(
 }
 
 fn update_class_text(
-    mut cmd: Commands,
-    mut player_query: Query<&Player, With<SelectedPlayer>>,
-    mut ui_query: Query<(&mut Text), (With<ClassNameText>, Without<SelectedPlayer>)>,
+    _cmd: Commands,
+    player_query: Query<&Player, With<SelectedPlayer>>,
+    mut ui_query: Query<&mut Text, (With<ClassNameText>, Without<SelectedPlayer>)>,
 ) {
     let mut text = ok_or_return!(ui_query.get_single_mut());
     let player = ok_or_return!(player_query.get_single());

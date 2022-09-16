@@ -159,13 +159,13 @@ fn spawn_from_ldtk(
 }
 
 fn take_damage(
-    mut cmd: Commands,
+    _cmd: Commands,
     mut events: EventReader<DamagePlayerEvent>,
     mut query: Query<(Entity, &mut Health, &GridEntity)>,
     mut room_state: ResMut<Level>,
 ) {
     for DamagePlayerEvent { entity } in events.iter() {
-        let (entity, mut health, grid_entity) = query.get_mut(*entity).unwrap();
+        let (entity, mut health, _grid_entity) = query.get_mut(*entity).unwrap();
 
         health.take(1);
         if health.is_zero() {

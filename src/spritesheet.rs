@@ -80,7 +80,7 @@ pub fn load_assets(
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    let mut data: HashMap<String, HandleUntyped> = HashMap::new();
+    let _data: HashMap<String, HandleUntyped> = HashMap::new();
 
     let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
         assets.load("tilesheet/bandit_hideout.png"),

@@ -48,7 +48,7 @@ pub struct AttackAction;
 
 // TODO this action is doing too many things
 fn attack_action(
-    mut player_query: Query<(&GridEntity), With<Player>>,
+    player_query: Query<&GridEntity, With<Player>>,
     mut action_query: Query<(&Actor, &mut ActionState), With<AttackAction>>,
     mut query: Query<(&GridEntity, &mut AttackIndicator), Without<Player>>,
     mut anim_writer: EventWriter<SpawnAttackAnimEvent>,
@@ -114,15 +114,14 @@ pub struct MoveAction;
 
 fn move_action(
     grid: Res<Grid>,
-    mut player_query: Query<(&GridEntity), With<Player>>,
+    player_query: Query<&GridEntity, With<Player>>,
     mut action_query: Query<(&Actor, &mut ActionState), With<MoveAction>>,
     mut query: Query<(&GridEntity, &mut Movement, &mut AttackIndicator), Without<Player>>,
 ) {
     let player_grid_entity = ok_or_return!(player_query.get_single());
 
     for (Actor(actor), mut state) in &mut action_query {
-        let (grid_entity, mut movement, mut attack_indicator) =
-            ok_or_continue!(query.get_mut(*actor));
+        let (grid_entity, mut movement, _attack_indicator) = ok_or_continue!(query.get_mut(*actor));
         match *state {
             ActionState::Requested => {
                 // movement phase

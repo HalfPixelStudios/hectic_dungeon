@@ -75,7 +75,7 @@ fn spawn_from_ldtk(
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
+    for (_entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
         // TODO this code is sorta cringe
         let dir: Dir = entity_instance
             .field_instances

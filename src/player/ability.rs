@@ -20,7 +20,7 @@ impl Plugin for AbilityPlugin {
 }
 
 fn warrior_ability_controller(
-    mut cmd: Commands,
+    _cmd: Commands,
     mut query: Query<
         (Entity, &Player, &GridEntity, &ActionState<TroopAction>),
         With<SelectedPlayer>,
