@@ -1,16 +1,9 @@
 use bevy::prelude::*;
 use iyes_loopless::prelude::ConditionSet;
 
-use crate::{
-    grid::{to_world_coords, GridEntity},
-    screens::state::ScreenState,
-};
+use crate::{prelude::*, utils::lerp};
 
 const THRESHOLD: f32 = 0.001;
-
-pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
-    x * (1. - by) + y * by
-}
 
 // store grid pos, or next move?
 #[derive(Component)]

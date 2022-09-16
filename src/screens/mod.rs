@@ -25,6 +25,6 @@ impl Plugin for ScreensPlugin {
     }
 }
 
-fn debug(mut cmd: Commands) {
+fn debug(_cmd: Commands) {
     // cmd.insert_resource(NextState(ScreenState::Ingame));
 }

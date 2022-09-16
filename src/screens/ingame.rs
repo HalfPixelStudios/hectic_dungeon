@@ -56,7 +56,7 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
                 // justify_content: JustifyContent::Center,
             },
         })
-        .with_children(|mut parent| {
+        .with_children(|parent| {
             HealthBar(parent, assets);
             // InventoryDisplay(&mut parent, assets);
         });
@@ -77,7 +77,7 @@ fn render_win_menu(mut cmd: Commands, assets: Res<AssetServer>) {
                 flex_direction: FlexDirection::ColumnReverse,
             },
         })
-        .with_children(|mut parent| {
+        .with_children(|parent| {
             parent.spawn_bundle(TextBundle {
                 text: Text::from_section(
                     "Level cleared",
@@ -102,7 +102,7 @@ fn render_win_menu(mut cmd: Commands, assets: Res<AssetServer>) {
                         },
                     })
                     .insert(tag)
-                    .with_children(|mut parent| {
+                    .with_children(|parent| {
                         parent.spawn_bundle(TextBundle {
                             text: Text::from_section(
                                 text,
@@ -134,7 +134,7 @@ fn render_lose_menu(mut cmd: Commands, assets: Res<AssetServer>) {
                 flex_direction: FlexDirection::ColumnReverse,
             },
         })
-        .with_children(|mut parent| {
+        .with_children(|parent| {
             parent.spawn_bundle(TextBundle {
                 text: Text::from_section(
                     "Level failed",
@@ -158,7 +158,7 @@ fn render_lose_menu(mut cmd: Commands, assets: Res<AssetServer>) {
                         },
                     })
                     .insert(tag)
-                    .with_children(|mut parent| {
+                    .with_children(|parent| {
                         parent.spawn_bundle(TextBundle {
                             text: Text::from_section(
                                 text,
@@ -177,7 +177,7 @@ fn render_lose_menu(mut cmd: Commands, assets: Res<AssetServer>) {
 /// Respond to changing the [PauseGame] resource by spawning/despawning the ui
 // TODO kinda wonk that this is calling two other systems directly
 fn pause_menu_controller(
-    mut cmd: Commands,
+    cmd: Commands,
     assets: Res<AssetServer>,
     query: Query<Entity, With<PauseMenuRoot>>,
     paused: Res<PauseGame>,
@@ -206,7 +206,7 @@ fn render_pause_menu(mut cmd: Commands, assets: Res<AssetServer>) {
                 flex_direction: FlexDirection::ColumnReverse,
             },
         })
-        .with_children(|mut parent| {
+        .with_children(|parent| {
             parent.spawn_bundle(TextBundle {
                 text: Text::from_section(
                     "Paused",
@@ -231,7 +231,7 @@ fn render_pause_menu(mut cmd: Commands, assets: Res<AssetServer>) {
                         },
                     })
                     .insert(tag)
-                    .with_children(|mut parent| {
+                    .with_children(|parent| {
                         parent.spawn_bundle(TextBundle {
                             text: Text::from_section(
                                 text,

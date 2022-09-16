@@ -3,16 +3,8 @@ use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::prelude::*;
 
 use crate::{
-    attack::AttackEvent,
-    constants::BEING_LAYER,
-    game::GameState,
-    grid::{to_world_coords, CellType, GridEntity},
-    map::ldtk_to_bevy,
-    screens::state::ScreenState,
-    spritesheet::SpriteSheet,
+    prelude::*,
     ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
-    utils::{cleanup, Dir},
-    weapon::CurrentWeapon,
 };
 
 // how many turns between each attack
@@ -83,7 +75,7 @@ fn spawn_from_ldtk(
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
+    for (_entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
         // TODO this code is sorta cringe
         let dir: Dir = entity_instance
             .field_instances

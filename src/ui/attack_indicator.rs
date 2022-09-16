@@ -50,7 +50,7 @@ impl Plugin for AttackIndicatorPlugin {
 
 fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
     for (attack_indicator, grid_position) in &query {
-        let pos: Vec<IVec2> = attack_indicator
+        let _pos: Vec<IVec2> = attack_indicator
             .get_pattern()
             .iter()
             .map(|v| *v + grid_position.pos)

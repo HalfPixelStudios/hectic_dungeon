@@ -97,6 +97,6 @@ fn spawn(
     }
 }
 
-fn debug(mut writer: EventWriter<SpawnAttackAnimEvent>) {
+fn debug(_writer: EventWriter<SpawnAttackAnimEvent>) {
     // writer.send(SpawnAttackAnimEvent { frames: vec![128, 129, 130], animation_speed: 0.2, spawn_pos: IVec2::new(4, 4) });
 }

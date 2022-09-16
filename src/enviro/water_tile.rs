@@ -3,14 +3,7 @@ use bevy_ecs_ldtk::EntityInstance;
 use iyes_loopless::prelude::*;
 use pino_utils::ok_or_continue;
 
-use crate::{
-    constants::BEING_LAYER,
-    game::GameState,
-    grid::{to_world_coords, CellType, Grid, GridEntity},
-    map::ldtk_to_bevy,
-    spritesheet::{SpriteIndex, SpriteSheet},
-    utils::Dir,
-};
+use crate::prelude::*;
 
 #[derive(Component)]
 pub struct WaterTile {
@@ -51,7 +44,7 @@ fn spawn_from_ldtk(
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "WaterTile") {
+    for (_entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "WaterTile") {
         let grid_coords = ldtk_to_bevy(&entity_instance.grid);
 
         cmd.spawn_bundle(SpriteSheetBundle {

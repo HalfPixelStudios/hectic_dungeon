@@ -4,8 +4,7 @@ use iyes_loopless::prelude::*;
 use leafwing_input_manager::prelude::*;
 use pino_utils::ok_or_return;
 
-use super::SelectedPlayer;
-use crate::{game::PauseGame, level::Level, screens::state::ScreenState};
+use crate::prelude::*;
 
 /// Tag component for user input controller
 #[derive(Component)]
@@ -88,7 +87,7 @@ fn troop_selector(
 fn game_pauser(
     mut cmd: Commands,
     query: Query<&ActionState<UserAction>>,
-    mut selector: ResMut<TroopSelector>,
+    _selector: ResMut<TroopSelector>,
     paused: Res<PauseGame>,
 ) {
     let action_state = ok_or_return!(query.get_single());

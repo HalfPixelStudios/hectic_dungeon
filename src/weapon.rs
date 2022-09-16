@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::{PrefabId, PrefabLib};
 use serde::Deserialize;
 
-use crate::attack::AttackPattern;
+use crate::prelude::*;
 
 #[derive(Deserialize)]
 pub enum Damage {

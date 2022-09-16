@@ -6,18 +6,12 @@ use pino_utils::ok_or_return;
 
 use super::{Player, PlayerMovedEvent, SelectedPlayer};
 use crate::{
-    attack::AttackEvent,
     enviro::dropped_item::DroppedItem,
-    game::GameState,
-    grid::{CellType, Grid, GridEntity},
-    movement::Movement,
-    screens::state::ScreenState,
-    spritesheet::SpriteFrames,
+    prelude::*,
     ui::{
         attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator,
         move_indicator::MoveIndicator,
     },
-    utils::{cardinal_dirs, Dir},
 };
 
 /// Indicator for the current troop action
@@ -109,7 +103,7 @@ fn move_controller(
     mut player_moved: EventWriter<PlayerMovedEvent>,
     grid: Res<Grid>,
 ) {
-    let (mut grid_position, mut movement, mut attack_indicator, action_state) =
+    let (grid_position, mut movement, _attack_indicator, action_state) =
         ok_or_return!(query.get_single_mut());
     let mut dir = IVec2::ZERO;
 

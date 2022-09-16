@@ -21,16 +21,8 @@ use self::{
 };
 use crate::{
     camera::CameraFollow,
-    constants::BEING_LAYER,
-    grid::{to_world_coords, CellType, GridEntity},
-    level::Level,
-    map::ldtk_to_bevy,
-    movement::Movement,
-    screens::state::ScreenState,
-    spritesheet::SpriteSheet,
+    prelude::*,
     ui::{attack_indicator::AttackIndicator, move_indicator::MoveIndicator},
-    utils::cleanup,
-    weapon::CurrentWeapon,
 };
 
 /// Tag component for the currently selected troop
@@ -167,13 +159,13 @@ fn spawn_from_ldtk(
 }
 
 fn take_damage(
-    mut cmd: Commands,
+    _cmd: Commands,
     mut events: EventReader<DamagePlayerEvent>,
     mut query: Query<(Entity, &mut Health, &GridEntity)>,
     mut room_state: ResMut<Level>,
 ) {
     for DamagePlayerEvent { entity } in events.iter() {
-        let (entity, mut health, grid_entity) = query.get_mut(*entity).unwrap();
+        let (entity, mut health, _grid_entity) = query.get_mut(*entity).unwrap();
 
         health.take(1);
         if health.is_zero() {

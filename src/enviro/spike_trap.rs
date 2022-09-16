@@ -2,15 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::EntityInstance;
 use iyes_loopless::prelude::AppLooplessStateExt;
 
-use crate::{
-    attack::AttackEvent,
-    constants::BEING_LAYER,
-    game::GameState,
-    grid::{to_world_coords, CellType, GridEntity},
-    map::ldtk_to_bevy,
-    spritesheet::{SpriteFrames, SpriteSheet},
-    ui::attack_animation::SpawnAttackAnimEvent,
-};
+use crate::{prelude::*, ui::attack_animation::SpawnAttackAnimEvent};
 
 #[derive(Component)]
 pub struct SpikeTrap {
@@ -83,7 +75,7 @@ fn spawn_from_ldtk(
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "SpikeTrap") {
+    for (_entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "SpikeTrap") {
         let grid_coords = ldtk_to_bevy(&entity_instance.grid);
 
         cmd.spawn_bundle(SpriteSheetBundle {

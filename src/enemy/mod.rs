@@ -15,17 +15,9 @@ use pino_utils::some_or_continue;
 use self::prefab::{EnemyPrefab, PrefabPlugin, AI};
 use crate::{
     ai::simple_ai::{AttackAction, AttackRangeScorer, MoveAction},
-    constants::{BEING_LAYER, INGAME_UI_LAYER},
     enviro::dropped_item::SpawnDroppedItemEvent,
-    grid::{to_world_coords, CellType, GridEntity},
-    level::Level,
-    map::ldtk_to_bevy,
-    movement::Movement,
-    screens::state::ScreenState,
-    spritesheet::SpriteSheet,
+    prelude::*,
     ui::attack_indicator::AttackIndicator,
-    utils::cleanup,
-    weapon::CurrentWeapon,
 };
 
 #[derive(Component)]
@@ -173,7 +165,7 @@ fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<
 fn spawn_from_ldtk(
     query: Query<&EntityInstance, Added<EntityInstance>>,
     mut writer: EventWriter<SpawnEnemyEvent>,
-    mut room: ResMut<Level>,
+    _room: ResMut<Level>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "EnemySpawn") {
         // TODO handle not found

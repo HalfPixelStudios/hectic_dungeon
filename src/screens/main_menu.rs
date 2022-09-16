@@ -40,7 +40,7 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
         })
         .id();
 
-    cmd.entity(root).with_children(|mut parent| {
+    cmd.entity(root).with_children(|parent| {
         for (tag, text) in vec![
             (ButtonTag::Play, "play"),
             (ButtonTag::Settings, "settings"),
@@ -54,7 +54,7 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
                     },
                 })
                 .insert(tag)
-                .with_children(|mut parent| {
+                .with_children(|parent| {
                     parent.spawn_bundle(TextBundle {
                         text: Text::from_section(
                             text,

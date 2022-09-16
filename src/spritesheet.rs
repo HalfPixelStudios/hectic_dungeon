@@ -80,7 +80,7 @@ pub fn load_assets(
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    let mut data: HashMap<String, HandleUntyped> = HashMap::new();
+    let _data: HashMap<String, HandleUntyped> = HashMap::new();
 
     let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
         assets.load("tilesheet/bandit_hideout.png"),
@@ -89,12 +89,4 @@ pub fn load_assets(
         TILESHEET_HEIGHT as usize,
     ));
     cmd.insert_resource(SpriteSheet(tilesheet_handle));
-}
-
-pub struct SpritesheetPlugin;
-
-impl Plugin for SpritesheetPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_startup_system(load_assets);
-    }
 }
