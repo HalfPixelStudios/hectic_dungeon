@@ -1,9 +1,6 @@
 use autodefault::*;
 use bevy::prelude::*;
-use bevy_bobs::component::health::Health;
-use bevy_ecs_ldtk::LevelSelection;
 use iyes_loopless::prelude::*;
-use pino_utils::ok_or_return;
 
 use super::{
     components::health::HealthBar,
@@ -14,7 +11,6 @@ use crate::{
     game::PauseGame,
     level::{LevelCleared, LevelFailed},
     map::{CurrentLevel, SwitchLevelEvent},
-    player::{Player, SelectedPlayer},
 };
 
 #[derive(Component)]

@@ -1,11 +1,11 @@
 use autodefault::*;
-use bevy::{prelude::*, ui::FocusPolicy};
+use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 use pino_utils::ok_or_return;
 
 use crate::{
     player::{Player, SelectedPlayer},
-    spritesheet::{SpriteIndex, SpriteSheet},
+    spritesheet::SpriteSheet,
 };
 
 #[derive(Component)]
