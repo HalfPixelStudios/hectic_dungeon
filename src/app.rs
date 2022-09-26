@@ -41,7 +41,7 @@ pub fn app(config: AppConfig) {
 
     app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(ImageSettings::default_nearest())
-        .insert_resource(Msaa { samples: 1 })
+        .insert_resource(Msaa { samples: 4 })
         .insert_resource(window_descriptor);
     // .insert_resource(LogSettings {
     //     level: bevy::log::Level::DEBUG,
@@ -52,12 +52,12 @@ pub fn app(config: AppConfig) {
 
     app.add_plugin(ScreensPlugin)
         .add_plugin(GamePlugin)
+        .add_plugin(CameraPlugin)
         .add_plugin(AIPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(LevelPlugin)
         .add_plugin(AttackPlugin)
         .add_plugin(ItemPlugin)
-        .add_plugin(CameraPlugin)
         .add_plugin(UIPlugin)
         .add_plugin(MaterialPlugin)
         .add_plugin(MovementPlugin)

@@ -23,6 +23,7 @@ leafwing-input-manager = { version = "0.5" }
 iyes_loopless = { version = "0.7" }
 big-brain = { version = "0.12" }
 bevy-inspector-egui = { version = "0.12" }
+bevy_hanabi = { version = "0.3", default-features = false, features = ["2d"] }
 
 ## utilities
 anyhow = "1"
@@ -35,6 +36,7 @@ priority-queue = { version = "1.2" }
 rand = { version = "0.8" }
 ron = "0.7"
 serde = { version = "1", features = ["derive"] }
+
 pino_argparse = { git = "https://github.com/MrPicklePinosaur/pino_argparse" }
 pino_utils = { git = "https://github.com/MrPicklePinosaur/pino_utils" }
 
