@@ -6,7 +6,8 @@ pub struct ParticlePlugin;
 
 impl Plugin for ParticlePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(HanabiPlugin).add_startup_system(debug);
+        app.add_plugin(HanabiPlugin);
+        // .add_startup_system(debug);
     }
 }
 
@@ -27,16 +28,12 @@ fn debug(mut cmd: Commands, mut effects: ResMut<Assets<EffectAsset>>) {
             axis: Vec3::Z,
             speed: 6.0.into(),
             radius: 1.,
-            dimension: ShapeDimension::Volume,
-        })
-        .render(SizeOverLifetimeModifier {
-            gradient: Gradient::constant(Vec2::splat(0.02)),
+            dimension: ShapeDimension::Surface,
         })
         .render(ColorOverLifetimeModifier { gradient }),
     );
 
     cmd.spawn_bundle(ParticleEffectBundle {
-        effect: ParticleEffect::new(effect),
-        transform: Transform::from_translation(Vec3::new(0., 0., 10.)),
+        effect: ParticleEffect::new(effect).with_z_layer_2d(Some(10.)),
     });
 }
