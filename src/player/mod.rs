@@ -9,6 +9,7 @@ use bevy_bobs::{
     prefab::{PrefabId, PrefabLib},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
+use bevy_hanabi::*;
 use iyes_loopless::prelude::*;
 use leafwing_input_manager::prelude::*;
 use pino_utils::some_or_continue;
@@ -22,7 +23,11 @@ use self::{
 use crate::{
     camera::CameraFollow,
     prelude::*,
-    ui::{attack_indicator::AttackIndicator, move_indicator::MoveIndicator},
+    ui::{
+        attack_indicator::AttackIndicator,
+        move_indicator::MoveIndicator,
+        particles::{hurt, player_move},
+    },
 };
 
 /// Tag component for the currently selected troop
@@ -74,6 +79,7 @@ fn spawn(
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<PlayerPrefab>>,
     mut room_state: ResMut<Level>,
+    mut effects: ResMut<Assets<EffectAsset>>,
 ) {
     for SpawnPlayerEvent {
         spawn_pos,
@@ -134,6 +140,10 @@ fn spawn(
             cmd.entity(id).insert(SelectedPlayer);
         }
 
+        // particle controller
+        let particle = player_move(&mut cmd, &mut effects);
+        cmd.entity(id).add_child(particle);
+
         room_state.register_player(id);
     }
 }
@@ -159,10 +169,11 @@ fn spawn_from_ldtk(
 }
 
 fn take_damage(
-    _cmd: Commands,
+    mut cmd: Commands,
     mut events: EventReader<DamagePlayerEvent>,
     mut query: Query<(Entity, &mut Health, &GridEntity)>,
     mut room_state: ResMut<Level>,
+    mut effects: ResMut<Assets<EffectAsset>>,
 ) {
     for DamagePlayerEvent { entity } in events.iter() {
         let (entity, mut health, _grid_entity) = query.get_mut(*entity).unwrap();
@@ -171,5 +182,9 @@ fn take_damage(
         if health.is_zero() {
             room_state.deregister_player(entity);
         }
+
+        // spawn damage particle
+        let particle = hurt(&mut cmd, &mut effects);
+        cmd.entity(entity).add_child(particle);
     }
 }
