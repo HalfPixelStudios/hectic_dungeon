@@ -14,6 +14,12 @@ have ran:
 $ rustup install nightly
 ```
 
+`dylint` is also required to add additional bevy related lints, you can install
+with:
+```
+$ cargo install cargo-dylint dylint-link
+```
+
 Next install some git hooks:
 ```
 $ just devsetup

@@ -45,3 +45,9 @@ opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
+
+[workspace.metadata.dylint]
+libraries = [
+    { git = "https://github.com/MinerSebas/bevy_lint", branch = "main" },
+]
+
