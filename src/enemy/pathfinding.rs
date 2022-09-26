@@ -3,7 +3,7 @@ use std::{cmp::Reverse, collections::HashMap};
 use bevy::prelude::*;
 use priority_queue::PriorityQueue;
 
-use crate::grid::{CellType, Grid};
+use crate::prelude::*;
 
 pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2>> {
     // trivial case
@@ -21,7 +21,7 @@ pub fn a_star(start: &IVec2, dest: &IVec2, grid: &Res<Grid>) -> Option<Vec<IVec2
     costs.insert(*start, 0);
 
     while !search.is_empty() {
-        let (cur_pos, cur_cost) = search.pop().unwrap();
+        let (cur_pos, _cur_cost) = search.pop().unwrap();
         // info!("searching {:?}", cur_pos);
 
         // done

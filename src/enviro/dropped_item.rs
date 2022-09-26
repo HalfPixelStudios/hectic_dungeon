@@ -1,13 +1,8 @@
 use bevy::prelude::*;
 use bevy_bobs::prefab::{PrefabId, PrefabLib};
+use pino_utils::some_or_return;
 
-use crate::{
-    assets::SpriteSheet,
-    constants::BEING_LAYER,
-    grid::{to_world_coords, CellType, Grid, GridEntity},
-    item::ItemPrefab,
-    utils::some_or_return,
-};
+use crate::{item::ItemPrefab, prelude::*};
 
 #[derive(Component)]
 pub struct DroppedItem {
@@ -32,7 +27,7 @@ impl Plugin for DroppedItemPlugin {
 fn spawn(
     mut cmd: Commands,
     mut events: EventReader<SpawnDroppedItemEvent>,
-    grid: Res<Grid>,
+    _grid: Res<Grid>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<ItemPrefab>>,
 ) {

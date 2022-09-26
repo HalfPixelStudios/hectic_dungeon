@@ -1,14 +1,13 @@
 pub mod health;
-pub mod inventory;
 
 use bevy::prelude::*;
 
-use self::{health::HealthPlugin, inventory::InventoryPlugin};
+use self::health::HealthPlugin;
 
 pub struct ComponentPlugin;
 
 impl Plugin for ComponentPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(InventoryPlugin).add_plugin(HealthPlugin);
+        app.add_plugin(HealthPlugin);
     }
 }

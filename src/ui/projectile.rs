@@ -5,9 +5,9 @@ use bevy_bobs::{
 };
 
 use crate::{
-    assets::SpriteSheet,
     constants::TILE_SIZE,
     grid::to_world_coords,
+    spritesheet::SpriteSheet,
     utils::{to_rotation, Dir},
 };
 

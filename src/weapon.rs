@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::{PrefabId, PrefabLib};
 use serde::Deserialize;
 
-use crate::attack::AttackPattern;
+use crate::prelude::*;
 
 #[derive(Deserialize)]
 pub enum Damage {
@@ -26,7 +26,7 @@ const RON_STRING: &str = r#"
         attack_pattern: Hammer,
         damage: Fixed(1),
     ),
-    "dagger": (
+    "steel_dagger": (
         attack_pattern: StraightOne,
         damage: Fixed(1),
     ),
@@ -36,6 +36,10 @@ const RON_STRING: &str = r#"
     ),
     "steel_sword": (
         attack_pattern: StraightTwo,
+        damage: Fixed(1),
+    ),
+    "wooden_bow": (
+        attack_pattern: PointThree,
         damage: Fixed(1),
     ),
     "arrow_trap": (

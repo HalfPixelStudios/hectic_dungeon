@@ -1,15 +1,12 @@
-use std::{fmt::Debug, ops::Deref};
+use std::ops::Deref;
 
 use bevy::prelude::*;
-use bevy_bobs::prefab::PrefabId;
 
-use crate::{
-    constants::{MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
-    map::CollisionMap,
-};
+use crate::prelude::*;
 
 #[derive(Clone, PartialEq)]
 pub enum CellType {
+    None,
     Player(Entity),
     Enemy(Entity),
     Wall,
@@ -40,7 +37,7 @@ impl Deref for GridEntity {
 }
 
 // TODO maybe don't use this (cant really lerp position anymore)
-fn sync_grid_positions(mut query: Query<(&mut Transform, &GridEntity)>, grid: Res<Grid>) {
+fn sync_grid_positions(mut query: Query<(&mut Transform, &GridEntity)>, _grid: Res<Grid>) {
     for (mut transform, grid_position) in &mut query {
         let z = transform.translation.z;
         transform.translation = grid_position.as_vec2().extend(z) * (TILE_SIZE as f32);

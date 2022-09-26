@@ -8,7 +8,7 @@ pub struct Door {
 pub struct DoorPlugin;
 
 impl Plugin for DoorPlugin {
-    fn build(&self, app: &mut App) {}
+    fn build(&self, _app: &mut App) {}
 }
 
 // fn spawn_from_ldtk(

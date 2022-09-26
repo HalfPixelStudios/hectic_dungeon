@@ -3,15 +3,8 @@ use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
 use iyes_loopless::prelude::*;
 
 use crate::{
-    assets::SpriteSheet,
-    attack::AttackEvent,
-    constants::BEING_LAYER,
-    game::GameState,
-    grid::{to_world_coords, CellType, GridEntity},
-    map::ldtk_to_bevy,
+    prelude::*,
     ui::{attack_indicator::AttackIndicator, projectile::SpawnProjectileEvent},
-    utils::{to_rotation, Dir},
-    weapon::CurrentWeapon,
 };
 
 // how many turns between each attack
@@ -35,7 +28,8 @@ pub struct ArrowTrapPlugin;
 impl Plugin for ArrowTrapPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(spawn_from_ldtk)
-            .add_enter_system(GameState::EnemyInput, ai);
+            .add_enter_system(GameState::EnemyInput, ai)
+            .add_exit_system(ScreenState::Ingame, cleanup::<ArrowTrap>);
     }
 }
 
@@ -81,7 +75,7 @@ fn spawn_from_ldtk(
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
     asset_sheet: Res<SpriteSheet>,
 ) {
-    for (entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
+    for (_entity, entity_instance) in query.iter().filter(|(_, t)| t.identifier == "ArrowTrap") {
         // TODO this code is sorta cringe
         let dir: Dir = entity_instance
             .field_instances

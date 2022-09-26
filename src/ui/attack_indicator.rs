@@ -2,12 +2,10 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::PrefabLib;
 
 use crate::{
-    assets::{PrefabData, SpriteSheet},
     attack::{rotate_offsets, AttackPattern},
     constants::{INGAME_UI_LAYER, TILE_SIZE},
     grid::GridEntity,
-    player::Player,
-    spritesheet_constants::SpriteIndex,
+    spritesheet::{SpriteIndex, SpriteSheet},
     utils::Dir,
     weapon::{CurrentWeapon, WeaponPrefab},
 };
@@ -52,7 +50,7 @@ impl Plugin for AttackIndicatorPlugin {
 
 fn render(query: Query<(&AttackIndicator, &GridEntity)>) {
     for (attack_indicator, grid_position) in &query {
-        let pos: Vec<IVec2> = attack_indicator
+        let _pos: Vec<IVec2> = attack_indicator
             .get_pattern()
             .iter()
             .map(|v| *v + grid_position.pos)

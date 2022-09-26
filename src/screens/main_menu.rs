@@ -3,11 +3,9 @@ use bevy::{app::AppExit, prelude::*};
 use iyes_loopless::prelude::*;
 
 use super::{
-    components::health::HealthBar,
     state::ScreenState,
     utils::{destroy_ui, UIRoot},
 };
-use crate::{assets::SpriteSheet, spritesheet_constants::SpriteIndex};
 
 pub struct MainMenuPlugin;
 
@@ -42,7 +40,7 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
         })
         .id();
 
-    cmd.entity(root).with_children(|mut parent| {
+    cmd.entity(root).with_children(|parent| {
         for (tag, text) in vec![
             (ButtonTag::Play, "play"),
             (ButtonTag::Settings, "settings"),
@@ -56,7 +54,7 @@ fn render_ui(mut cmd: Commands, assets: Res<AssetServer>) {
                     },
                 })
                 .insert(tag)
-                .with_children(|mut parent| {
+                .with_children(|parent| {
                     parent.spawn_bundle(TextBundle {
                         text: Text::from_section(
                             text,
@@ -81,7 +79,7 @@ fn button_listener(
         match interaction {
             Interaction::Clicked => match button_tag {
                 ButtonTag::Play => {
-                    cmd.insert_resource(NextState(ScreenState::Ingame));
+                    cmd.insert_resource(NextState(ScreenState::LevelSelect));
                 },
                 ButtonTag::Settings => {},
                 ButtonTag::Quit => exit_writer.send(AppExit),

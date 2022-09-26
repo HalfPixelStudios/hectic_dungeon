@@ -1,8 +1,6 @@
-use std::time::Duration;
-
 use bevy::{prelude::*, time::Stopwatch};
 
-use crate::{assets::SpriteSheet, grid::to_world_coords};
+use crate::{constants::INGAME_UI_LAYER, grid::to_world_coords, spritesheet::SpriteSheet};
 
 // TODO this is simply a short lived sprite animation, should be replaced by general animation
 // system in future
@@ -90,7 +88,7 @@ fn spawn(
             },
             texture_atlas: asset_sheet.clone(),
             transform: Transform {
-                translation: to_world_coords(spawn_pos).extend(2.),
+                translation: to_world_coords(spawn_pos).extend(INGAME_UI_LAYER),
                 ..default()
             },
             ..default()
@@ -99,6 +97,6 @@ fn spawn(
     }
 }
 
-fn debug(mut writer: EventWriter<SpawnAttackAnimEvent>) {
+fn debug(_writer: EventWriter<SpawnAttackAnimEvent>) {
     // writer.send(SpawnAttackAnimEvent { frames: vec![128, 129, 130], animation_speed: 0.2, spawn_pos: IVec2::new(4, 4) });
 }

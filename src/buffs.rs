@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 
@@ -16,8 +14,8 @@ struct Modifier {
     var: String,
 }
 impl Modifier {
-    fn apply(&self, mut stats: ModifiedStats) -> ModifiedStats {
-        return stats;
+    fn apply(&self, stats: ModifiedStats) -> ModifiedStats {
+        stats
     }
 }
 #[derive(Clone, Copy)]
@@ -41,7 +39,7 @@ pub struct Stats {
 }
 impl Stats {
     pub fn apply_modifiers(self) -> ModifiedStats {
-        let mut m_stats = ModifiedStats {
+        let m_stats = ModifiedStats {
             health: self.health,
             armor: self.armor,
             speed: self.speed,
@@ -51,7 +49,7 @@ impl Stats {
         for modifier in self.modifiers {
             modifier.apply(m_stats);
         }
-        return m_stats;
+        m_stats
     }
 }
 fn tick_modifiers(time: Res<Time>, mut stat_query: Query<&mut Stats>) {

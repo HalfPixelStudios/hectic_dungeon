@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use bevy::prelude::*;
 use serde::Deserialize;
 
 pub const TILESHEET_WIDTH: u32 = 16;
@@ -7,7 +10,9 @@ pub const SPRITE_SIZE: u32 = 8;
 // beings
 #[derive(Deserialize, Clone, Copy)]
 pub enum SpriteIndex {
-    Player = sprite!(0, 3),
+    PlayerWarrior = sprite!(0, 3),
+    PlayerArcher = sprite!(1, 3),
+    OrcDagger = sprite!(1, 4),
     OrcSwordsman = sprite!(2, 4),
     OrcTwinblade = sprite!(3, 4),
 
@@ -16,10 +21,12 @@ pub enum SpriteIndex {
     Barrel = sprite!(0, 7),
 
     AttackIndicator = sprite!(0, 8),
-    // MoveIndicatorW = sprite!(4, 10),
-    // MoveIndicatorN = sprite!(5, 10),
-    // MoveIndicatorS = sprite!(6, 10),
-    // MoveIndicatorE = sprite!(7, 10),
+
+    MoveIndicatorW = sprite!(4, 10),
+    MoveIndicatorN = sprite!(5, 10),
+    MoveIndicatorS = sprite!(6, 10),
+    MoveIndicatorE = sprite!(7, 10),
+
     ItemSlotBg = sprite!(0, 11),
     WeaponSlot = sprite!(1, 11),
     ArmorSlot = sprite!(2, 11),
@@ -27,6 +34,8 @@ pub enum SpriteIndex {
 
     HeartFull = sprite!(0, 12),
     HeartEmpty = sprite!(0, 13),
+
+    WaterTile = sprite!(0, 14),
 }
 
 // ui
@@ -36,6 +45,7 @@ pub enum SpriteIndex {
 pub enum SpriteFrames {
     PlayerAttack,
     EnemyAttack,
+    SpikeTrap,
 }
 
 impl SpriteFrames {
@@ -43,6 +53,7 @@ impl SpriteFrames {
         match self {
             Self::PlayerAttack => vec![(0, 9), (1, 9), (2, 9), (3, 9)],
             Self::EnemyAttack => vec![(0, 10), (1, 10), (2, 10)],
+            Self::SpikeTrap => vec![(0, 13), (1, 13), (2, 13), (3, 13)],
         }
     }
 
@@ -60,3 +71,22 @@ macro_rules! sprite {
     };
 }
 pub(crate) use sprite;
+
+#[derive(Deref)]
+pub struct SpriteSheet(pub Handle<TextureAtlas>);
+
+pub fn load_assets(
+    mut cmd: Commands,
+    assets: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    let _data: HashMap<String, HandleUntyped> = HashMap::new();
+
+    let tilesheet_handle = texture_atlases.add(TextureAtlas::from_grid(
+        assets.load("tilesheet/bandit_hideout.png"),
+        Vec2::new(SPRITE_SIZE as f32, SPRITE_SIZE as f32),
+        TILESHEET_WIDTH as usize,
+        TILESHEET_HEIGHT as usize,
+    ));
+    cmd.insert_resource(SpriteSheet(tilesheet_handle));
+}

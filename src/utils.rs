@@ -81,46 +81,13 @@ pub fn cardinal_dirs() -> Vec<Dir> {
     vec![Dir::North, Dir::South, Dir::East, Dir::West]
 }
 
-pub fn variant_eq<T>(a: &T, b: &T) -> bool {
-    std::mem::discriminant(a) == std::mem::discriminant(b)
+/// Despawn all entities with a given tag component
+pub fn cleanup<C: Component>(mut cmd: Commands, query: Query<Entity, With<C>>) {
+    for entity in &query {
+        cmd.entity(entity).despawn_recursive();
+    }
 }
 
-macro_rules! ok_or_return {
-    ( $e:expr ) => {
-        match $e {
-            Ok(x) => x,
-            Err(_) => return,
-        }
-    };
+pub fn lerp(x: f32, y: f32, by: f32) -> f32 {
+    x * (1. - by) + y * by
 }
-pub(crate) use ok_or_return;
-
-macro_rules! ok_or_continue {
-    ( $e:expr ) => {
-        match $e {
-            Ok(x) => x,
-            Err(_) => continue,
-        }
-    };
-}
-pub(crate) use ok_or_continue;
-
-macro_rules! some_or_return {
-    ( $e:expr ) => {
-        match $e {
-            Some(x) => x,
-            None => return,
-        }
-    };
-}
-pub(crate) use some_or_return;
-
-macro_rules! some_or_continue {
-    ( $e:expr ) => {
-        match $e {
-            Some(x) => x,
-            None => continue,
-        }
-    };
-}
-pub(crate) use some_or_continue;

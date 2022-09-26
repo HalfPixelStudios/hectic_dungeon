@@ -1,30 +1,20 @@
-use bevy::{
-    animation::*, asset::AssetLoader, log::LogSettings, prelude::*, render::texture::ImageSettings,
-};
+use bevy::{prelude::*, render::texture::ImageSettings};
 use bevy_bobs::health_bar::HealthBarPlugin;
 use bevy_inspector_egui::WorldInspectorPlugin;
-use iyes_loopless::{prelude::AppLooplessStateExt, state::NextState};
+use iyes_loopless::state::NextState;
 
 use super::{
-    animation::AnimatePlugin,
-    assets::*,
-    camera::CameraPlugin,
-    enemy::{EnemyPlugin, SpawnEnemyEvent},
-    game::{GamePlugin, GameState},
-    grid::GridPlugin,
-    material::MaterialPlugin,
-    movement::MovementPlugin,
-    player::{PlayerMovedEvent, PlayerPlugin, SpawnPlayerEvent},
-    ui::UIPlugin,
+    camera::CameraPlugin, enemy::EnemyPlugin, game::GamePlugin, grid::GridPlugin,
+    material::MaterialPlugin, movement::MovementPlugin, player::PlayerPlugin,
+    spritesheet::load_assets, ui::UIPlugin,
 };
 use crate::{
-    ability::AbilityPlugin,
     ai::AIPlugin,
     attack::AttackPlugin,
     enviro::EnviroPlugin,
     item::ItemPlugin,
+    level::LevelPlugin,
     map::MapPlugin,
-    room::RoomPlugin,
     screens::{state::ScreenState, ScreensPlugin},
     weapon::WeaponPlugin,
 };
@@ -51,7 +41,7 @@ pub fn app(config: AppConfig) {
 
     app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(ImageSettings::default_nearest())
-        .insert_resource(Msaa { samples: 1 })
+        .insert_resource(Msaa { samples: 4 })
         .insert_resource(window_descriptor);
     // .insert_resource(LogSettings {
     //     level: bevy::log::Level::DEBUG,
@@ -60,15 +50,12 @@ pub fn app(config: AppConfig) {
 
     app.add_plugins(DefaultPlugins).add_plugin(HealthBarPlugin);
 
-    app.add_plugin(GamePlugin)
-        .add_plugin(ScreensPlugin)
+    app.add_plugin(ScreensPlugin)
+        .add_plugin(GamePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(AIPlugin)
-        .add_plugin(AbilityPlugin)
-        .add_plugin(AssetLoadPlugin)
         .add_plugin(PlayerPlugin)
-        .add_plugin(RoomPlugin)
-        // .add_plugin(AnimatePlugin)
+        .add_plugin(LevelPlugin)
         .add_plugin(AttackPlugin)
         .add_plugin(ItemPlugin)
         .add_plugin(UIPlugin)
@@ -85,6 +72,8 @@ pub fn app(config: AppConfig) {
     }
 
     app.insert_resource(NextState(config.start_state));
+
+    app.add_startup_system(load_assets);
 
     app.run();
 }

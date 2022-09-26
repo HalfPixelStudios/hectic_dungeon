@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_bobs::prefab::PrefabLib;
 use serde::Deserialize;
 
-use crate::spritesheet_constants::SpriteIndex;
+use crate::spritesheet::SpriteIndex;
 
 #[derive(Deserialize)]
 pub struct EnemyPrefab {
@@ -28,6 +28,13 @@ impl Plugin for PrefabPlugin {
 
 const RON_STRING: &str = r#"
 {
+    "orc_dagger": (
+        health: 3,
+        ai: Simple ( attack_range: 2. ),
+        weapon_id: "steel_dagger",
+        sprite_index: OrcDagger,
+        drops: []
+    ),
     "orc_swordsman": (
         health: 3,
         ai: Simple ( attack_range: 3. ),

@@ -1,14 +1,9 @@
 use bevy::prelude::*;
 use iyes_loopless::prelude::ConditionSet;
+use pino_utils::{cmp::variant_eq, ok_or_continue};
 use serde::Deserialize;
 
-use crate::{
-    enemy::DamageEnemyEvent,
-    grid::{CellType, Grid},
-    player::DamagePlayerEvent,
-    screens::state::ScreenState,
-    utils::{ok_or_continue, variant_eq, Dir},
-};
+use crate::prelude::*;
 
 #[derive(Deserialize, Clone, Copy)]
 pub enum AttackPattern {
@@ -18,6 +13,8 @@ pub enum AttackPattern {
     StraightSix,
     Hammer,
     TwinBlade,
+    PointThree,
+    Around,
 }
 
 impl AttackPattern {
@@ -42,6 +39,17 @@ impl AttackPattern {
                 IVec2::new(1, 1),
                 IVec2::new(2, 2),
             ],
+            AttackPattern::PointThree => vec![IVec2::new(0, 3)],
+            AttackPattern::Around => vec![
+                IVec2::new(1, 0),
+                IVec2::new(1, 1),
+                IVec2::new(0, 1),
+                IVec2::new(-1, 1),
+                IVec2::new(-1, 0),
+                IVec2::new(-1, -1),
+                IVec2::new(0, -1),
+                IVec2::new(1, -1),
+            ],
         }
     }
 }
@@ -62,7 +70,7 @@ pub struct AttackEvent {
     pub cell_type: CellType,
 }
 
-pub struct AttackPlugin;
+pub(super) struct AttackPlugin;
 
 impl Plugin for AttackPlugin {
     fn build(&self, app: &mut App) {

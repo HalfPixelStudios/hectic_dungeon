@@ -40,7 +40,7 @@ fn spawn(
 ) {
     let font = asset_server.load("fonts/arcadeclassic.ttf");
 
-    for (entity, FloatingText { text, offset }, children) in &query {
+    for (entity, FloatingText { text, offset }, _children) in &query {
         let id = cmd.spawn().id();
 
         cmd.entity(id).insert_bundle(Text2dBundle {

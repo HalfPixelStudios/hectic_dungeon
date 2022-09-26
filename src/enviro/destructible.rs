@@ -1,14 +1,9 @@
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
 use bevy_ecs_ldtk::EntityInstance;
+use iyes_loopless::prelude::*;
 
-use crate::{
-    assets::SpriteSheet,
-    constants::BEING_LAYER,
-    grid::{to_world_coords, CellType, GridEntity},
-    map::ldtk_to_bevy,
-    spritesheet_constants::SpriteIndex,
-};
+use crate::prelude::*;
 
 #[derive(Component)]
 pub struct Destructible;
@@ -17,7 +12,8 @@ pub struct DestructiblePlugin;
 
 impl Plugin for DestructiblePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_from_ldtk);
+        app.add_system(spawn_from_ldtk)
+            .add_exit_system(ScreenState::Ingame, cleanup::<Destructible>);
     }
 }
 
@@ -27,7 +23,7 @@ fn spawn_from_ldtk(
     asset_sheet: Res<SpriteSheet>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "Destructible") {
-        if let Some(field) = entity_instance
+        if let Some(_field) = entity_instance
             .field_instances
             .iter()
             .find(|field| field.identifier == "id")

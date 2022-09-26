@@ -1,12 +1,6 @@
 pub mod pathfinding;
 pub mod prefab;
 
-use std::{
-    cmp::Reverse,
-    collections::{HashMap, HashSet},
-    sync,
-};
-
 use bevy::prelude::*;
 use bevy_bobs::{
     component::health::Health,
@@ -14,27 +8,16 @@ use bevy_bobs::{
     prefab::{PrefabId, PrefabLib},
 };
 use bevy_ecs_ldtk::{prelude::FieldValue, EntityInstance};
-use big_brain::{prelude::FirstToScore, thinker::Thinker, BigBrainPlugin};
+use big_brain::{prelude::FirstToScore, thinker::Thinker};
 use iyes_loopless::prelude::*;
+use pino_utils::some_or_continue;
 
 use self::prefab::{EnemyPrefab, PrefabPlugin, AI};
 use crate::{
     ai::simple_ai::{AttackAction, AttackRangeScorer, MoveAction},
-    animation::Animation,
-    assets::{BeingPrefab, PrefabData, SpriteSheet},
-    attack::{AttackEvent, AttackPattern},
-    constants::{BEING_LAYER, INGAME_UI_LAYER},
     enviro::dropped_item::SpawnDroppedItemEvent,
-    game::GameState,
-    grid::{to_world_coords, CellType, Grid, GridEntity},
-    map::ldtk_to_bevy,
-    movement::Movement,
-    player::Player,
-    screens::state::ScreenState,
-    spritesheet_constants::SpriteIndex,
-    ui::{attack_animation::SpawnAttackAnimEvent, attack_indicator::AttackIndicator},
-    utils::{some_or_continue, Dir},
-    weapon::CurrentWeapon,
+    prelude::*,
+    ui::attack_indicator::AttackIndicator,
 };
 
 #[derive(Component)]
@@ -57,16 +40,18 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(PrefabPlugin)
             .add_event::<SpawnEnemyEvent>()
-            .add_event::<DamageEnemyEvent>()
-            .add_system_set(
-                ConditionSet::new()
-                    .run_in_state(ScreenState::Ingame)
-                    .with_system(spawn)
-                    .with_system(take_damage)
-                    .with_system(sync_health_bars)
-                    .with_system(spawn_from_ldtk)
-                    .into(),
-            );
+            .add_event::<DamageEnemyEvent>();
+
+        app.add_system_set(
+            ConditionSet::new()
+                .run_in_state(ScreenState::Ingame)
+                .with_system(spawn)
+                .with_system(take_damage)
+                .with_system(sync_health_bars)
+                .with_system(spawn_from_ldtk)
+                .into(),
+        )
+        .add_exit_system(ScreenState::Ingame, cleanup::<Enemy>);
     }
 }
 
@@ -75,6 +60,7 @@ fn spawn(
     mut events: EventReader<SpawnEnemyEvent>,
     asset_sheet: Res<SpriteSheet>,
     prefab_lib: Res<PrefabLib<EnemyPrefab>>,
+    mut room_state: ResMut<Level>,
 ) {
     for SpawnEnemyEvent {
         spawn_pos,
@@ -133,6 +119,8 @@ fn spawn(
             },
         );
         cmd.entity(id).push_children(&[hp_bar]);
+
+        room_state.register_enemy(id);
     }
 }
 
@@ -141,6 +129,7 @@ fn take_damage(
     mut events: EventReader<DamageEnemyEvent>,
     mut query: Query<(&mut Health, Option<&DropTable>, &GridEntity)>,
     mut writer: EventWriter<SpawnDroppedItemEvent>,
+    mut room_state: ResMut<Level>,
 ) {
     for DamageEnemyEvent { entity } in events.iter() {
         let (mut health, droptable, grid_entity) = query.get_mut(*entity).unwrap();
@@ -148,6 +137,7 @@ fn take_damage(
         health.take(1);
         if health.is_zero() {
             cmd.entity(*entity).despawn_recursive();
+            room_state.deregister_enemy(*entity);
 
             // select item to drop
             if let Some(droptable) = droptable {
@@ -175,6 +165,7 @@ fn sync_health_bars(query: Query<(&Health, &Children)>, mut hp_bar_query: Query<
 fn spawn_from_ldtk(
     query: Query<&EntityInstance, Added<EntityInstance>>,
     mut writer: EventWriter<SpawnEnemyEvent>,
+    _room: ResMut<Level>,
 ) {
     for entity_instance in query.iter().filter(|e| e.identifier == "EnemySpawn") {
         // TODO handle not found

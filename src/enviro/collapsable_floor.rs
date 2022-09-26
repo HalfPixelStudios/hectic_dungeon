@@ -1,15 +1,9 @@
 use bevy::prelude::*;
 use bevy_bobs::component::health::Health;
-use bevy_ecs_ldtk::{EntityInstance, GridCoords, TileMetadata};
+use bevy_ecs_ldtk::EntityInstance;
 use iyes_loopless::prelude::*;
 
-use crate::{
-    assets::SpriteSheet,
-    constants::BEING_LAYER,
-    game::GameState,
-    grid::{to_world_coords, CellType, Grid, GridEntity},
-    map::{ldtk_to_bevy, CollisionMap},
-};
+use crate::prelude::*;
 
 const FLOOR_HEALTH: u32 = 2;
 
@@ -33,7 +27,8 @@ impl Plugin for CollapsableFloorPlugin {
         app.add_system(update)
             .add_system(spawn_from_ldtk)
             .add_exit_system(GameState::PlayerInput, detect_step_on)
-            .add_system(despawn);
+            .add_system(despawn)
+            .add_exit_system(ScreenState::Ingame, cleanup::<CollapsableFloor>);
     }
 }
 

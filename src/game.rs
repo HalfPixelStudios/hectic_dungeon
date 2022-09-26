@@ -4,12 +4,15 @@ use iyes_loopless::{
     state::{CurrentState, NextState},
 };
 
-use crate::{player::PlayerMovedEvent, screens::state::ScreenState};
+use crate::prelude::*;
 
-const PLAYER_INPUT_TIME_LIMIT: f32 = 1.2;
+const PLAYER_INPUT_TIME_LIMIT: f32 = 30.;
 const PLAYER_ANIM_TIME_LIMIT: f32 = 0.1;
 const ENEMY_INPUT_TIME_LIMIT: f32 = 0.3;
 const ENEMY_ANIM_TIME_LIMIT: f32 = 0.1;
+const WORLD_UPDATE_TIME_LIMIT: f32 = 0.5;
+
+const START_STATE: GameState = GameState::PlayerInput;
 
 /// Four phases of the game loop
 ///
@@ -17,6 +20,7 @@ const ENEMY_ANIM_TIME_LIMIT: f32 = 0.1;
 /// - `PlayerAnimation` is a short period allocated to playing animations like moving and attacking
 /// - `EnemyInput` is for enemies to compute or carry out their next move and attacks
 /// - `EnemyAnimation` similar to `PlayerAnimation` phase
+/// - `WorldUpdate` is for updates that are not related to either the player or enemy
 ///
 /// Can hook into each of these phases by adding your system to on_enter or on_update
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,6 +29,14 @@ pub enum GameState {
     PlayerAnimation,
     EnemyInput,
     EnemyAnimation,
+    WorldUpdate,
+}
+
+/// Resource that is used to pause and unpause the game
+pub struct PauseGame(pub bool);
+
+fn is_paused(paused: Res<PauseGame>) -> bool {
+    paused.0
 }
 
 impl GameState {
@@ -34,6 +46,7 @@ impl GameState {
             GameState::PlayerAnimation => PLAYER_ANIM_TIME_LIMIT,
             GameState::EnemyInput => ENEMY_INPUT_TIME_LIMIT,
             GameState::EnemyAnimation => ENEMY_ANIM_TIME_LIMIT,
+            GameState::WorldUpdate => WORLD_UPDATE_TIME_LIMIT,
         }
     }
 
@@ -42,16 +55,17 @@ impl GameState {
             GameState::PlayerInput => GameState::PlayerAnimation,
             GameState::PlayerAnimation => GameState::EnemyInput,
             GameState::EnemyInput => GameState::EnemyAnimation,
-            GameState::EnemyAnimation => GameState::PlayerInput,
+            GameState::EnemyAnimation => GameState::WorldUpdate,
+            GameState::WorldUpdate => GameState::PlayerInput,
         }
     }
 }
 
 #[derive(Deref, DerefMut, Default)]
-pub struct StateTimer(pub Stopwatch);
+struct StateTimer(pub Stopwatch);
 
 /// Advance the game state based on defined time limits
-pub fn game_loop(
+fn game_loop(
     mut cmd: Commands,
     time: Res<Time>,
     mut state_timer: ResMut<StateTimer>,
@@ -68,7 +82,7 @@ pub fn game_loop(
 }
 
 /// End player input stage early if player sends input
-pub fn end_player_input(
+fn end_player_input(
     mut cmd: Commands,
     mut state_timer: ResMut<StateTimer>,
     state: Res<CurrentState<GameState>>,
@@ -77,16 +91,24 @@ pub fn end_player_input(
     state_timer.reset();
 }
 
-pub struct GamePlugin;
+// TODO need to reset game state back to start state
+fn reset(mut cmd: Commands, mut state_timer: ResMut<StateTimer>) {
+    state_timer.reset();
+    cmd.insert_resource(NextState(START_STATE));
+}
+
+pub(super) struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_loopless_state(GameState::PlayerInput)
+        app.add_loopless_state(START_STATE)
             .insert_resource(StateTimer::default())
+            .insert_resource(PauseGame(false))
+            .add_enter_system(ScreenState::Ingame, reset)
             .add_system_set(
                 ConditionSet::new()
                     .run_in_state(ScreenState::Ingame)
-                    .with_system(game_loop)
+                    .with_system(game_loop.run_if_not(is_paused))
                     .with_system(
                         end_player_input
                             .run_in_state(GameState::PlayerInput)
